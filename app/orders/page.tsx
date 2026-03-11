@@ -69,36 +69,41 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8 md:py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Tra cứu đơn hàng</h1>
+        {/* Header */}
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Tra cứu đơn hàng</h1>
+          <p className="text-gray-600">Nhập mã đơn hàng để xem tình trạng giao hàng</p>
+        </div>
 
         {/* Search Form */}
-        <Card className="mb-8">
-          <CardContent className="pt-6">
+        <Card className="mb-8 border-0 shadow-lg">
+          <CardContent className="pt-8 pb-8">
             <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1 relative">
+                <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-4" />
                 <input
                   type="text"
-                  placeholder="Nhập mã đơn hàng (VD: 1234567890)"
+                  placeholder="Nhập mã đơn hàng của bạn"
                   value={orderId}
                   onChange={(e) => setOrderId(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-amber-700"
+                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 pl-11 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-base"
                 />
-                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
               </div>
               <Button 
                 type="submit"
                 disabled={loading}
-                className="bg-amber-700 hover:bg-amber-800 h-12"
+                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 h-12 text-white font-medium px-6 sm:px-8 sm:w-auto"
               >
-                {loading ? 'Đang tìm kiếm...' : 'Tìm kiếm'}
+                {loading ? 'Đang tìm...' : 'Tìm kiếm'}
               </Button>
             </form>
 
             {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                {error}
+              <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                <p className="text-red-800 font-medium">Không tìm thấy đơn hàng</p>
+                <p className="text-red-600 text-sm mt-1">Vui lòng kiểm tra lại mã đơn hàng</p>
               </div>
             )}
           </CardContent>
@@ -108,16 +113,16 @@ export default function OrdersPage() {
         {order && (
           <div className="space-y-6">
             {/* Order Header */}
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50">
+              <CardHeader className="pb-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
-                    <CardTitle>Đơn hàng #{order.id}</CardTitle>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <CardTitle className="text-2xl md:text-3xl">Đơn hàng #{order.id}</CardTitle>
+                    <p className="text-sm text-gray-600 mt-3 font-mono bg-gray-100 px-3 py-1.5 rounded w-fit">
                       {new Date(order.createdAt).toLocaleString('vi-VN')}
                     </p>
                   </div>
-                  <div className={`px-4 py-2 rounded-lg font-semibold ${getStatusColor(order.status)}`}>
+                  <div className={`px-4 py-2.5 rounded-lg font-bold text-sm inline-block ${getStatusColor(order.status)}`}>
                     {getStatusText(order.status)}
                   </div>
                 </div>
@@ -239,40 +244,50 @@ export default function OrdersPage() {
             </div>
 
             {/* Order Items */}
-            <Card>
+            <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle>Chi tiết sản phẩm</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {order.items.map((item: any, idx: number) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                      <div>
+                    <div key={idx} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+                      <div className="flex-1">
                         <p className="font-semibold text-gray-900">{item.name}</p>
-                        <p className="text-sm text-gray-600">Số lượng: {item.quantity}</p>
+                        <p className="text-sm text-gray-600 mt-1">Số lượng: <span className="font-medium text-gray-900">{item.quantity}</span></p>
                       </div>
-                      <p className="font-semibold text-amber-700">
-                        {(item.price * item.quantity).toLocaleString('vi-VN')} đ
-                      </p>
+                      <div className="text-right">
+                        <p className="font-bold text-violet-600 text-lg">
+                          {(item.price * item.quantity).toLocaleString('vi-VN')} đ
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {(item.price / 1000).toFixed(0)}K × {item.quantity}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="border-t border-gray-200 mt-4 pt-4">
-                  <div className="flex justify-between items-center text-lg">
-                    <span className="font-bold text-gray-900">Tổng cộng:</span>
-                    <span className="font-bold text-amber-700 text-xl">
-                      {order.total.toLocaleString('vi-VN')} đ
-                    </span>
+                <div className="border-t-2 border-gray-200 mt-6 pt-6 bg-gradient-to-r from-violet-50 to-indigo-50 -mx-6 px-6 py-4 rounded-b-lg">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-lg text-gray-900">Tổng cộng:</span>
+                    <div className="text-right">
+                      <span className="font-bold text-violet-600 text-2xl block">
+                        {(order.total / 1000).toFixed(0)}K đ
+                      </span>
+                      <span className="text-xs text-gray-600 mt-1">
+                        {order.total.toLocaleString('vi-VN')} đ
+                      </span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Back Button */}
-            <div className="flex gap-3">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Link href="/products" className="flex-1">
-                <Button className="w-full bg-amber-700 hover:bg-amber-800">
+                <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium h-11">
                   Tiếp tục mua sắm
                 </Button>
               </Link>
@@ -282,7 +297,7 @@ export default function OrdersPage() {
                   setOrder(null)
                   setOrderId('')
                 }}
-                className="flex-1"
+                className="flex-1 border-violet-300 text-violet-600 hover:bg-violet-50 h-11 font-medium"
               >
                 Tìm kiếm đơn hàng khác
               </Button>
@@ -291,11 +306,12 @@ export default function OrdersPage() {
         )}
 
         {!order && !error && (
-          <Card>
-            <CardContent className="pt-12 pb-12 text-center">
-              <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">
-                Nhập mã đơn hàng để tra cứu thông tin giao hàng
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-gray-50 to-white">
+            <CardContent className="pt-16 pb-16 text-center">
+              <div className="text-6xl mb-4">📦</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Nhập mã đơn hàng</h3>
+              <p className="text-gray-600">
+                Bạn có thể tìm thấy mã đơn hàng trong email xác nhận hoặc tin nhắn từ Gia Vị Việt
               </p>
             </CardContent>
           </Card>
