@@ -1,194 +1,313 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Star, Truck, Shield, Award } from 'lucide-react'
+import { ArrowRight, Leaf, Truck, Shield, Clock, Award, MapPin, Phone, Mail } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 
 export default function HomePage() {
+  const [mounted, setMounted] = useState(false)
+  const [email, setEmail] = useState('')
+  const [subscribing, setSubscribing] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!email.trim()) {
+      toast.error('Vui lòng nhập email của bạn')
+      return
+    }
+
+    setSubscribing(true)
+    try {
+      await new Promise(resolve => setTimeout(resolve, 800))
+      toast.success('Cảm ơn! Bạn đã đăng ký thành công.')
+      setEmail('')
+    } catch (error) {
+      toast.error('Có lỗi xảy ra. Vui lòng thử lại.')
+    } finally {
+      setSubscribing(false)
+    }
+  }
+
+  if (!mounted) return null
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-hidden">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-amber-700 to-amber-800 text-white py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Gia Vị Việt - Hương vị Việt Nam Nguyên Chất
-            </h1>
-            <p className="text-lg text-amber-50 mb-8">
-              Khám phá bộ sưu tập gia vị chất lượng cao từ Việt Nam. Từ tiêu đen hạt đến saffron cao cấp, 
-              tất cả những gì bạn cần để nấu những món ăn tuyệt vời.
-            </p>
-            <Link href="/products">
-              <Button size="lg" className="bg-white text-amber-700 hover:bg-amber-50 font-bold">
-                Khám phá sản phẩm
-              </Button>
-            </Link>
-          </div>
-          <div className="relative h-96 bg-amber-600 rounded-lg overflow-hidden">
-            <Image
-              src="/images/hero-banner.jpg"
-              alt="Gia vị Việt"
-              fill
-              className="object-cover"
-              onError={(e) => {
-                e.currentTarget.src = '/images/placeholder.png'
-              }}
-            />
+      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-indigo-50 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-violet-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+        <div className="absolute -bottom-8 right-10 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-40 right-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '4s' }}></div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
+          <div className="animate-slideUp space-y-8">
+            <div>
+              <div className="inline-block px-4 py-2 bg-violet-100 text-violet-700 rounded-full text-sm font-bold mb-6 animate-fadeIn">
+                Khám phá gia vị chất lượng cao
+              </div>
+              <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600">
+                  Gia Vị Việt
+                </span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-700 mb-4 max-w-3xl mx-auto leading-relaxed">
+                Mang hương vị truyền thống Việt Nam vào bếp nhà bạn. Gia vị nguyên chất, chất lượng cao được lựa chọn kỹ lưỡng.
+              </p>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Từ các bếp ăn chuyên nghiệp đến những gia đình yêu nấu ăn, chúng tôi phục vụ với tâm huyết.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Link href="/products" className="group">
+                <Button size="lg" className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-lg h-14 px-8 group-hover:scale-105 transition-transform duration-300">
+                  Khám phá sản phẩm
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/contact">
+                <Button size="lg" variant="outline" className="border-2 border-violet-600 text-violet-600 hover:bg-violet-50 text-lg h-14 px-8">
+                  Liên hệ chúng tôi
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Tại sao chọn Gia Vị Việt?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <Card className="border-0 shadow-md">
-              <CardContent className="pt-6 text-center">
-                <Award className="w-12 h-12 text-amber-700 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Chất lượng cao</h3>
-                <p className="text-gray-600 text-sm">
-                  Tất cả sản phẩm được chọn lọc kỹ lưỡng để đảm bảo chất lượng tốt nhất
-                </p>
-              </CardContent>
-            </Card>
+          <div className="text-center mb-16 animate-slideUp">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Tại sao chọn Gia Vị Việt?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Chúng tôi cam kết cung cấp những sản phẩm tốt nhất với dịch vụ xuất sắc
+            </p>
+          </div>
 
-            <Card className="border-0 shadow-md">
-              <CardContent className="pt-6 text-center">
-                <Truck className="w-12 h-12 text-amber-700 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Giao hàng nhanh</h3>
-                <p className="text-gray-600 text-sm">
-                  Giao hàng nhanh chóng đến tận nơi với chi phí hợp lý
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-md">
-              <CardContent className="pt-6 text-center">
-                <Shield className="w-12 h-12 text-amber-700 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Bảo đảm an toàn</h3>
-                <p className="text-gray-600 text-sm">
-                  Tất cả sản phẩm đều qua kiểm định chất lượng nghiêm ngặt
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-md">
-              <CardContent className="pt-6 text-center">
-                <Star className="w-12 h-12 text-amber-700 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Giá cạnh tranh</h3>
-                <p className="text-gray-600 text-sm">
-                  Mua trực tiếp từ nhà sản xuất với giá tốt nhất
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Leaf,
+                title: 'Gia vị 100% nguyên chất',
+                description: 'Không có chất phụ gia, không pha trộn. Từ thiên nhiên, đến bàn ăn của bạn.'
+              },
+              {
+                icon: Truck,
+                title: 'Giao hàng nhanh chóng',
+                description: 'Vận chuyển an toàn đến khắp cả nước trong 3-5 ngày làm việc.'
+              },
+              {
+                icon: Shield,
+                title: 'Chất lượng đảm bảo',
+                description: 'Kiểm tra kỹ lưỡng, đóng gói cẩn thận, bảo quản tối ưu.'
+              },
+              {
+                icon: Clock,
+                title: 'Hỗ trợ 24/7',
+                description: 'Đội tế nhân viên sẵn sàng giúp đỡ bạn bất cứ lúc nào.'
+              },
+              {
+                icon: Award,
+                title: 'Giá cạnh tranh',
+                description: 'Chất lượng cao mà giá không tăng. Mua trực tiếp từ nhà sản xuất.'
+              },
+              {
+                icon: Phone,
+                title: 'Tin tưởng của khách hàng',
+                description: 'Hàng ngàn khách hàng hài lòng đã chọn tin tưởng chúng tôi.'
+              }
+            ].map((feature, index) => {
+              const Icon = feature.icon
+              return (
+                <div
+                  key={index}
+                  className="animate-slideUp group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-violet-300 hover:scale-105"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="w-14 h-14 bg-gradient-to-br from-violet-100 to-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-gradient-to-br group-hover:from-violet-500 group-hover:to-indigo-500 transition-all duration-300">
+                    <Icon className="w-7 h-7 text-violet-600 group-hover:text-white transition-colors" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
 
-      {/* Products Preview */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      {/* Stats Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Sản phẩm nổi bật</h2>
-            <Link href="/products">
-              <Button variant="outline" className="border-amber-700 text-amber-700 hover:bg-amber-50">
-                Xem tất cả
-              </Button>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             {[
-              { name: 'Tiêu Đen Hạt', price: '45,000 đ', image: '/images/pepper-black.jpg' },
-              { name: 'Saffron Cao Cấp', price: '120,000 đ', image: '/images/saffron.jpg' },
-              { name: 'Dâu Tằm Hạt', price: '75,000 đ', image: '/images/cardamom.jpg' },
-              { name: 'Dầu Mầm Mè', price: '125,000 đ', image: '/images/sesame-oil.jpg' },
-            ].map((product) => (
-              <Card key={product.name} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-0">
-                  <div className="relative h-48 w-full bg-gray-200 overflow-hidden rounded-t-lg">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform"
-                      onError={(e) => {
-                        e.currentTarget.src = '/images/placeholder.png'
-                      }}
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>
-                    <p className="text-lg font-bold text-amber-700 mb-3">{product.price}</p>
-                    <Link href="/products">
-                      <Button size="sm" className="w-full bg-amber-700 hover:bg-amber-800">
-                        Xem chi tiết
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+              { number: '1000+', label: 'Khách hàng hài lòng' },
+              { number: '500+', label: 'Sản phẩm chất lượng' },
+              { number: '5000+', label: 'Đơn hàng thành công' },
+              { number: '98%', label: 'Tỉ lệ hài lòng' }
+            ].map((stat, index) => (
+              <div key={index} className="animate-slideUp" style={{ animationDelay: `${index * 100}ms` }}>
+                <p className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</p>
+                <p className="text-violet-100 text-lg">{stat.label}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="bg-amber-700 text-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Nhận tin tức khuyến mãi</h2>
-          <p className="mb-6 text-amber-50">
-            Đăng ký nhận bản tin của chúng tôi để cập nhật những sản phẩm mới và khuyến mãi đặc biệt
+      {/* CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-4xl mx-auto text-center animate-slideUp">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Bạn sẵn sàng nấu ăn ngon hơn?
+          </h2>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Khám phá bộ sưu tập gia vị cao cấp của chúng tôi ngay hôm nay và biến mỗi bữa ăn thành một kiệt tác.
           </p>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/products" className="group">
+              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-lg h-14 px-8 w-full sm:w-auto group-hover:scale-105 transition-transform duration-300">
+                Mua ngay
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link href="/contact">
+              <Button size="lg" variant="outline" className="border-2 border-violet-600 text-violet-600 hover:bg-violet-50 text-lg h-14 px-8 w-full sm:w-auto">
+                Gọi tư vấn
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-violet-50 to-indigo-50 border-y border-gray-200">
+        <div className="max-w-2xl mx-auto text-center animate-slideUp">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Nhận tin tức khuyến mãi
+          </h2>
+          <p className="text-gray-600 mb-8">
+            Đăng ký để nhận thông tin về sản phẩm mới, khuyến mãi đặc biệt và mẹo nấu ăn từ đội của chúng tôi
+          </p>
+          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
             <input
               type="email"
               placeholder="Nhập email của bạn"
-              className="flex-1 px-4 py-2 rounded-md text-gray-900"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-violet-600 transition-colors"
+              disabled={subscribing}
             />
-            <Button className="bg-white text-amber-700 hover:bg-amber-50 font-semibold">
-              Đăng ký
+            <Button 
+              type="submit"
+              disabled={subscribing}
+              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold h-12 px-6 whitespace-nowrap"
+            >
+              {subscribing ? 'Đang gửi...' : 'Đăng ký'}
             </Button>
+          </form>
+        </div>
+      </section>
+
+      {/* Contact Info Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Phone,
+                title: 'Gọi cho chúng tôi',
+                content: '+84 (123) 456 789',
+                subtext: 'Thứ 2-7, 8:00-18:00'
+              },
+              {
+                icon: Mail,
+                title: 'Email',
+                content: 'info@giaviviet.com',
+                subtext: 'Hỗ trợ 24/7'
+              },
+              {
+                icon: MapPin,
+                title: 'Địa chỉ',
+                content: '123 Trần Hưng Đạo',
+                subtext: 'Hà Nội, Việt Nam'
+              }
+            ].map((info, index) => {
+              const Icon = info.icon
+              return (
+                <div
+                  key={index}
+                  className="animate-slideUp text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">{info.title}</h3>
+                  <p className="font-semibold text-violet-600 mb-1">{info.content}</p>
+                  <p className="text-sm text-gray-600">{info.subtext}</p>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12 px-4 sm:px-6 lg:px-8">
+      <footer className="bg-gray-900 text-gray-400 py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-white font-bold mb-4">Gia Vị Việt</h3>
-            <p className="text-sm">Cung cấp gia vị chất lượng cao cho các gia đình Việt Nam</p>
+            <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">GV</span>
+              </div>
+              Gia Vị Việt
+            </h3>
+            <p className="text-sm text-gray-500">
+              Cung cấp gia vị chất lượng cao cho các gia đình và bếp ăn chuyên nghiệp
+            </p>
           </div>
           <div>
             <h3 className="text-white font-bold mb-4">Liên kết nhanh</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/products" className="hover:text-white">Sản phẩm</Link></li>
-              <li><Link href="/contact" className="hover:text-white">Liên hệ</Link></li>
-              <li><Link href="/admin" className="hover:text-white">Quản lý</Link></li>
+              <li><Link href="/products" className="hover:text-white transition-colors">Sản phẩm</Link></li>
+              <li><Link href="/orders" className="hover:text-white transition-colors">Tra cứu đơn</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">Liên hệ</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="text-white font-bold mb-4">Chính sách</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-white">Về chúng tôi</a></li>
-              <li><a href="#" className="hover:text-white">Điều khoản dịch vụ</a></li>
-              <li><a href="#" className="hover:text-white">Chính sách bảo mật</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Về chúng tôi</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Điều khoản dịch vụ</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Chính sách bảo mật</a></li>
             </ul>
           </div>
           <div>
-            <h3 className="text-white font-bold mb-4">Liên hệ</h3>
+            <h3 className="text-white font-bold mb-4">Theo dõi chúng tôi</h3>
             <ul className="space-y-2 text-sm">
-              <li>Điện thoại: +84 123 456 789</li>
-              <li>Email: info@giaviviet.com</li>
-              <li>Địa chỉ: 123 Trần Hưng Đạo, Hà Nội</li>
+              <li><a href="#" className="hover:text-white transition-colors">Facebook</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">TikTok</a></li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-700 pt-8 text-center text-sm">
+        <div className="border-t border-gray-800 pt-8 text-center text-sm">
           <p>&copy; 2024 Gia Vị Việt. Tất cả quyền được bảo vệ.</p>
         </div>
       </footer>

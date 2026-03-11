@@ -5,10 +5,12 @@ import { useCart } from '@/app/context/CartContext'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, Menu, X, Package } from 'lucide-react'
 import { useState } from 'react'
+import { OrderModal } from './OrderModal'
 
 export function Header() {
   const { items } = useCart()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [orderModalOpen, setOrderModalOpen] = useState(false)
   const cartCount = items.length
 
   return (
@@ -27,14 +29,17 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-1">
+          <nav className="hidden md:flex space-x-1 items-center">
             <Link href="/products" className="px-4 py-2 text-gray-700 hover:text-violet-600 font-medium text-sm transition-colors rounded-lg hover:bg-violet-50">
               Sản phẩm
             </Link>
-            <Link href="/orders" className="px-4 py-2 text-gray-700 hover:text-violet-600 font-medium text-sm transition-colors rounded-lg hover:bg-violet-50 flex items-center gap-1">
+            <button 
+              onClick={() => setOrderModalOpen(true)}
+              className="px-4 py-2 text-gray-700 hover:text-violet-600 font-medium text-sm transition-colors rounded-lg hover:bg-violet-50 flex items-center gap-1"
+            >
               <Package className="w-4 h-4" />
-              Tra cứu đơn
-            </Link>
+              Đơn hàng của tôi
+            </button>
             <Link href="/contact" className="px-4 py-2 text-gray-700 hover:text-violet-600 font-medium text-sm transition-colors rounded-lg hover:bg-violet-50">
               Liên hệ
             </Link>
@@ -74,14 +79,16 @@ export function Header() {
             >
               Sản phẩm
             </Link>
-            <Link
-              href="/orders"
-              className="block px-4 py-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors font-medium flex items-center gap-2"
-              onClick={() => setMobileMenuOpen(false)}
+            <button
+              onClick={() => {
+                setOrderModalOpen(true)
+                setMobileMenuOpen(false)
+              }}
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors font-medium flex items-center gap-2"
             >
               <Package className="w-4 h-4" />
-              Tra cứu đơn
-            </Link>
+              Đơn hàng của tôi
+            </button>
             <Link
               href="/contact"
               className="block px-4 py-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors font-medium"
@@ -91,6 +98,8 @@ export function Header() {
             </Link>
           </nav>
         )}
+
+        <OrderModal open={orderModalOpen} onOpenChange={setOrderModalOpen} />
       </div>
     </header>
   )
