@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ShoppingCart, Minus, Plus, Truck, RotateCcw, Shield } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 interface Product {
   id: number
@@ -74,6 +75,11 @@ export default function ProductDetailPage() {
         image: product.image,
       })
 
+      toast.success(`Đã thêm ${quantity} ${product.name} vào giỏ hàng!`, {
+        description: `Tổng: ${(product.price * quantity).toLocaleString('vi-VN')} đ`,
+        duration: 2000,
+      })
+
       setAddedToCart(true)
       setTimeout(() => setAddedToCart(false), 2000)
     }
@@ -109,49 +115,49 @@ export default function ProductDetailPage() {
   }
 
   return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
           {/* Breadcrumb */}
-          <div className="mb-6">
-            <Link href="/products" className="text-amber-700 hover:text-amber-800">
+          <div className="mb-6 animate-slideUp">
+            <Link href="/products" className="text-violet-600 hover:text-violet-700 font-medium">
               Sản phẩm
             </Link>
-            <span className="text-gray-500 mx-2">/</span>
+            <span className="text-gray-400 mx-2">/</span>
             <span className="text-gray-900">{product.name}</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
             {/* Product Image */}
-            <Card>
+            <Card className="animate-slideInLeft shadow-lg">
               <CardContent className="p-0">
-                <div className="relative h-96 w-full bg-gray-200">
+                <div className="relative h-96 w-full bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden rounded-t-lg">
                   <Image
                       src={product.image}
                       alt={product.name}
                       fill
-                      className="object-cover"
+                      className="object-cover hover:scale-110 transition-transform duration-500"
                   />
                 </div>
               </CardContent>
             </Card>
 
             {/* Product Info */}
-            <div>
+            <div className="animate-slideInRight">
               <div className="mb-6">
-                <p className="text-amber-700 font-semibold mb-2">
+                <p className="text-violet-600 font-bold text-sm uppercase tracking-wide mb-2">
                   {product.category === 'spices' && 'Gia vị'}
                   {product.category === 'condiments' && 'Gia vị nêm'}
                   {product.category === 'oils' && 'Dầu'}
                 </p>
 
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">
                   {product.name}
                 </h1>
 
-                <p className="text-2xl font-bold text-amber-700 mb-6">
-                  {product.price.toLocaleString('vi-VN')} đ
+                <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 mb-6">
+                  {(product.price / 1000).toFixed(0)}K đ
                 </p>
               </div>
 
@@ -170,7 +176,7 @@ export default function ProductDetailPage() {
 
                   <div className="flex justify-between">
                     <span className="text-gray-600">Kho hàng:</span>
-                    <span className="font-semibold text-amber-700">
+                    <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {product.stock > 0
                         ? `${product.stock} sản phẩm`
                         : 'Hết hàng'}
@@ -223,9 +229,9 @@ export default function ProductDetailPage() {
               <Button
                   onClick={handleAddToCart}
                   disabled={product.stock === 0}
-                  className="w-full h-12 bg-amber-700 hover:bg-amber-800 text-white"
+                  className="w-full h-12 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold transition-all duration-300 transform hover:scale-105"
               >
-                <ShoppingCart className="w-5 h-5 mr-2" />
+                <ShoppingCart className={`w-5 h-5 mr-2 transition-transform ${addedToCart ? 'scale-125' : ''}`} />
                 {addedToCart ? 'Đã thêm vào giỏ!' : 'Thêm vào giỏ'}
               </Button>
 
@@ -233,17 +239,17 @@ export default function ProductDetailPage() {
               <div className="grid grid-cols-3 gap-4 pt-6 border-t mt-6">
 
                 <div className="text-center">
-                  <Truck className="w-6 h-6 text-amber-700 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Giao hàng miễn phí</p>
+                  <Truck className="w-6 h-6 text-violet-600 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600">Giao hàng nhanh</p>
                 </div>
 
                 <div className="text-center">
-                  <RotateCcw className="w-6 h-6 text-amber-700 mx-auto mb-2" />
+                  <RotateCcw className="w-6 h-6 text-violet-600 mx-auto mb-2" />
                   <p className="text-sm text-gray-600">Hoàn trả 30 ngày</p>
                 </div>
 
                 <div className="text-center">
-                  <Shield className="w-6 h-6 text-amber-700 mx-auto mb-2" />
+                  <Shield className="w-6 h-6 text-violet-600 mx-auto mb-2" />
                   <p className="text-sm text-gray-600">Bảo hành chất lượng</p>
                 </div>
 
