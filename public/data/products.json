@@ -1,0 +1,136 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Tiêu Đen Hạt",
+      "price": 50000,
+      "category": "spices",
+      "stock": 50,
+      "weight": "250g",
+      "origin": "Việt Nam",
+      "description": "Tiêu đen hạt nguyên chất 100%, được sản xuất từ những hạt tiêu chọn lọc tốt nhất. Mùi thơm đặc trưng, hương vị cay nồn tự nhiên.",
+      "image": "/images/pepper-black.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Hạt Tiêu Trắng",
+      "category": "spices",
+      "price": 55000,
+      "image": "/images/pepper-white.jpg",
+      "description": "Hạt tiêu trắng nguyên chất, được lựa chọn kỹ lưỡng. Hương vị nhẹ nhàng, thích hợp cho các món ăn tinh tế.",
+      "origin": "Việt Nam",
+      "weight": "250g",
+      "stock": 35
+    },
+    {
+      "id": 3,
+      "name": "Saffron Cao Cấp",
+      "category": "spices",
+      "price": 120000,
+      "image": "/images/saffron.jpg",
+      "description": "Saffron nhập khẩu cao cấp từ Iran, mùi thơm quý báu, màu sắc rực rỡ, tăng hương vị cho các món ăn đặc biệt.",
+      "origin": "Iran",
+      "weight": "1g",
+      "stock": 20
+    },
+    {
+      "id": 4,
+      "name": "Dâu Tằm Hạt",
+      "category": "spices",
+      "price": 75000,
+      "image": "/images/cardamom.jpg",
+      "description": "Dâu tằm hạt nguyên chất, hương vị ấm áp, thích hợp cho cà phê, trà và các món tráng miệng.",
+      "origin": "Việt Nam",
+      "weight": "100g",
+      "stock": 40
+    },
+    {
+      "id": 5,
+      "name": "Quế Cinnamon Roll",
+      "category": "spices",
+      "price": 65000,
+      "image": "/images/cinnamon.jpg",
+      "description": "Quế nguyên chất cuộn từ vỏ quế tươi, mùi thơm ngọt ngào, thích hợp nấu ăn, nướng bánh, pha trà.",
+      "origin": "Việt Nam",
+      "weight": "80g",
+      "stock": 45
+    },
+    {
+      "id": 6,
+      "name": "Tỏi Khô Miếng",
+      "category": "condiments",
+      "price": 35000,
+      "image": "/images/garlic-dried.jpg",
+      "description": "Tỏi khô tự nhiên, không hóa chất, mùi thơm đặc trưng, dễ sử dụng cho mọi món ăn.",
+      "origin": "Việt Nam",
+      "weight": "100g",
+      "stock": 60
+    },
+    {
+      "id": 7,
+      "name": "Hành Tím Khô",
+      "category": "condiments",
+      "price": 40000,
+      "image": "/images/onion-dried.jpg",
+      "description": "Hành tím khô chất lượng cao, mang mùi hành tự nhiên, thích hợp nêm nếm các món ăn.",
+      "origin": "Việt Nam",
+      "weight": "100g",
+      "stock": 55
+    },
+    {
+      "id": 8,
+      "name": "Dầu Mầm Mè Nguyên Chất",
+      "category": "oils",
+      "price": 125000,
+      "image": "/images/sesame-oil.jpg",
+      "description": "Dầu mầm mè nguyên chất 100%, được ép lạnh, giàu dinh dưỡng, thích hợp cho nấu ăn và chế biến thực phẩm.",
+      "origin": "Việt Nam",
+      "weight": "250ml",
+      "stock": 30
+    },
+    {
+      "id": 9,
+      "name": "Dầu Thực Vật Cao Cấp",
+      "category": "oils",
+      "price": 95000,
+      "image": "/images/vegetable-oil.jpg",
+      "description": "Dầu thực vật cao cấp, lành mạnh, thích hợp cho nấu ăn, chiên, xào tất cả các loại thực phẩm.",
+      "origin": "Việt Nam",
+      "weight": "500ml",
+      "stock": 70
+    },
+    {
+      "id": 10,
+      "name": "Hạt Mè Đen Nguyên Chất",
+      "category": "spices",
+      "price": 50000,
+      "image": "/images/sesame-seed.jpg",
+      "description": "Hạt mè đen nguyên chất, được sàng lọc kỹ lưỡng, giàu canxi, thích hợp rắc lên các món ăn.",
+      "origin": "Việt Nam",
+      "weight": "200g",
+      "stock": 48
+    },
+    {
+      "id": 11,
+      "name": "Muối Hoa Tinh Khiết",
+      "category": "condiments",
+      "price": 30000,
+      "image": "/images/salt-flower.jpg",
+      "description": "Muối hoa tinh khiết từ biển, mang lại hương vị đặc biệt, thích hợp cho chế biến thực phẩm cao cấp.",
+      "origin": "Việt Nam",
+      "weight": "200g",
+      "stock": 80
+    },
+    {
+      "id": 12,
+      "name": "Ớt Khô Nguyên Trái",
+      "category": "spices",
+      "price": 85000,
+      "image": "/images/chili-dried.jpg",
+      "description": "Ớt khô nguyên trái, mang mùi hương tự nhiên, cay nhẹ tới cay nồn tùy loại, dùng nêm nếm các món ăn.",
+      "origin": "Việt Nam",
+      "weight": "100g",
+      "stock": 42
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "orders": [
+    {
+      "id": 1773202796084,
+      "items": [
+        {
+          "id": 1,
+          "name": "Tiêu Đen Hạt",
+          "price": 50000,
+          "quantity": 1
+        }
+      ],
+      "total": 50000,
+      "customer": {
+        "customerName": "Nguyễn Minh 2 123",
+        "phoneNumber": "0981236572",
+        "email": "bihj@gmail.com",
+        "address": "àasfasfasfaf",
+        "city": "âs",
+        "district": "ấ",
+        "notes": ""
+      },
+      "paymentMethod": "cash",
+      "status": "cancelled",
+      "createdAt": "2026-03-11T04:19:56.084Z"
+    }
+  ]
+}
