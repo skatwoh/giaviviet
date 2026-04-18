@@ -10,8 +10,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Di Động Việt - Hệ thống bán lẻ điện thoại, laptop, phụ kiện chính hãng',
-  description: 'Di Động Việt - Chuyển giao giá trị vượt trội. Chuyên cung cấp iPhone, Samsung, Oppo, Xiaomi, Laptop, MacBook, Phụ kiện chính hãng giá tốt nhất.',
+  title: 'Cửa hàng Hải Trang - Gia vị và thực phẩm sạch',
+  description: 'Cửa hàng Hải Trang chuyên cung cấp các loại gia vị, dầu ăn, thực phẩm khô và dụng cụ bếp chất lượng cao.',
   generator: 'v0.app',
   icons: {
     icon: [

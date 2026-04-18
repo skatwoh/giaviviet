@@ -25,127 +25,104 @@ export function Header() {
   const cartCount = items.length
 
   const categories = [
-    'Điện thoại', 'Laptop', 'Apple', 'Máy tính bảng',
-    'Âm thanh', 'Đồng hồ', 'Phụ kiện', 'Thu cũ đổi mới', 'Tin tức'
+    { name: 'Rau Củ Quả', href: '/products?category=rau-cu' },
+    { name: 'Gia Vị Các Loại', href: '/products?category=gia-vi' },
+    { name: 'Dầu, Bơ', href: '/products?category=dau-bo' },
+    { name: 'Đồ Hộp', href: '/products?category=do-hop' },
+    { name: 'Đồ Khô', href: '/products?category=do-kho' },
+    { name: 'Bột Nấu Ăn', href: '/products?category=bot-nau-an' },
+    { name: 'Miến, Bánh Đa', href: '/products?category=mien-banh-da' },
+    { name: 'Dụng Cụ Bếp', href: '/products?category=dung-cu-bep' }
   ]
 
   return (
-    <header className="w-full sticky top-0 z-50 shadow-sm">
-      {/* Top Bar */}
-      <div className="bg-brand-red text-white py-1.5 px-4 hidden md:block">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-xs font-medium">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5" />
-              Xem hệ thống 60 cửa hàng
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5" />
-              Hotline: 1800.6018 (07:30 - 21:30)
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/news" className="hover:opacity-80 transition-opacity">Tin công nghệ</Link>
-            <Link href="/contact" className="hover:opacity-80 transition-opacity">Liên hệ</Link>
-          </div>
-        </div>
-      </div>
-
+    <header className="w-full sticky top-0 z-50 shadow-sm font-sans">
       {/* Main Header */}
-      <div className="bg-white border-b border-gray-100 py-3">
+      <div className="bg-[#00483d] text-white py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4 md:gap-8">
+          <div className="flex items-center justify-between gap-4">
             {/* Mobile Menu Trigger */}
             <button
-              className="md:hidden p-2 text-gray-600"
+              className="md:hidden p-2 text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu className="w-6 h-6" />
             </button>
 
             {/* Logo */}
-            <Link href="/" className="flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-brand-red rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                  D
-                </div>
-                <div className="hidden sm:block leading-none">
-                  <div className="font-bold text-lg text-brand-red tracking-tighter">DI ĐỘNG VIỆT</div>
-                  <div className="text-[10px] text-gray-500 font-bold uppercase">Chuyển giao giá trị vượt trội</div>
+            <Link href="/" className="flex-shrink-0 flex items-center gap-2">
+              <div className="flex items-center">
+                <span className="font-bold text-2xl tracking-tight">HẢI TRANG</span>
+                <div className="ml-1 mt-1">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L15 8H21L16.5 12L18 18L12 14.5L6 18L7.5 12L3 8H9L12 2Z" fill="white" />
+                  </svg>
                 </div>
               </div>
             </Link>
 
             {/* Search Bar */}
-            <div className="flex-1 max-w-2xl relative group hidden sm:block">
+            <div className="flex-1 max-w-xl relative group hidden sm:block">
               <div className="relative">
-                <Input
+                <input
                   type="text"
-                  placeholder="Bạn cần tìm gì?"
-                  className="w-full bg-gray-100 border-none rounded-full pl-10 pr-4 h-10 focus-visible:ring-1 focus-visible:ring-brand-red"
+                  placeholder="Tìm kiếm sản phẩm..."
+                  className="w-full bg-white text-gray-800 rounded-sm pl-4 pr-10 h-10 focus:outline-none focus:ring-1 focus:ring-brand-green"
                 />
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <button className="absolute right-0 top-0 h-10 px-3 flex items-center justify-center text-gray-400">
+                  <Search className="w-5 h-5" />
+                </button>
               </div>
             </div>
 
             {/* Utility Icons */}
-            <div className="flex items-center space-x-1 sm:space-x-3">
-              <button
-                onClick={() => setOrderModalOpen(true)}
-                className="hidden md:flex flex-col items-center justify-center text-gray-600 hover:text-brand-red transition-colors px-2"
-              >
-                <Package className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px] font-bold whitespace-nowrap uppercase">Tra cứu đơn</span>
+            <div className="flex items-center space-x-6">
+              <button className="hidden md:flex flex-col items-center justify-center hover:opacity-80 transition-opacity">
+                <User className="w-6 h-6" />
+                <span className="text-[11px] font-medium mt-1">Tài khoản</span>
               </button>
 
-              <Link href="/cart" className="relative p-2 text-gray-600 hover:text-brand-red transition-colors flex flex-col items-center">
+              <Link href="/cart" className="relative flex flex-col items-center justify-center hover:opacity-80 transition-opacity">
                 <div className="relative">
                   <ShoppingCart className="w-6 h-6" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-brand-red text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold border-2 border-white">
+                    <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
                       {cartCount}
                     </span>
                   )}
+                  {cartCount === 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                      0
+                    </span>
+                  )}
                 </div>
-                <span className="hidden md:block text-[10px] font-bold mt-0.5 uppercase">Giỏ hàng</span>
+                <span className="text-[11px] font-medium mt-1">Giỏ hàng</span>
               </Link>
 
-              <button className="hidden md:flex flex-col items-center justify-center text-gray-600 hover:text-brand-red transition-colors px-2">
-                <User className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px] font-bold uppercase">Đăng nhập</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Search */}
-          <div className="mt-3 sm:hidden">
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Bạn cần tìm gì?"
-                className="w-full bg-gray-100 border-none rounded-full pl-10 pr-4 h-10"
-              />
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <div className="hidden md:flex items-center gap-1 border border-white/30 px-2 py-1 rounded-sm">
+                <span className="text-xl">🇻🇳</span>
+                <ChevronDown className="w-4 h-4" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Navigation Menu */}
-      <div className="bg-white border-b border-gray-200 hidden md:block overflow-x-auto scrollbar-hide">
-        <div className="max-w-7xl mx-auto px-4 h-10 flex items-center justify-between">
-          <div className="flex items-center space-x-6 h-full">
-            {categories.map((cat, i) => (
-              <Link
-                key={i}
-                href="/products"
-                className="text-[13px] font-semibold text-gray-800 hover:text-brand-red transition-colors h-full flex items-center border-b-2 border-transparent hover:border-brand-red whitespace-nowrap"
-              >
-                {cat}
-                {['Điện thoại', 'Apple', 'Phụ kiện'].includes(cat) && <ChevronDown className="w-3 h-3 ml-1" />}
-              </Link>
-            ))}
-          </div>
+      <div className="bg-[#f8f8f8] border-b border-gray-200 py-2 hidden md:block overflow-x-auto scrollbar-hide">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-2">
+          <Link href="/" className="p-2 border border-gray-300 rounded-sm bg-white hover:bg-gray-50 transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00483d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </Link>
+          {categories.map((cat, i) => (
+            <Link
+              key={i}
+              href={cat.href}
+              className="px-4 py-2 bg-white border border-gray-300 rounded-sm text-[13px] font-medium text-gray-700 hover:text-brand-green hover:border-brand-green transition-all whitespace-nowrap min-w-[120px] text-center shadow-sm"
+            >
+              {cat.name}
+            </Link>
+          ))}
         </div>
       </div>
 
@@ -154,7 +131,7 @@ export function Header() {
         <div className="fixed inset-0 bg-black/50 z-50 md:hidden" onClick={() => setMobileMenuOpen(false)}>
           <div className="absolute left-0 top-0 h-full w-[280px] bg-white p-4" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6">
-              <span className="font-bold text-lg text-brand-red">Danh mục</span>
+              <span className="font-bold text-lg text-brand-green">Danh mục</span>
               <button onClick={() => setMobileMenuOpen(false)}>
                 <X className="w-6 h-6" />
               </button>
@@ -163,23 +140,13 @@ export function Header() {
               {categories.map((cat, i) => (
                 <Link
                   key={i}
-                  href="/products"
+                  href={cat.href}
                   className="block py-2 text-gray-700 font-medium border-b border-gray-100"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  {cat}
+                  {cat.name}
                 </Link>
               ))}
-              <button
-                onClick={() => {
-                  setOrderModalOpen(true)
-                  setMobileMenuOpen(false)
-                }}
-                className="w-full text-left py-2 text-gray-700 font-medium border-b border-gray-100 flex items-center gap-2"
-              >
-                <Package className="w-4 h-4" />
-                Tra cứu đơn hàng
-              </button>
             </nav>
           </div>
         </div>

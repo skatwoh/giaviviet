@@ -79,7 +79,10 @@ export default function AdminPage() {
           fetch('/api/messages'),
         ])
 
-        if (productsRes.ok) setProducts(await productsRes.json())
+        if (productsRes.ok) {
+          const data = await productsRes.json()
+          setProducts(data.products || [])
+        }
         if (ordersRes.ok) setOrders(await ordersRes.json())
         if (messagesRes.ok) setMessages(await messagesRes.json())
       } catch (error) {
