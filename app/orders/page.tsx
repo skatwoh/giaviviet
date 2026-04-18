@@ -88,13 +88,13 @@ export default function OrdersPage() {
                   placeholder="Nhập mã đơn hàng của bạn"
                   value={orderId}
                   onChange={(e) => setOrderId(e.target.value)}
-                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 pl-11 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-base"
+                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 pl-11 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all text-base"
                 />
               </div>
               <Button 
                 type="submit"
                 disabled={loading}
-                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 h-12 text-white font-medium px-6 sm:px-8 sm:w-auto"
+                className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 h-12 text-white font-medium px-6 sm:px-8 sm:w-auto"
               >
                 {loading ? 'Đang tìm...' : 'Tìm kiếm'}
               </Button>
@@ -192,7 +192,7 @@ export default function OrdersPage() {
                       </div>
                       <div className="flex-1 pt-1">
                         <p className="font-semibold text-gray-900">Đơn hàng đã được giao</p>
-                        <p className="text-sm text-gray-600">Cảm ơn bạn đã mua hàng từ Gia Vị Việt!</p>
+                        <p className="text-sm text-gray-600">Cảm ơn bạn đã mua hàng từ Hải Trang!</p>
                       </div>
                     </div>
                   )}
@@ -257,7 +257,7 @@ export default function OrdersPage() {
                         <p className="text-sm text-gray-600 mt-1">Số lượng: <span className="font-medium text-gray-900">{item.quantity}</span></p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-violet-600 text-lg">
+                        <p className="font-bold text-red-600 text-lg">
                           {(item.price * item.quantity).toLocaleString('vi-VN')} đ
                         </p>
                         <p className="text-xs text-gray-500">
@@ -268,11 +268,11 @@ export default function OrdersPage() {
                   ))}
                 </div>
 
-                <div className="border-t-2 border-gray-200 mt-6 pt-6 bg-gradient-to-r from-violet-50 to-indigo-50 -mx-6 px-6 py-4 rounded-b-lg">
+                <div className="border-t-2 border-gray-200 mt-6 pt-6 bg-gradient-to-r from-red-50 to-orange-50 -mx-6 px-6 py-4 rounded-b-lg">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-lg text-gray-900">Tổng cộng:</span>
                     <div className="text-right">
-                      <span className="font-bold text-violet-600 text-2xl block">
+                      <span className="font-bold text-red-600 text-2xl block">
                         {(order.total / 1000).toFixed(0)}K đ
                       </span>
                       <span className="text-xs text-gray-600 mt-1">
@@ -287,7 +287,7 @@ export default function OrdersPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Link href="/products" className="flex-1">
-                <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium h-11">
+                <Button className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-medium h-11">
                   Tiếp tục mua sắm
                 </Button>
               </Link>
@@ -297,7 +297,7 @@ export default function OrdersPage() {
                   setOrder(null)
                   setOrderId('')
                 }}
-                className="flex-1 border-violet-300 text-violet-600 hover:bg-violet-50 h-11 font-medium"
+                className="flex-1 border-red-300 text-red-600 hover:bg-red-50 h-11 font-medium"
               >
                 Tìm kiếm đơn hàng khác
               </Button>
@@ -311,7 +311,7 @@ export default function OrdersPage() {
               <div className="text-6xl mb-4">📦</div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Nhập mã đơn hàng</h3>
               <p className="text-gray-600">
-                Bạn có thể tìm thấy mã đơn hàng trong email xác nhận hoặc tin nhắn từ Gia Vị Việt
+                Bạn có thể tìm thấy mã đơn hàng trong email xác nhận hoặc tin nhắn từ Hải Trang
               </p>
             </CardContent>
           </Card>

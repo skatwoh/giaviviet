@@ -114,7 +114,7 @@ export default function ProductsPage() {
             {!isLoading && (
               <div className="text-right">
                 <p className="text-sm text-gray-500">
-                  Đang hiển thị <span className="font-bold text-violet-600">{filteredProducts.length}</span> sản phẩm
+                  Đang hiển thị <span className="font-bold text-red-600">{filteredProducts.length}</span> sản phẩm
                 </p>
               </div>
             )}
@@ -179,7 +179,7 @@ export default function ProductsPage() {
                         }}
                         className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
                           sortBy === option.value
-                            ? 'bg-violet-50 text-violet-700 font-medium'
+                            ? 'bg-red-50 text-red-700 font-medium'
                             : 'text-gray-700 hover:bg-gray-50'
                         }`}
                       >
@@ -194,7 +194,7 @@ export default function ProductsPage() {
               {(selectedCategory || searchQuery || sortBy !== 'newest' || priceRange[0] > 0 || priceRange[1] < 200000) && (
                 <button
                   onClick={handleReset}
-                  className="text-xs font-medium text-violet-600 hover:text-violet-700 hover:underline"
+                  className="text-xs font-medium text-red-600 hover:text-red-700 hover:underline"
                 >
                   Xóa tất cả bộ lọc
                 </button>
@@ -205,7 +205,7 @@ export default function ProductsPage() {
             {isLoading ? (
               <div className="text-center py-16">
                 <div className="inline-block">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
                   <p className="text-gray-500 mt-4">Đang tải sản phẩm...</p>
                 </div>
               </div>
@@ -218,7 +218,7 @@ export default function ProductsPage() {
                 </p>
                 <Button
                   onClick={handleReset}
-                  className="bg-violet-600 hover:bg-violet-700 text-white"
+                  className="bg-red-600 hover:bg-red-700 text-white"
                 >
                   Xóa bộ lọc
                 </Button>

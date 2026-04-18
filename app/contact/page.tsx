@@ -70,8 +70,8 @@ export default function ContactPage() {
             <CardContent className="pt-6 text-center">
               <Phone className="w-8 h-8 text-amber-700 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Điện thoại</h3>
-              <p className="text-gray-600">+84 123 456 789</p>
-              <p className="text-gray-600">+84 987 654 321</p>
+              <p className="text-gray-600">094.550.1989</p>
+              <p className="text-gray-600">024.3828.1234</p>
             </CardContent>
           </Card>
 
@@ -79,8 +79,8 @@ export default function ContactPage() {
             <CardContent className="pt-6 text-center">
               <Mail className="w-8 h-8 text-amber-700 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-              <p className="text-gray-600">info@giaviviet.com</p>
-              <p className="text-gray-600">support@giaviviet.com</p>
+              <p className="text-gray-600">cuahanghaitrang@gmail.com</p>
+              <p className="text-gray-600">support@haitrang.com</p>
             </CardContent>
           </Card>
 
@@ -88,8 +88,8 @@ export default function ContactPage() {
             <CardContent className="pt-6 text-center">
               <MapPin className="w-8 h-8 text-amber-700 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Địa chỉ</h3>
-              <p className="text-gray-600">123 Đường Trần Hưng Đạo</p>
-              <p className="text-gray-600">Hà Nội, Việt Nam</p>
+              <p className="text-gray-600">03 Hàng Khoai, Đồng Xuân</p>
+              <p className="text-gray-600">Hoàn Kiếm, Hà Nội</p>
             </CardContent>
           </Card>
         </div>
