@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, ArrowRight } from 'lucide-react'
@@ -15,6 +16,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ id, name, price, image, category }: ProductCardProps) {
+  const router = useRouter()
   const getCategoryLabel = (cat: string) => {
     const labels: Record<string, string> = {
       'gia-vi': 'Gia vị',
@@ -63,21 +65,29 @@ export function ProductCard({ id, name, price, image, category }: ProductCardPro
 
       {/* Footer */}
       <CardFooter className="flex flex-col gap-3 pt-2 pb-4">
-        <div className="w-full flex items-baseline gap-1">
-          <span className="text-2xl md:text-xl font-bold text-red-600">
-            {(price / 1000).toFixed(0)}K
-          </span>
-          <span className="text-xs text-gray-500">đ</span>
+        <div className="w-full flex items-center justify-between">
+          <div className="flex items-baseline gap-1">
+            <span className="text-xl font-bold text-red-600">
+              {(price / 1000).toFixed(0)}.000
+            </span>
+            <span className="text-xs text-gray-500">đ</span>
+          </div>
+          <div className="text-[10px] line-through text-gray-400">
+            {((price * 1.2) / 1000).toFixed(0)}.000đ
+          </div>
         </div>
-        <Link href={`/products/${id}`} className="w-full">
-          <Button 
-            size="sm" 
-            className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-medium group/btn"
-          >
-            <ArrowRight className="w-4 h-4 mr-1 group-hover/btn:translate-x-1 transition-transform" />
-            Xem chi tiết
-          </Button>
-        </Link>
+        <Button
+          size="sm"
+          className="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase rounded-none"
+          onClick={(e) => {
+            e.preventDefault();
+            // In a real app, this would add to cart. For now, let's just navigate to detail or show a toast
+            router.push(`/products/${id}`);
+          }}
+        >
+          <ShoppingCart className="w-3 h-3 mr-2" />
+          CHỌN MUA
+        </Button>
       </CardFooter>
     </Card>
   )
