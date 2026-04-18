@@ -4,7 +4,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ShoppingCart, ArrowRight } from 'lucide-react'
+import { ShoppingCart, Star } from 'lucide-react'
+import { toast } from 'sonner'
+import { useCart } from '@/app/context/CartContext'
 
 interface ProductCardProps {
   id: number
@@ -15,64 +17,80 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ id, name, price, image, category }: ProductCardProps) {
-  const getCategoryLabel = (cat: string) => {
-    const labels: Record<string, string> = {
-      'spices': 'Gia vị',
-      'condiments': 'Gia vị nêm',
-      'oils': 'Dầu'
-    }
-    return labels[cat] || cat
+  const { addItem } = useCart()
+
+  const formatPrice = (p: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p)
+  }
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addItem({ id, name, price, image, quantity: 1 })
+    toast.success(`Đã thêm ${name} vào giỏ hàng`)
   }
 
   return (
-    <Card className="h-full overflow-hidden hover:shadow-xl transition-all duration-300 border-gray-200 group">
-      {/* Image Container */}
-      <div className="relative h-56 w-full bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-        <Link href={`/products/${id}`}>
+    <Card className="h-full overflow-hidden hover:shadow-xl transition-all duration-300 border-gray-100 group flex flex-col bg-white rounded-xl">
+      <Link href={`/products/${id}`} className="relative block">
+        {/* Image Container */}
+        <div className="relative aspect-square w-full bg-gray-50 overflow-hidden p-2">
           <Image
             src={image}
             alt={name}
             fill
-            className="object-cover group-hover:scale-110 transition-transform duration-500"
+            className="object-contain p-4 group-hover:scale-110 transition-transform duration-500"
             onError={(e) => {
               e.currentTarget.src = '/images/placeholder.png'
             }}
           />
-        </Link>
-        {/* Category Badge */}
-        <div className="absolute top-3 left-3">
-          <span className="inline-block bg-violet-100 text-violet-700 text-xs font-bold px-2.5 py-1 rounded-full">
-            {getCategoryLabel(category)}
-          </span>
+          {/* Discount Badge (Mock) */}
+          <div className="absolute top-2 left-2 bg-brand-red text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+            -15%
+          </div>
         </div>
-      </div>
+      </Link>
 
       {/* Content */}
-      <CardContent className="pt-4 pb-3">
-        <Link href={`/products/${id}`} className="group/link">
-          <h3 className="font-semibold text-gray-900 hover:text-violet-600 line-clamp-2 group-hover/link:text-violet-600 transition-colors text-sm md:text-base">
+      <CardContent className="p-3 flex-1 flex flex-col">
+        <Link href={`/products/${id}`} className="block mb-2">
+          <h3 className="font-bold text-gray-800 text-xs md:text-[13px] line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-brand-red transition-colors">
             {name}
           </h3>
         </Link>
+
+        <div className="mt-auto">
+          {/* Rating (Mock) */}
+          <div className="flex items-center gap-1 mb-2">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star key={s} className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+            <span className="text-[10px] text-gray-400 font-medium">(24)</span>
+          </div>
+
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm md:text-base font-bold text-brand-red">
+              {formatPrice(price)}
+            </span>
+            <span className="text-[10px] text-gray-400 line-through">
+              {formatPrice(price * 1.15)}
+            </span>
+          </div>
+        </div>
       </CardContent>
 
       {/* Footer */}
-      <CardFooter className="flex flex-col gap-3 pt-2 pb-4">
-        <div className="w-full flex items-baseline gap-1">
-          <span className="text-2xl md:text-xl font-bold text-violet-600">
-            {(price / 1000).toFixed(0)}K
-          </span>
-          <span className="text-xs text-gray-500">đ</span>
-        </div>
-        <Link href={`/products/${id}`} className="w-full">
-          <Button 
-            size="sm" 
-            className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium group/btn"
-          >
-            <ArrowRight className="w-4 h-4 mr-1 group-hover/btn:translate-x-1 transition-transform" />
-            Xem chi tiết
-          </Button>
-        </Link>
+      <CardFooter className="p-3 pt-0">
+        <Button
+          onClick={handleAddToCart}
+          size="sm"
+          className="w-full bg-brand-red hover:bg-brand-red-dark text-white font-bold text-[11px] h-8 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+        >
+          <ShoppingCart className="w-3.5 h-3.5" />
+          MUA NGAY
+        </Button>
       </CardFooter>
     </Card>
   )

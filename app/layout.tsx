@@ -10,8 +10,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Gia Vị Việt - Gia vị chất lượng cao',
-  description: 'Cửa hàng gia vị Việt Nam chất lượng cao, bao gồm tiêu, saffron, dầu mầm mè và nhiều sản phẩm khác',
+  title: 'Di Động Việt - Hệ thống bán lẻ điện thoại, laptop, phụ kiện chính hãng',
+  description: 'Di Động Việt - Chuyển giao giá trị vượt trội. Chuyên cung cấp iPhone, Samsung, Oppo, Xiaomi, Laptop, MacBook, Phụ kiện chính hãng giá tốt nhất.',
   generator: 'v0.app',
   icons: {
     icon: [

@@ -16,7 +16,7 @@ function writeProducts(data: any) {
 export async function GET() {
   try {
     const data = readProducts()
-    return NextResponse.json(data.products)
+    return NextResponse.json(data)
   } catch (error) {
     console.error('Error reading products:', error)
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
