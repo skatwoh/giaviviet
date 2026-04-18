@@ -23,7 +23,7 @@ export default function CartPage() {
               Hãy khám phá các sản phẩm gia vị tuyệt vời của chúng tôi và thêm chúng vào giỏ hàng
             </p>
             <Link href="/products">
-              <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold">
+              <Button className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold">
                 Tiếp tục mua sắm
               </Button>
             </Link>
@@ -66,11 +66,11 @@ export default function CartPage() {
                     {/* Product Details */}
                     <div className="flex-1">
                       <Link href={`/products/${item.id}`}>
-                        <h3 className="font-semibold text-gray-900 hover:text-violet-600 transition-colors">
+                        <h3 className="font-semibold text-gray-900 hover:text-red-600 transition-colors">
                           {item.name}
                         </h3>
                       </Link>
-                      <p className="text-violet-600 font-bold mt-2">
+                      <p className="text-red-600 font-bold mt-2">
                         {(item.price / 1000).toFixed(0)}K đ
                       </p>
 
@@ -83,9 +83,9 @@ export default function CartPage() {
                               toast.success(`Đã xóa ${item.name} khỏi giỏ hàng`)
                             }
                           }}
-                          className="p-1 border-2 border-gray-300 rounded-lg hover:bg-violet-50 hover:border-violet-300 transition-colors"
+                          className="p-1 border-2 border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors"
                         >
-                          <Minus className="w-4 h-4 text-violet-600" />
+                          <Minus className="w-4 h-4 text-red-600" />
                         </button>
                         <Input
                           type="number"
@@ -101,9 +101,9 @@ export default function CartPage() {
                             updateQuantity(item.id, item.quantity + 1)
                             toast.success(`Cập nhật số lượng ${item.name}`)
                           }}
-                          className="p-1 border-2 border-gray-300 rounded-lg hover:bg-violet-50 hover:border-violet-300 transition-colors"
+                          className="p-1 border-2 border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors"
                         >
-                          <Plus className="w-4 h-4 text-violet-600" />
+                          <Plus className="w-4 h-4 text-red-600" />
                         </button>
                       </div>
                     </div>
@@ -111,7 +111,7 @@ export default function CartPage() {
                     {/* Subtotal & Remove */}
                     <div className="text-right">
                       <p className="text-gray-600 mb-4">
-                        Tổng: <span className="font-bold text-violet-600">
+                        Tổng: <span className="font-bold text-red-600">
                           {(item.price * item.quantity / 1000).toFixed(0)}K đ
                         </span>
                       </p>
@@ -134,8 +134,8 @@ export default function CartPage() {
           {/* Order Summary */}
           <div>
             <Card className="sticky top-20 animate-slideInRight shadow-lg border-gray-200">
-              <CardHeader className="bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-gray-200">
-                <CardTitle className="text-violet-900">Tóm tắt đơn hàng</CardTitle>
+              <CardHeader className="bg-gradient-to-r from-red-50 to-orange-50 border-b border-gray-200">
+                <CardTitle className="text-red-900">Tóm tắt đơn hàng</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
                 <div className="flex justify-between text-gray-600">
@@ -149,13 +149,13 @@ export default function CartPage() {
                 <div className="border-t-2 border-gray-200 pt-4">
                   <div className="flex justify-between text-xl">
                     <span className="font-semibold">Tổng cộng:</span>
-                    <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">
+                    <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600">
                       {(total / 1000).toFixed(0)}K đ
                     </span>
                   </div>
                 </div>
                 <Link href="/checkout" className="block">
-                  <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 h-11 font-bold text-white transition-all duration-300 hover:scale-105">
+                  <Button className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 h-11 font-bold text-white transition-all duration-300 hover:scale-105">
                     Tiến hành thanh toán
                   </Button>
                 </Link>

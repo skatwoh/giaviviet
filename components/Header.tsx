@@ -19,28 +19,28 @@ export function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <span className="text-white font-bold text-lg">GV</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-orange-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+              <span className="text-white font-bold text-lg">HT</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg text-gray-900">Gia Vị Việt</span>
-              <span className="text-xs text-gray-500 font-medium">Gia vị chất lượng cao</span>
+              <span className="font-bold text-lg text-gray-900">Hải Trang</span>
+              <span className="text-xs text-gray-500 font-medium">Gia vị & Thực phẩm sạch</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-1 items-center">
-            <Link href="/products" className="px-4 py-2 text-gray-700 hover:text-violet-600 font-medium text-sm transition-colors rounded-lg hover:bg-violet-50">
+            <Link href="/products" className="px-4 py-2 text-gray-700 hover:text-red-600 font-medium text-sm transition-colors rounded-lg hover:bg-red-50">
               Sản phẩm
             </Link>
             <button 
               onClick={() => setOrderModalOpen(true)}
-              className="px-4 py-2 text-gray-700 hover:text-violet-600 font-medium text-sm transition-colors rounded-lg hover:bg-violet-50 flex items-center gap-1"
+              className="px-4 py-2 text-gray-700 hover:text-red-600 font-medium text-sm transition-colors rounded-lg hover:bg-red-50 flex items-center gap-1"
             >
               <Package className="w-4 h-4" />
               Đơn hàng của tôi
             </button>
-            <Link href="/contact" className="px-4 py-2 text-gray-700 hover:text-violet-600 font-medium text-sm transition-colors rounded-lg hover:bg-violet-50">
+            <Link href="/contact" className="px-4 py-2 text-gray-700 hover:text-red-600 font-medium text-sm transition-colors rounded-lg hover:bg-red-50">
               Liên hệ
             </Link>
           </nav>
@@ -48,10 +48,10 @@ export function Header() {
           {/* Cart Button */}
           <div className="flex items-center space-x-2 md:space-x-4">
             <Link href="/cart">
-              <Button variant="ghost" size="icon" className="relative text-gray-700 hover:text-violet-600 hover:bg-violet-50">
+              <Button variant="ghost" size="icon" className="relative text-gray-700 hover:text-red-600 hover:bg-red-50">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute top-0 right-0 bg-violet-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  <span className="absolute top-0 right-0 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                     {cartCount}
                   </span>
                 )}
@@ -74,7 +74,7 @@ export function Header() {
           <nav className="md:hidden pb-4 space-y-1 border-t border-gray-200 pt-4">
             <Link
               href="/products"
-              className="block px-4 py-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors font-medium"
+              className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               Sản phẩm
@@ -84,14 +84,14 @@ export function Header() {
                 setOrderModalOpen(true)
                 setMobileMenuOpen(false)
               }}
-              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors font-medium flex items-center gap-2"
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors font-medium flex items-center gap-2"
             >
               <Package className="w-4 h-4" />
               Đơn hàng của tôi
             </button>
             <Link
               href="/contact"
-              className="block px-4 py-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors font-medium"
+              className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               Liên hệ

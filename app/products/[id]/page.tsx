@@ -120,7 +120,7 @@ export default function ProductDetailPage() {
 
           {/* Breadcrumb */}
           <div className="mb-6 animate-slideUp">
-            <Link href="/products" className="text-violet-600 hover:text-violet-700 font-medium">
+            <Link href="/products" className="text-red-600 hover:text-red-700 font-medium">
               Sản phẩm
             </Link>
             <span className="text-gray-400 mx-2">/</span>
@@ -146,17 +146,22 @@ export default function ProductDetailPage() {
             {/* Product Info */}
             <div className="animate-slideInRight">
               <div className="mb-6">
-                <p className="text-violet-600 font-bold text-sm uppercase tracking-wide mb-2">
-                  {product.category === 'spices' && 'Gia vị'}
-                  {product.category === 'condiments' && 'Gia vị nêm'}
-                  {product.category === 'oils' && 'Dầu'}
+                <p className="text-red-600 font-bold text-sm uppercase tracking-wide mb-2">
+                  {product.category === 'gia-vi' && 'Gia vị'}
+                  {product.category === 'rau-cu' && 'Rau củ'}
+                  {product.category === 'dau-bo' && 'Dầu, Bơ'}
+                  {product.category === 'do-hop' && 'Đồ hộp'}
+                  {product.category === 'do-kho' && 'Đồ khô'}
+                  {product.category === 'bot-nau-an' && 'Bột nấu ăn'}
+                  {product.category === 'mien-banh-da' && 'Miến, Bánh đa'}
+                  {product.category === 'dung-cu-bep' && 'Dụng cụ bếp'}
                 </p>
 
                 <h1 className="text-4xl font-bold text-gray-900 mb-4">
                   {product.name}
                 </h1>
 
-                <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 mb-6">
+                <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600 mb-6">
                   {(product.price / 1000).toFixed(0)}K đ
                 </p>
               </div>
@@ -229,7 +234,7 @@ export default function ProductDetailPage() {
               <Button
                   onClick={handleAddToCart}
                   disabled={product.stock === 0}
-                  className="w-full h-12 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold transition-all duration-300 transform hover:scale-105"
+                  className="w-full h-12 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold transition-all duration-300 transform hover:scale-105"
               >
                 <ShoppingCart className={`w-5 h-5 mr-2 transition-transform ${addedToCart ? 'scale-125' : ''}`} />
                 {addedToCart ? 'Đã thêm vào giỏ!' : 'Thêm vào giỏ'}
@@ -239,17 +244,17 @@ export default function ProductDetailPage() {
               <div className="grid grid-cols-3 gap-4 pt-6 border-t mt-6">
 
                 <div className="text-center">
-                  <Truck className="w-6 h-6 text-violet-600 mx-auto mb-2" />
+                  <Truck className="w-6 h-6 text-red-600 mx-auto mb-2" />
                   <p className="text-sm text-gray-600">Giao hàng nhanh</p>
                 </div>
 
                 <div className="text-center">
-                  <RotateCcw className="w-6 h-6 text-violet-600 mx-auto mb-2" />
+                  <RotateCcw className="w-6 h-6 text-red-600 mx-auto mb-2" />
                   <p className="text-sm text-gray-600">Hoàn trả 30 ngày</p>
                 </div>
 
                 <div className="text-center">
-                  <Shield className="w-6 h-6 text-violet-600 mx-auto mb-2" />
+                  <Shield className="w-6 h-6 text-red-600 mx-auto mb-2" />
                   <p className="text-sm text-gray-600">Bảo hành chất lượng</p>
                 </div>
 

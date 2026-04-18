@@ -69,7 +69,7 @@ export function OrderModal({ open, onOpenChange }: OrderModalProps) {
     const colors: Record<string, string> = {
       pending: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
       confirmed: 'bg-blue-50 text-blue-700 border border-blue-200',
-      shipped: 'bg-purple-50 text-purple-700 border border-purple-200',
+      shipped: 'bg-red-50 text-red-700 border border-red-200',
       delivered: 'bg-green-50 text-green-700 border border-green-200',
       cancelled: 'bg-red-50 text-red-700 border border-red-200',
     }
@@ -105,7 +105,7 @@ export function OrderModal({ open, onOpenChange }: OrderModalProps) {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
+            className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
           >
             {loading ? 'Đang tìm...' : 'Tìm kiếm'}
           </Button>
@@ -123,7 +123,7 @@ export function OrderModal({ open, onOpenChange }: OrderModalProps) {
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <p className="text-xs text-gray-600 font-medium">Mã đơn hàng</p>
-                  <p className="font-bold text-lg text-violet-600">{order.id}</p>
+                  <p className="font-bold text-lg text-red-600">{order.id}</p>
                 </div>
                 <div className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(order.status)}`}>
                   {getStatusText(order.status)}
@@ -137,7 +137,7 @@ export function OrderModal({ open, onOpenChange }: OrderModalProps) {
                 </div>
                 <div>
                   <p className="text-xs text-gray-600 font-medium">Tổng tiền</p>
-                  <p className="font-bold text-violet-600">
+                  <p className="font-bold text-red-600">
                     {(order.total / 1000).toFixed(0)}K đ
                   </p>
                 </div>
@@ -158,7 +158,7 @@ export function OrderModal({ open, onOpenChange }: OrderModalProps) {
 
             <Button
               onClick={handleClose}
-              className="w-full bg-violet-600 hover:bg-violet-700 text-white"
+              className="w-full bg-red-600 hover:bg-red-700 text-white"
             >
               Đóng
             </Button>

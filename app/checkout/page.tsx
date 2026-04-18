@@ -105,19 +105,19 @@ export default function CheckoutPage() {
               {/* Success Message */}
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-3">Đặt hàng thành công!</h2>
-                <p className="text-gray-600 text-lg">Cảm ơn bạn đã tin tưởng Gia Vị Việt</p>
+                <p className="text-gray-600 text-lg">Cảm ơn bạn đã tin tưởng Hải Trang</p>
               </div>
 
               {/* Order ID - PROMINENT */}
-              <div className="bg-gradient-to-br from-violet-50 to-indigo-50 border-2 border-violet-200 rounded-xl p-6 space-y-2">
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 rounded-xl p-6 space-y-2">
                 <p className="text-sm font-medium text-gray-600 uppercase tracking-wider">Mã đơn hàng</p>
-                <p className="text-4xl font-bold text-violet-700 font-mono break-all">{orderId}</p>
+                <p className="text-4xl font-bold text-red-700 font-mono break-all">{orderId}</p>
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(orderId)
                     alert('Đã sao chép mã đơn hàng!')
                   }}
-                  className="text-xs text-violet-600 hover:text-violet-700 font-medium mt-3 px-3 py-1.5 rounded-lg hover:bg-violet-100 transition-colors inline-block"
+                  className="text-xs text-red-600 hover:text-red-700 font-medium mt-3 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors inline-block"
                 >
                   Sao chép mã
                 </button>
@@ -152,7 +152,7 @@ export default function CheckoutPage() {
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <p className="text-sm text-gray-700">
                   <span className="font-semibold">Cách tra cứu đơn hàng:</span> Sử dụng mã đơn hàng ở trên tại trang{' '}
-                  <Link href="/orders" className="text-violet-600 hover:text-violet-700 font-medium hover:underline">
+                  <Link href="/orders" className="text-red-600 hover:text-red-700 font-medium hover:underline">
                     Tra cứu đơn hàng
                   </Link>
                 </p>
@@ -161,12 +161,12 @@ export default function CheckoutPage() {
               {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-3 pt-4">
                 <Link href="/orders" className="col-span-2 md:col-span-1">
-                  <Button className="w-full bg-violet-600 hover:bg-violet-700 text-white font-medium h-11">
+                  <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-medium h-11">
                     Tra cứu đơn
                   </Button>
                 </Link>
                 <Link href="/products" className="col-span-2 md:col-span-1">
-                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium h-11">
+                  <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium h-11">
                     Tiếp tục mua
                   </Button>
                 </Link>
@@ -302,8 +302,8 @@ export default function CheckoutPage() {
                 <CardContent className="space-y-3">
                   <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     paymentMethod === 'cash' 
-                      ? 'border-violet-300 bg-violet-50' 
-                      : 'border-gray-300 hover:border-violet-200'
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 hover:border-red-200'
                   }`}
                     onClick={() => setPaymentMethod('cash')}>
                     <input
@@ -312,9 +312,9 @@ export default function CheckoutPage() {
                       value="cash"
                       checked={paymentMethod === 'cash'}
                       onChange={() => setPaymentMethod('cash')}
-                      className="w-4 h-4 accent-violet-600 mr-3"
+                      className="w-4 h-4 accent-red-600 mr-3"
                     />
-                    <Banknote className="w-5 h-5 text-violet-600 mr-3" />
+                    <Banknote className="w-5 h-5 text-red-600 mr-3" />
                     <div>
                       <p className="font-semibold text-gray-900">Thanh toán khi nhận hàng</p>
                       <p className="text-sm text-gray-600">COD - An toàn và tiện lợi</p>
@@ -323,8 +323,8 @@ export default function CheckoutPage() {
 
                   <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     paymentMethod === 'bank'
-                      ? 'border-violet-300 bg-violet-50'
-                      : 'border-gray-300 hover:border-violet-200'
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 hover:border-red-200'
                   }`}
                     onClick={() => setPaymentMethod('bank')}>
                     <input
@@ -333,9 +333,9 @@ export default function CheckoutPage() {
                       value="bank"
                       checked={paymentMethod === 'bank'}
                       onChange={() => setPaymentMethod('bank')}
-                      className="w-4 h-4 accent-violet-600 mr-3"
+                      className="w-4 h-4 accent-red-600 mr-3"
                     />
-                    <DollarSign className="w-5 h-5 text-violet-600 mr-3" />
+                    <DollarSign className="w-5 h-5 text-red-600 mr-3" />
                     <div>
                       <p className="font-semibold text-gray-900">Chuyển khoản ngân hàng</p>
                       <p className="text-sm text-gray-600">Chuyển khoản trước giao hàng</p>
@@ -344,8 +344,8 @@ export default function CheckoutPage() {
 
                   <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     paymentMethod === 'mobile'
-                      ? 'border-violet-300 bg-violet-50'
-                      : 'border-gray-300 hover:border-violet-200'
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 hover:border-red-200'
                   }`}
                     onClick={() => setPaymentMethod('mobile')}>
                     <input
@@ -354,9 +354,9 @@ export default function CheckoutPage() {
                       value="mobile"
                       checked={paymentMethod === 'mobile'}
                       onChange={() => setPaymentMethod('mobile')}
-                      className="w-4 h-4 accent-violet-600 mr-3"
+                      className="w-4 h-4 accent-red-600 mr-3"
                     />
-                    <Smartphone className="w-5 h-5 text-violet-600 mr-3" />
+                    <Smartphone className="w-5 h-5 text-red-600 mr-3" />
                     <div>
                       <p className="font-semibold text-gray-900">Ví điện tử/Momo</p>
                       <p className="text-sm text-gray-600">Thanh toán qua ứng dụng</p>
@@ -385,7 +385,7 @@ export default function CheckoutPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting || !formData.customerName || !formData.phoneNumber || !formData.email}
-                className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 h-12 font-semibold text-white"
+                className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 h-12 font-semibold text-white"
               >
                 {isSubmitting ? 'Đang xử lý...' : 'Xác nhận đặt hàng'}
               </Button>

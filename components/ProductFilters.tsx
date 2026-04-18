@@ -41,24 +41,29 @@ export function ProductFilters({
 
   const getCategoryLabel = (category: string) => {
     const labels: Record<string, string> = {
-      'spices': 'Gia vị',
-      'condiments': 'Gia vị nêm',
-      'oils': 'Dầu'
+      'gia-vi': 'Gia vị',
+      'rau-cu': 'Rau củ',
+      'dau-bo': 'Dầu, Bơ',
+      'do-hop': 'Đồ hộp',
+      'do-kho': 'Đồ khô',
+      'bot-nau-an': 'Bột nấu ăn',
+      'mien-banh-da': 'Miến, Bánh đa',
+      'dung-cu-bep': 'Dụng cụ bếp'
     }
     return labels[category] || category
   }
 
   return (
-    <Card className="sticky top-24 h-fit border-violet-200 shadow-sm">
-      <CardHeader className="border-b border-violet-100">
+    <Card className="sticky top-24 h-fit border-red-200 shadow-sm">
+      <CardHeader className="border-b border-red-100">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg text-gray-900">Bộ lọc</CardTitle>
           <button
             onClick={onReset}
-            className="p-1.5 hover:bg-violet-50 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
             title="Xóa tất cả bộ lọc"
           >
-            <RotateCcw className="w-4 h-4 text-violet-600" />
+            <RotateCcw className="w-4 h-4 text-red-600" />
           </button>
         </div>
       </CardHeader>
@@ -72,7 +77,7 @@ export function ProductFilters({
           <div className="space-y-2">
             <label className={`flex items-center px-3 py-2 rounded-lg cursor-pointer transition-all border-2 ${
               selectedCategory === null
-                ? 'bg-violet-50 border-violet-300 text-violet-700'
+                ? 'bg-red-50 border-red-300 text-red-700'
                 : 'border-transparent hover:bg-gray-50 text-gray-900'
             }`}>
               <input
@@ -80,7 +85,7 @@ export function ProductFilters({
                 name="category"
                 checked={selectedCategory === null}
                 onChange={() => onCategoryChange(null)}
-                className="w-4 h-4 accent-violet-600"
+                className="w-4 h-4 accent-red-600"
               />
               <span className="ml-2 font-medium text-sm">Tất cả danh mục</span>
             </label>
@@ -89,7 +94,7 @@ export function ProductFilters({
                 key={category}
                 className={`flex items-center px-3 py-2 rounded-lg cursor-pointer transition-all border-2 ${
                   selectedCategory === category
-                    ? 'bg-violet-50 border-violet-300 text-violet-700'
+                    ? 'bg-red-50 border-red-300 text-red-700'
                     : 'border-transparent hover:bg-gray-50 text-gray-900'
                 }`}
               >
@@ -98,7 +103,7 @@ export function ProductFilters({
                   name="category"
                   checked={selectedCategory === category}
                   onChange={() => onCategoryChange(category)}
-                  className="w-4 h-4 accent-violet-600"
+                  className="w-4 h-4 accent-red-600"
                 />
                 <span className="ml-2 font-medium text-sm">{getCategoryLabel(category)}</span>
               </label>
@@ -130,8 +135,8 @@ export function ProductFilters({
                 className="border-gray-300 text-sm h-9"
               />
             </div>
-            <div className="bg-gradient-to-r from-violet-50 to-indigo-50 px-3 py-2.5 rounded-lg border border-violet-100">
-              <p className="text-sm font-semibold text-violet-900">
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 px-3 py-2.5 rounded-lg border border-red-100">
+              <p className="text-sm font-semibold text-red-900">
                 {priceRange[0].toLocaleString('vi-VN')} - {priceRange[1].toLocaleString('vi-VN')} đ
               </p>
             </div>
@@ -151,7 +156,7 @@ export function ProductFilters({
               <button
                 key={range.label}
                 onClick={() => onPriceChange([range.min, range.max])}
-                className="text-xs font-medium px-2 py-1.5 rounded-lg transition-all border border-gray-200 hover:border-violet-300 hover:bg-violet-50 text-gray-700 hover:text-violet-700"
+                className="text-xs font-medium px-2 py-1.5 rounded-lg transition-all border border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700 hover:text-red-700"
               >
                 {range.label}
               </button>
@@ -163,7 +168,7 @@ export function ProductFilters({
         <Button
           onClick={onReset}
           variant="outline"
-          className="w-full border-violet-300 text-violet-600 hover:bg-violet-50 hover:text-violet-700 font-medium"
+          className="w-full border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 font-medium"
         >
           <RotateCcw className="w-4 h-4 mr-2" />
           Xóa bộ lọc

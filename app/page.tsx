@@ -40,41 +40,41 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white overflow-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-indigo-50 overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 overflow-hidden">
         {/* Animated Background Elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-violet-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
-        <div className="absolute -bottom-8 right-10 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+        <div className="absolute -bottom-8 right-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
         <div className="absolute top-40 right-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '4s' }}></div>
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
           <div className="animate-slideUp space-y-8">
             <div>
-              <div className="inline-block px-4 py-2 bg-violet-100 text-violet-700 rounded-full text-sm font-bold mb-6 animate-fadeIn">
-                Khám phá gia vị chất lượng cao
+              <div className="inline-block px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-bold mb-6 animate-fadeIn">
+                Hải Trang - Danh mục lớn, giá cả nhỏ
               </div>
               <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600">
-                  Gia Vị Việt
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-600 to-red-700">
+                  Hải Trang
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-700 mb-4 max-w-3xl mx-auto leading-relaxed">
-                Mang hương vị truyền thống Việt Nam vào bếp nhà bạn. Gia vị nguyên chất, chất lượng cao được lựa chọn kỹ lưỡng.
+                Hơn 60 năm đồng hành cùng gian bếp Việt. Chuyên cung cấp sỉ & lẻ gia vị, thực phẩm chất lượng cao.
               </p>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Từ các bếp ăn chuyên nghiệp đến những gia đình yêu nấu ăn, chúng tôi phục vụ với tâm huyết.
+                Từ sạp hàng số 3 Hàng Khoai những năm 60, chúng tôi tự hào cung cấp nguồn nguyên liệu tin cậy cho hàng ngàn nhà hàng trên toàn quốc.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link href="/products" className="group">
-                <Button size="lg" className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-lg h-14 px-8 group-hover:scale-105 transition-transform duration-300">
+                <Button size="lg" className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-lg h-14 px-8 group-hover:scale-105 transition-transform duration-300">
                   Khám phá sản phẩm
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="/contact">
-                <Button size="lg" variant="outline" className="border-2 border-violet-600 text-violet-600 hover:bg-violet-50 text-lg h-14 px-8">
+                <Button size="lg" variant="outline" className="border-2 border-red-600 text-red-600 hover:bg-red-50 text-lg h-14 px-8">
                   Liên hệ chúng tôi
                 </Button>
               </Link>
@@ -88,10 +88,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 animate-slideUp">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Tại sao chọn Gia Vị Việt?
+              Tại sao chọn Hải Trang?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Chúng tôi cam kết cung cấp những sản phẩm tốt nhất với dịch vụ xuất sắc
+              Uy tín tạo nên thương hiệu từ những năm 1960 tại số 03 Hàng Khoai.
             </p>
           </div>
 
@@ -132,11 +132,11 @@ export default function HomePage() {
               return (
                 <div
                   key={index}
-                  className="animate-slideUp group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-violet-300 hover:scale-105"
+                  className="animate-slideUp group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-red-300 hover:scale-105"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="w-14 h-14 bg-gradient-to-br from-violet-100 to-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-gradient-to-br group-hover:from-violet-500 group-hover:to-indigo-500 transition-all duration-300">
-                    <Icon className="w-7 h-7 text-violet-600 group-hover:text-white transition-colors" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-red-100 to-orange-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-gradient-to-br group-hover:from-red-500 group-hover:to-orange-500 transition-all duration-300">
+                    <Icon className="w-7 h-7 text-red-600 group-hover:text-white transition-colors" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">
                     {feature.title}
@@ -152,7 +152,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-red-600 to-orange-600 text-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             {[
@@ -163,7 +163,7 @@ export default function HomePage() {
             ].map((stat, index) => (
               <div key={index} className="animate-slideUp" style={{ animationDelay: `${index * 100}ms` }}>
                 <p className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</p>
-                <p className="text-violet-100 text-lg">{stat.label}</p>
+                <p className="text-red-100 text-lg">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -181,13 +181,13 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/products" className="group">
-              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-lg h-14 px-8 w-full sm:w-auto group-hover:scale-105 transition-transform duration-300">
+              <Button size="lg" className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white text-lg h-14 px-8 w-full sm:w-auto group-hover:scale-105 transition-transform duration-300">
                 Mua ngay
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="border-2 border-violet-600 text-violet-600 hover:bg-violet-50 text-lg h-14 px-8 w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="border-2 border-red-600 text-red-600 hover:bg-red-50 text-lg h-14 px-8 w-full sm:w-auto">
                 Gọi tư vấn
               </Button>
             </Link>
@@ -196,7 +196,7 @@ export default function HomePage() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-violet-50 to-indigo-50 border-y border-gray-200">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-red-50 to-orange-50 border-y border-gray-200">
         <div className="max-w-2xl mx-auto text-center animate-slideUp">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Nhận tin tức khuyến mãi
@@ -210,13 +210,13 @@ export default function HomePage() {
               placeholder="Nhập email của bạn"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-violet-600 transition-colors"
+              className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-red-600 transition-colors"
               disabled={subscribing}
             />
             <Button 
               type="submit"
               disabled={subscribing}
-              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold h-12 px-6 whitespace-nowrap"
+              className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold h-12 px-6 whitespace-nowrap"
             >
               {subscribing ? 'Đang gửi...' : 'Đăng ký'}
             </Button>
@@ -232,20 +232,20 @@ export default function HomePage() {
               {
                 icon: Phone,
                 title: 'Gọi cho chúng tôi',
-                content: '+84 (123) 456 789',
-                subtext: 'Thứ 2-7, 8:00-18:00'
+                content: '094.550.1989',
+                subtext: 'Bán hàng: 7:00 - 21:30'
               },
               {
                 icon: Mail,
                 title: 'Email',
-                content: 'info@giaviviet.com',
+                content: 'cuahanghaitrang@gmail.com',
                 subtext: 'Hỗ trợ 24/7'
               },
               {
                 icon: MapPin,
                 title: 'Địa chỉ',
-                content: '123 Trần Hưng Đạo',
-                subtext: 'Hà Nội, Việt Nam'
+                content: '03 Hàng Khoai',
+                subtext: 'Hoàn Kiếm, Hà Nội'
               }
             ].map((info, index) => {
               const Icon = info.icon
@@ -255,11 +255,11 @@ export default function HomePage() {
                   className="animate-slideUp text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{info.title}</h3>
-                  <p className="font-semibold text-violet-600 mb-1">{info.content}</p>
+                  <p className="font-semibold text-red-600 mb-1">{info.content}</p>
                   <p className="text-sm text-gray-600">{info.subtext}</p>
                 </div>
               )
@@ -273,13 +273,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">GV</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-orange-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">HT</span>
               </div>
-              Gia Vị Việt
+              Hải Trang
             </h3>
             <p className="text-sm text-gray-500">
-              Cung cấp gia vị chất lượng cao cho các gia đình và bếp ăn chuyên nghiệp
+              Cửa hàng số 03 Hàng Khoai - Chuyên gia vị, thực phẩm cho nhà hàng và đại lý trên toàn quốc.
             </p>
           </div>
           <div>
@@ -308,7 +308,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="border-t border-gray-800 pt-8 text-center text-sm">
-          <p>&copy; 2024 Gia Vị Việt. Tất cả quyền được bảo vệ.</p>
+          <p>&copy; 2024 Hải Trang. Tất cả quyền được bảo vệ.</p>
         </div>
       </footer>
     </div>

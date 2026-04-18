@@ -10,8 +10,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Gia Vị Việt - Gia vị chất lượng cao',
-  description: 'Cửa hàng gia vị Việt Nam chất lượng cao, bao gồm tiêu, saffron, dầu mầm mè và nhiều sản phẩm khác',
+  title: 'Hải Trang - Gia vị & Thực phẩm chất lượng cao',
+  description: 'Hải Trang - Chuyên cung cấp sỉ và lẻ các loại gia vị, đồ hộp, rau củ quả tươi cho nhà hàng và gia đình với hơn 60 năm kinh nghiệm.',
   generator: 'v0.app',
   icons: {
     icon: [
