@@ -46,9 +46,9 @@ export function Header() {
       <div className="bg-[#00483d] text-white py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4">
-            {/* Mobile Menu Trigger */}
+            {/* Menu Trigger (All devices) */}
             <button
-              className="md:hidden flex flex-col items-center justify-center text-white"
+              className="flex flex-col items-center justify-center text-white group hover:opacity-80 transition-opacity"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -137,9 +137,9 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Menu Overlay (All devices) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/50 z-[100] md:hidden transition-opacity duration-300" onClick={() => setMobileMenuOpen(false)}>
+        <div className="fixed inset-0 bg-black/50 z-[100] transition-opacity duration-300" onClick={() => setMobileMenuOpen(false)}>
           <div className="absolute left-0 top-0 h-full w-[300px] bg-white shadow-2xl overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-gray-100">
               <Link href="/" onClick={() => setMobileMenuOpen(false)} className="inline-block p-1">
