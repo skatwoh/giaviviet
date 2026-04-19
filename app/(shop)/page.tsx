@@ -31,9 +31,9 @@ export default function HomePage() {
   ]
 
   const productSections = [
-    { id: 'gia-vi', title: 'Gia Vị Các Loại', category: 'spices' },
-    { id: 'dau-bo', title: 'Dầu, Bơ', category: 'oils' },
-    { id: 'do-kho', title: 'Đồ Khô', category: 'condiments' }
+    { id: 'gia-vi', title: 'Gia Vị Các Loại', category: 'gia-vi' },
+    { id: 'dau-bo', title: 'Dầu, Bơ', category: 'dau-bo' },
+    { id: 'do-kho', title: 'Đồ Khô', category: 'do-kho' }
   ]
 
   return (
