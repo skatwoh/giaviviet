@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -39,6 +39,8 @@ import {
   AlertCircle,
   DollarSign,
   ChevronRight,
+  Download,
+  Upload,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -87,6 +89,7 @@ export default function AdminPage() {
   const [showProductDialog, setShowProductDialog] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     name: '',
     price: 0,
@@ -238,6 +241,82 @@ export default function AdminPage() {
     }
   }
 
+  const handleDownloadTemplate = () => {
+    const headers = ['name', 'price', 'category', 'stock', 'weight', 'origin', 'description', 'image']
+    const csvContent = headers.join(',') + '\n' +
+      'Sản phẩm mẫu 1,50000,spices,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
+      'Sản phẩm mẫu 2,120000,oils,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
+
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'template_san_pham.csv')
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success('Đã tải xuống template mẫu')
+  }
+
+  const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const text = event.target?.result as string
+      const lines = text.split('\n')
+      const headers = lines[0].split(',').map(h => h.trim())
+
+      let importCount = 0
+
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue
+
+        // Simple CSV parser that handles quotes
+        const values: string[] = []
+        let current = ''
+        let inQuotes = false
+        for (let char of lines[i]) {
+          if (char === '"') inQuotes = !inQuotes
+          else if (char === ',' && !inQuotes) {
+            values.push(current.trim())
+            current = ''
+          } else current += char
+        }
+        values.push(current.trim())
+
+        const productData: any = {}
+        headers.forEach((header, index) => {
+          let value: any = values[index]?.replace(/^"|"$/g, '')
+          if (header === 'price' || header === 'stock') {
+            value = Number(value) || 0
+          }
+          productData[header] = value
+        })
+
+        try {
+          const res = await fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData),
+          })
+          if (res.ok) {
+            const created = await res.json()
+            setProducts(prev => [...prev, created])
+            importCount++
+          }
+        } catch (err) {
+          console.error('Error importing product:', err)
+        }
+      }
+      toast.success(`Đã nhập thành công ${importCount} sản phẩm`)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+    reader.readAsText(file)
+  }
+
   // Calculate statistics
   const stats = {
     totalProducts: products.length,
@@ -263,6 +342,21 @@ export default function AdminPage() {
           <p className="text-gray-500">Quản lý cửa hàng, sản phẩm và đơn hàng của bạn.</p>
         </div>
         <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept=".csv"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleImportExcel}
+          />
+          <Button variant="outline" onClick={handleDownloadTemplate} className="hidden sm:flex">
+            <Download className="w-4 h-4 mr-2" />
+            Tải mẫu
+          </Button>
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="w-4 h-4 mr-2" />
+            Nhập Excel
+          </Button>
           <Button
             onClick={() => {
               setEditingProduct(null)
