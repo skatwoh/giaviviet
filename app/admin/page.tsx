@@ -2,10 +2,45 @@
 
 import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Trash2, Plus, Edit2, Package, ShoppingBag, MessageSquare, TrendingUp, Search, CheckCircle, Clock } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import {
+  Trash2,
+  Plus,
+  Edit2,
+  Package,
+  ShoppingBag,
+  MessageSquare,
+  TrendingUp,
+  Search,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  DollarSign,
+  ChevronRight,
+} from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Product {
   id: number
@@ -49,7 +84,7 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [messages, setMessages] = useState<Message[]>([])
-  const [showProductForm, setShowProductForm] = useState(false)
+  const [showProductDialog, setShowProductDialog] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [formData, setFormData] = useState({
@@ -87,6 +122,7 @@ export default function AdminPage() {
         if (messagesRes.ok) setMessages(await messagesRes.json())
       } catch (error) {
         console.error('Error fetching data:', error)
+        toast.error('Không thể tải dữ liệu')
       }
     }
 
@@ -116,6 +152,7 @@ export default function AdminPage() {
         if (res.ok) {
           const updated = await res.json()
           setProducts(products.map((p) => (p.id === editingProduct.id ? updated : p)))
+          toast.success('Cập nhật sản phẩm thành công')
         }
       } else {
         const newProduct = { id: Date.now(), ...formData }
@@ -127,23 +164,15 @@ export default function AdminPage() {
         if (res.ok) {
           const created = await res.json()
           setProducts([...products, created])
+          toast.success('Thêm sản phẩm mới thành công')
         }
       }
     } catch (error) {
       console.error('Error saving product:', error)
+      toast.error('Lỗi khi lưu sản phẩm')
     }
 
-    setFormData({
-      name: '',
-      price: 0,
-      category: 'spices',
-      stock: 0,
-      weight: '',
-      origin: '',
-      description: '',
-      image: '',
-    })
-    setShowProductForm(false)
+    setShowProductDialog(false)
     setEditingProduct(null)
   }
 
@@ -154,9 +183,11 @@ export default function AdminPage() {
       const res = await fetch(`/api/products/${id}`, { method: 'DELETE' })
       if (res.ok) {
         setProducts(products.filter((p) => p.id !== id))
+        toast.success('Xóa sản phẩm thành công')
       }
     } catch (error) {
       console.error('Error deleting product:', error)
+      toast.error('Lỗi khi xóa sản phẩm')
     }
   }
 
@@ -172,7 +203,7 @@ export default function AdminPage() {
       description: product.description,
       image: product.image,
     })
-    setShowProductForm(true)
+    setShowProductDialog(true)
   }
 
   const handleOrderStatusChange = async (orderId: number, newStatus: string) => {
@@ -184,9 +215,11 @@ export default function AdminPage() {
       })
       if (res.ok) {
         setOrders(orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)))
+        toast.success('Cập nhật trạng thái đơn hàng thành công')
       }
     } catch (error) {
       console.error('Error updating order:', error)
+      toast.error('Lỗi khi cập nhật đơn hàng')
     }
   }
 
@@ -197,9 +230,11 @@ export default function AdminPage() {
       const res = await fetch(`/api/messages/${messageId}`, { method: 'DELETE' })
       if (res.ok) {
         setMessages(messages.filter((m) => m.id !== messageId))
+        toast.success('Xóa tin nhắn thành công')
       }
     } catch (error) {
       console.error('Error deleting message:', error)
+      toast.error('Lỗi khi xóa tin nhắn')
     }
   }
 
@@ -220,375 +255,247 @@ export default function AdminPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Bảng quản lý</h1>
-
-          {/* Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Sản phẩm</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
-                  </div>
-                  <Package className="w-8 h-8 text-amber-700" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Đơn hàng</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalOrders}</p>
-                  </div>
-                  <ShoppingBag className="w-8 h-8 text-amber-700" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Tin nhắn</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalMessages}</p>
-                  </div>
-                  <MessageSquare className="w-8 h-8 text-amber-700" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Doanh thu</p>
-                    <p className="text-lg font-bold text-amber-700">
-                      {(stats.totalRevenue / 1000000).toFixed(1)}M đ
-                    </p>
-                  </div>
-                  <TrendingUp className="w-8 h-8 text-amber-700" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Chờ xử lý</p>
-                    <p className="text-2xl font-bold text-red-600">{stats.pendingOrders}</p>
-                  </div>
-                  <Clock className="w-8 h-8 text-red-600" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Tổng quan</h1>
+          <p className="text-gray-500">Quản lý cửa hàng, sản phẩm và đơn hàng của bạn.</p>
         </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => {
+              setEditingProduct(null)
+              setFormData({
+                name: '',
+                price: 0,
+                category: 'spices',
+                stock: 0,
+                weight: '',
+                origin: '',
+                description: '',
+                image: '',
+              })
+              setShowProductDialog(true)
+            }}
+            className="bg-amber-700 hover:bg-amber-800"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Sản phẩm mới
+          </Button>
+        </div>
+      </div>
 
-        <Tabs defaultValue="products" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="products">
+      {/* Statistics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {[
+          { label: 'Sản phẩm', value: stats.totalProducts, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Tin nhắn', value: stats.totalMessages, icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50' },
+          { label: 'Doanh thu', value: `${(stats.totalRevenue / 1000000).toFixed(1)}M đ`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Chờ xử lý', value: stats.pendingOrders, icon: Clock, color: 'text-red-600', bg: 'bg-red-50' },
+        ].map((stat, i) => (
+          <Card key={i} className="border-none shadow-sm overflow-hidden">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                  <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                </div>
+                <div className={`${stat.bg} ${stat.color} p-3 rounded-xl`}>
+                  <stat.icon className="w-6 h-6" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Tabs defaultValue="products" className="space-y-6">
+        <div className="flex items-center justify-between">
+          <TabsList className="bg-white border p-1 h-12">
+            <TabsTrigger value="products" className="px-6 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <Package className="w-4 h-4 mr-2" />
               Sản phẩm
             </TabsTrigger>
-            <TabsTrigger value="orders">
+            <TabsTrigger value="orders" className="px-6 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <ShoppingBag className="w-4 h-4 mr-2" />
               Đơn hàng
             </TabsTrigger>
-            <TabsTrigger value="messages">
+            <TabsTrigger value="messages" className="px-6 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <MessageSquare className="w-4 h-4 mr-2" />
               Tin nhắn
             </TabsTrigger>
           </TabsList>
 
-          {/* Products Tab */}
-          <TabsContent value="products">
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex-1 w-full">
-                    <CardTitle>Quản lý sản phẩm ({filteredProducts.length})</CardTitle>
-                    <div className="mt-4 flex items-center border border-gray-300 rounded-lg">
-                      <Search className="w-5 h-5 text-gray-400 ml-3" />
-                      <input
-                        type="text"
-                        placeholder="Tìm sản phẩm..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex-1 px-3 py-2 border-0 outline-none"
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      setEditingProduct(null)
-                      setFormData({
-                        name: '',
-                        price: 0,
-                        category: 'spices',
-                        stock: 0,
-                        weight: '',
-                        origin: '',
-                        description: '',
-                        image: '',
-                      })
-                      setShowProductForm(!showProductForm)
-                    }}
-                    className="bg-amber-700 hover:bg-amber-800 whitespace-nowrap"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Thêm sản phẩm
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {showProductForm && (
-                  <form
-                    onSubmit={handleProductSubmit}
-                    className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Input
-                        type="text"
-                        name="name"
-                        placeholder="Tên sản phẩm"
-                        value={formData.name}
-                        onChange={handleProductFormChange}
-                        required
-                      />
-                      <Input
-                        type="number"
-                        name="price"
-                        placeholder="Giá"
-                        value={formData.price}
-                        onChange={handleProductFormChange}
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleProductFormChange}
-                        className="border border-gray-300 rounded-md px-3 py-2"
-                      >
-                        <option value="spices">Gia vị</option>
-                        <option value="condiments">Gia vị nêm</option>
-                        <option value="oils">Dầu</option>
-                      </select>
-                      <Input
-                        type="number"
-                        name="stock"
-                        placeholder="Số lượng kho"
-                        value={formData.stock}
-                        onChange={handleProductFormChange}
-                        required
-                      />
-                      <Input
-                        type="text"
-                        name="weight"
-                        placeholder="Cân nặng"
-                        value={formData.weight}
-                        onChange={handleProductFormChange}
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Input
-                        type="text"
-                        name="origin"
-                        placeholder="Xuất xứ"
-                        value={formData.origin}
-                        onChange={handleProductFormChange}
-                      />
-                      <Input
-                        type="text"
-                        name="image"
-                        placeholder="URL hình ảnh"
-                        value={formData.image}
-                        onChange={handleProductFormChange}
-                      />
-                    </div>
-                    <textarea
-                      name="description"
-                      placeholder="Mô tả sản phẩm"
-                      value={formData.description}
-                      onChange={handleProductFormChange}
-                      rows={3}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    />
-                    <div className="flex space-x-2">
-                      <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
-                        {editingProduct ? 'Cập nhật' : 'Thêm mới'}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setShowProductForm(false)}
-                      >
-                        Hủy
-                      </Button>
-                    </div>
-                  </form>
-                )}
+          <div className="hidden md:flex items-center relative w-64">
+            <Search className="absolute left-3 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Tìm kiếm..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-white"
+            />
+          </div>
+        </div>
 
-                <div className="space-y-2">
+        {/* Products Tab */}
+        <TabsContent value="products">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="pb-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Danh sách sản phẩm</CardTitle>
+                  <CardDescription>Hiển thị {filteredProducts.length} sản phẩm hiện có trong kho.</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0 sm:p-6 pt-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[80px]">Hình ảnh</TableHead>
+                    <TableHead>Tên sản phẩm</TableHead>
+                    <TableHead>Danh mục</TableHead>
+                    <TableHead>Giá</TableHead>
+                    <TableHead>Kho</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {filteredProducts.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">Không có sản phẩm nào</p>
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                        Không tìm thấy sản phẩm nào
+                      </TableCell>
+                    </TableRow>
                   ) : (
                     filteredProducts.map((product) => (
-                      <div
-                        key={product.id}
-                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
-                      >
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {product.price.toLocaleString('vi-VN')} đ | Danh mục:{' '}
-                            {categoryMap[product.category] ?? product.category}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Kho:{' '}
-                            {product.stock > 5 ? (
-                              <span className="text-green-600">✓ {product.stock}</span>
+                      <TableRow key={product.id}>
+                        <TableCell>
+                          <div className="h-10 w-10 rounded-md overflow-hidden bg-gray-100 border">
+                            {product.image ? (
+                              <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
                             ) : (
-                              <span className="text-red-600">⚠ {product.stock}</span>
+                              <Package className="h-full w-full p-2 text-gray-400" />
                             )}
-                          </p>
-                        </div>
-                        <div className="flex space-x-2 mt-3 sm:mt-0">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEditProduct(product)}
-                            className="text-amber-700 hover:bg-amber-50"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteProduct(product.id)}
-                            className="text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Orders Tab */}
-          <TabsContent value="orders">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quản lý đơn hàng ({orders.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {orders.length === 0 ? (
-                  <div className="text-center py-12">
-                    <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">Chưa có đơn hàng nào</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <div
-                        key={order.id}
-                        className="p-4 border border-gray-200 rounded-lg hover:border-amber-300 transition"
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase">Mã đơn hàng</p>
-                            <p className="font-bold text-gray-900">#{order.id}</p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {new Date(order.createdAt).toLocaleString('vi-VN')}
-                            </p>
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase">Khách hàng</p>
-                            <p className="font-semibold text-gray-900">
-                              {order.customer.customerName}
-                            </p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {order.customer.phoneNumber}
-                            </p>
-                          </div>
-                          <div className="flex flex-col justify-between">
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase">Tổng tiền</p>
-                              <p className="text-lg font-bold text-amber-700">
-                                {order.total.toLocaleString('vi-VN')} đ
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-gray-50 p-3 rounded mb-3">
-                          <p className="text-sm font-semibold text-gray-900 mb-2">
-                            Địa chỉ giao hàng:
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {order.customer.address}, {order.customer.district},{' '}
-                            {order.customer.city}
-                          </p>
-                          <p className="text-sm text-gray-600 mt-2">
-                            <strong>Sản phẩm:</strong>{' '}
-                            {order.items.map((i) => `${i.name} (x${i.quantity})`).join(', ')}
-                          </p>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                          <div className="flex gap-2 items-center">
-                            {order.status === 'pending' && (
-                              <Clock className="w-5 h-5 text-yellow-600" />
-                            )}
-                            {(order.status === 'confirmed' || order.status === 'delivered') && (
-                              <CheckCircle
-                                className={`w-5 h-5 ${
-                                  order.status === 'delivered'
-                                    ? 'text-green-600'
-                                    : 'text-blue-600'
-                                }`}
-                              />
-                            )}
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                order.status === 'pending'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : order.status === 'confirmed'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : order.status === 'cancelled'
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-green-100 text-green-800'
-                              }`}
-                            >
-                              {order.status === 'pending'
-                                ? 'Chờ xác nhận'
-                                : order.status === 'confirmed'
-                                ? 'Đã xác nhận'
-                                : order.status === 'cancelled'
-                                ? 'Đã hủy'
-                                : 'Đã giao'}
+                        </TableCell>
+                        <TableCell className="font-medium text-gray-900">{product.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="bg-gray-50">
+                            {categoryMap[product.category] ?? product.category}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{product.price.toLocaleString('vi-VN')} đ</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <span className={`h-2 w-2 rounded-full ${product.stock > 5 ? 'bg-green-500' : 'bg-red-500'}`} />
+                            <span className={product.stock > 5 ? 'text-gray-700' : 'text-red-600 font-medium'}>
+                              {product.stock} sản phẩm
                             </span>
                           </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleEditProduct(product)}
+                              className="text-amber-700 hover:bg-amber-50"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                          <div className="flex gap-2 w-full sm:w-auto">
+        {/* Orders Tab */}
+        <TabsContent value="orders">
+          <Card className="border-none shadow-sm">
+            <CardHeader>
+              <CardTitle>Quản lý đơn hàng</CardTitle>
+              <CardDescription>Theo dõi và cập nhật trạng thái đơn hàng từ khách hàng.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Mã đơn</TableHead>
+                    <TableHead>Khách hàng</TableHead>
+                    <TableHead>Ngày đặt</TableHead>
+                    <TableHead>Tổng tiền</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {orders.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                        Chưa có đơn hàng nào
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    orders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-mono text-xs font-bold">#{order.id}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900">{order.customer.customerName}</span>
+                            <span className="text-xs text-gray-500">{order.customer.phoneNumber}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-600">
+                          {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                        </TableCell>
+                        <TableCell className="font-semibold text-amber-700">
+                          {order.total.toLocaleString('vi-VN')} đ
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              order.status === 'pending'
+                                ? 'bg-yellow-100 text-yellow-800 border-yellow-200 shadow-none'
+                                : order.status === 'confirmed'
+                                ? 'bg-blue-100 text-blue-800 border-blue-200 shadow-none'
+                                : order.status === 'cancelled'
+                                ? 'bg-red-100 text-red-800 border-red-200 shadow-none'
+                                : 'bg-green-100 text-green-800 border-green-200 shadow-none'
+                            }
+                          >
+                            {order.status === 'pending'
+                              ? 'Chờ xác nhận'
+                              : order.status === 'confirmed'
+                              ? 'Đã xác nhận'
+                              : order.status === 'cancelled'
+                              ? 'Đã hủy'
+                              : 'Đã giao'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
                             {order.status === 'pending' && (
                               <>
                                 <Button
                                   size="sm"
                                   onClick={() => handleOrderStatusChange(order.id, 'confirmed')}
-                                  className="bg-blue-600 hover:bg-blue-700 flex-1 sm:flex-none"
+                                  className="bg-blue-600 hover:bg-blue-700 h-8"
                                 >
                                   Xác nhận
                                 </Button>
@@ -596,7 +503,7 @@ export default function AdminPage() {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => handleOrderStatusChange(order.id, 'cancelled')}
-                                  className="flex-1 sm:flex-none"
+                                  className="h-8"
                                 >
                                   Hủy
                                 </Button>
@@ -606,83 +513,207 @@ export default function AdminPage() {
                               <Button
                                 size="sm"
                                 onClick={() => handleOrderStatusChange(order.id, 'delivered')}
-                                className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none"
+                                className="bg-green-600 hover:bg-green-700 h-8"
                               >
-                                Xác nhận giao
+                                Giao hàng
                               </Button>
                             )}
                           </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          {/* Messages Tab */}
-          <TabsContent value="messages">
-            <Card>
-              <CardHeader>
-                <CardTitle>Tin nhắn liên hệ ({messages.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {messages.length === 0 ? (
-                  <div className="text-center py-12">
-                    <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">Chưa có tin nhắn nào</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className="p-4 border border-gray-200 rounded-lg hover:border-amber-300 transition"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-gray-900 text-lg">{message.subject}</h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                              <strong>Từ:</strong> {message.name} ({message.email})
-                            </p>
+        {/* Messages Tab */}
+        <TabsContent value="messages">
+          <div className="grid grid-cols-1 gap-4">
+            {messages.length === 0 ? (
+              <Card className="border-none shadow-sm">
+                <CardContent className="h-32 flex items-center justify-center text-gray-500">
+                  Chưa có tin nhắn nào
+                </CardContent>
+              </Card>
+            ) : (
+              messages.map((message) => (
+                <Card key={message.id} className="border-none shadow-sm overflow-hidden">
+                  <div className="flex items-start">
+                    <div className="w-1 bg-amber-700 self-stretch" />
+                    <CardContent className="p-6 w-full">
+                      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">{message.subject}</h3>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <strong>Người gửi:</strong> {message.name}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <strong>Email:</strong> {message.email}
+                            </span>
                             {message.phone && (
-                              <p className="text-sm text-gray-600">
-                                <strong>Điện thoại:</strong> {message.phone}
-                              </p>
+                              <span className="flex items-center gap-1">
+                                <strong>SĐT:</strong> {message.phone}
+                              </span>
                             )}
                           </div>
-                          <div className="text-right">
-                            <p className="text-xs text-gray-500">
-                              {new Date(message.createdAt).toLocaleString('vi-VN')}
-                            </p>
-                          </div>
                         </div>
-
-                        <div className="bg-gray-50 p-4 rounded-lg mb-3 border-l-4 border-amber-700">
-                          <p className="text-gray-700 whitespace-pre-wrap">{message.message}</p>
-                        </div>
-
-                        <div className="flex justify-end">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteMessage(message.id)}
-                            className="text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Xóa
-                          </Button>
+                        <div className="text-sm text-gray-400 font-medium">
+                          {new Date(message.createdAt).toLocaleString('vi-VN')}
                         </div>
                       </div>
-                    ))}
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 whitespace-pre-wrap leading-relaxed">
+                        {message.message}
+                      </div>
+                      <div className="flex justify-end mt-4">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteMessage(message.id)}
+                          className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Xóa tin nhắn
+                        </Button>
+                      </div>
+                    </CardContent>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Product Form Dialog */}
+      <Dialog open={showProductDialog} onOpenChange={setShowProductDialog}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <form onSubmit={handleProductSubmit}>
+            <DialogHeader>
+              <DialogTitle>{editingProduct ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'}</DialogTitle>
+              <DialogDescription>
+                Điền thông tin chi tiết của sản phẩm vào form bên dưới.
+              </DialogDescription>
+            </DialogHeader>
+
+            <Separator className="my-4" />
+
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Tên sản phẩm</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Ví dụ: Nước mắm Hưng Thịnh"
+                    value={formData.name}
+                    onChange={handleProductFormChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="price">Giá bán (đ)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    name="price"
+                    placeholder="0"
+                    value={formData.price}
+                    onChange={handleProductFormChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="category">Danh mục</Label>
+                  <select
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleProductFormChange}
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="spices">Gia vị</option>
+                    <option value="condiments">Gia vị nêm</option>
+                    <option value="oils">Dầu</option>
+                  </select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="stock">Số lượng kho</Label>
+                  <Input
+                    id="stock"
+                    type="number"
+                    name="stock"
+                    placeholder="0"
+                    value={formData.stock}
+                    onChange={handleProductFormChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="weight">Khối lượng</Label>
+                  <Input
+                    id="weight"
+                    name="weight"
+                    placeholder="Ví dụ: 500ml, 1kg"
+                    value={formData.weight}
+                    onChange={handleProductFormChange}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="origin">Xuất xứ</Label>
+                  <Input
+                    id="origin"
+                    name="origin"
+                    placeholder="Ví dụ: Việt Nam"
+                    value={formData.origin}
+                    onChange={handleProductFormChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="image">URL Hình ảnh</Label>
+                  <Input
+                    id="image"
+                    name="image"
+                    placeholder="https://..."
+                    value={formData.image}
+                    onChange={handleProductFormChange}
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="description">Mô tả sản phẩm</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  placeholder="Nhập mô tả chi tiết sản phẩm..."
+                  value={formData.description}
+                  onChange={handleProductFormChange}
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button type="button" variant="outline" onClick={() => setShowProductDialog(false)}>
+                Hủy bỏ
+              </Button>
+              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+                {editingProduct ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
