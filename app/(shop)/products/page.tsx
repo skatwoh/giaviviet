@@ -33,7 +33,7 @@ export default function ProductsPage() {
       try {
         const response = await fetch('/api/products')
         const data = await response.json()
-        setProducts(data)
+        setProducts(data.products || [])
         setIsLoading(false)
       } catch (error) {
         console.error('Error fetching products:', error)

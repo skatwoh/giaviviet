@@ -4,7 +4,7 @@
       "id": 1,
       "name": "Tiêu Đen Hạt",
       "price": 50000,
-      "category": "spices",
+      "category": "gia-vi",
       "stock": 50,
       "weight": "250g",
       "origin": "Việt Nam",
@@ -14,7 +14,7 @@
     {
       "id": 2,
       "name": "Hạt Tiêu Trắng",
-      "category": "spices",
+      "category": "gia-vi",
       "price": 55000,
       "image": "/images/pepper-white.jpg",
       "description": "Hạt tiêu trắng nguyên chất, được lựa chọn kỹ lưỡng. Hương vị nhẹ nhàng, thích hợp cho các món ăn tinh tế.",
@@ -25,7 +25,7 @@
     {
       "id": 3,
       "name": "Saffron Cao Cấp",
-      "category": "spices",
+      "category": "gia-vi",
       "price": 120000,
       "image": "/images/saffron.jpg",
       "description": "Saffron nhập khẩu cao cấp từ Iran, mùi thơm quý báu, màu sắc rực rỡ, tăng hương vị cho các món ăn đặc biệt.",
@@ -36,7 +36,7 @@
     {
       "id": 4,
       "name": "Dâu Tằm Hạt",
-      "category": "spices",
+      "category": "gia-vi",
       "price": 75000,
       "image": "/images/cardamom.jpg",
       "description": "Dâu tằm hạt nguyên chất, hương vị ấm áp, thích hợp cho cà phê, trà và các món tráng miệng.",
@@ -47,7 +47,7 @@
     {
       "id": 5,
       "name": "Quế Cinnamon Roll",
-      "category": "spices",
+      "category": "gia-vi",
       "price": 65000,
       "image": "/images/cinnamon.jpg",
       "description": "Quế nguyên chất cuộn từ vỏ quế tươi, mùi thơm ngọt ngào, thích hợp nấu ăn, nướng bánh, pha trà.",
@@ -58,7 +58,7 @@
     {
       "id": 6,
       "name": "Tỏi Khô Miếng",
-      "category": "condiments",
+      "category": "gia-vi",
       "price": 35000,
       "image": "/images/garlic-dried.jpg",
       "description": "Tỏi khô tự nhiên, không hóa chất, mùi thơm đặc trưng, dễ sử dụng cho mọi món ăn.",
@@ -69,7 +69,7 @@
     {
       "id": 7,
       "name": "Hành Tím Khô",
-      "category": "condiments",
+      "category": "gia-vi",
       "price": 40000,
       "image": "/images/onion-dried.jpg",
       "description": "Hành tím khô chất lượng cao, mang mùi hành tự nhiên, thích hợp nêm nếm các món ăn.",
@@ -80,7 +80,7 @@
     {
       "id": 8,
       "name": "Dầu Mầm Mè Nguyên Chất",
-      "category": "oils",
+      "category": "dau-bo",
       "price": 125000,
       "image": "/images/sesame-oil.jpg",
       "description": "Dầu mầm mè nguyên chất 100%, được ép lạnh, giàu dinh dưỡng, thích hợp cho nấu ăn và chế biến thực phẩm.",
@@ -91,7 +91,7 @@
     {
       "id": 9,
       "name": "Dầu Thực Vật Cao Cấp",
-      "category": "oils",
+      "category": "dau-bo",
       "price": 95000,
       "image": "/images/vegetable-oil.jpg",
       "description": "Dầu thực vật cao cấp, lành mạnh, thích hợp cho nấu ăn, chiên, xào tất cả các loại thực phẩm.",
@@ -102,7 +102,7 @@
     {
       "id": 10,
       "name": "Hạt Mè Đen Nguyên Chất",
-      "category": "spices",
+      "category": "gia-vi",
       "price": 50000,
       "image": "/images/sesame-seed.jpg",
       "description": "Hạt mè đen nguyên chất, được sàng lọc kỹ lưỡng, giàu canxi, thích hợp rắc lên các món ăn.",
@@ -113,7 +113,7 @@
     {
       "id": 11,
       "name": "Muối Hoa Tinh Khiết",
-      "category": "condiments",
+      "category": "gia-vi",
       "price": 30000,
       "image": "/images/salt-flower.jpg",
       "description": "Muối hoa tinh khiết từ biển, mang lại hương vị đặc biệt, thích hợp cho chế biến thực phẩm cao cấp.",
@@ -124,7 +124,7 @@
     {
       "id": 12,
       "name": "Ớt Khô Nguyên Trái",
-      "category": "spices",
+      "category": "gia-vi",
       "price": 85000,
       "image": "/images/chili-dried.jpg",
       "description": "Ớt khô nguyên trái, mang mùi hương tự nhiên, cay nhẹ tới cay nồn tùy loại, dùng nêm nếm các món ăn.",

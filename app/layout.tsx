@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/app/context/CartContext'
-import { Header } from '@/components/Header'
 import { Toaster } from 'sonner'
 import './globals.css'
 
@@ -10,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Gia Vị Việt - Gia vị chất lượng cao',
-  description: 'Cửa hàng gia vị Việt Nam chất lượng cao, bao gồm tiêu, saffron, dầu mầm mè và nhiều sản phẩm khác',
+  title: 'Cửa hàng Hải Trang - Gia vị và thực phẩm sạch',
+  description: 'Cửa hàng Hải Trang chuyên cung cấp các loại gia vị, dầu ăn, thực phẩm khô và dụng cụ bếp chất lượng cao.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -41,7 +40,6 @@ export default function RootLayout({
     <html lang="vi">
       <body className="font-sans antialiased">
         <CartProvider>
-          <Header />
           {children}
         </CartProvider>
         <Toaster

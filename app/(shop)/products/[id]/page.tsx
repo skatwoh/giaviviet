@@ -40,7 +40,8 @@ export default function ProductDetailPage() {
     const fetchProducts = async () => {
       try {
         const response = await fetch('/api/products')
-        const products = await response.json()
+        const data = await response.json()
+        const products = data.products || []
 
         const found = products.find(
             (p: Product) => p.id === parseInt(id)
