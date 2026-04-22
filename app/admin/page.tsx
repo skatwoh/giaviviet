@@ -41,6 +41,7 @@ import {
   ChevronRight,
   Download,
   Upload,
+  LayoutGrid,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -54,6 +55,11 @@ interface Product {
   origin: string
   description: string
   image: string
+}
+
+interface Category {
+  id: string
+  name: string
 }
 
 interface Order {
@@ -84,16 +90,23 @@ interface Message {
 
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [messages, setMessages] = useState<Message[]>([])
+
   const [showProductDialog, setShowProductDialog] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+
   const [searchTerm, setSearchTerm] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [formData, setFormData] = useState({
+
+  const [productFormData, setProductFormData] = useState({
     name: '',
     price: 0,
-    category: 'spices',
+    category: '',
     stock: 0,
     weight: '',
     origin: '',
@@ -101,18 +114,18 @@ export default function AdminPage() {
     image: '',
   })
 
-  const categoryMap: Record<string, string> = {
-    spices: 'Gia vị',
-    condiments: 'Gia vị nêm',
-    oils: 'Dầu',
-  }
+  const [categoryFormData, setCategoryFormData] = useState({
+    id: '',
+    name: '',
+  })
 
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, ordersRes, messagesRes] = await Promise.all([
+        const [productsRes, categoriesRes, ordersRes, messagesRes] = await Promise.all([
           fetch('/api/products'),
+          fetch('/api/categories'),
           fetch('/api/orders'),
           fetch('/api/messages'),
         ])
@@ -120,6 +133,9 @@ export default function AdminPage() {
         if (productsRes.ok) {
           const data = await productsRes.json()
           setProducts(data.products || [])
+        }
+        if (categoriesRes.ok) {
+          setCategories(await categoriesRes.json())
         }
         if (ordersRes.ok) setOrders(await ordersRes.json())
         if (messagesRes.ok) setMessages(await messagesRes.json())
@@ -132,11 +148,12 @@ export default function AdminPage() {
     fetchData()
   }, [])
 
+  // Product Handlers
   const handleProductFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
+    setProductFormData((prev) => ({
       ...prev,
       [name]: name === 'price' || name === 'stock' ? Number(value) : value,
     }))
@@ -150,7 +167,7 @@ export default function AdminPage() {
         const res = await fetch(`/api/products/${editingProduct.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: editingProduct.id, ...formData }),
+          body: JSON.stringify({ id: editingProduct.id, ...productFormData }),
         })
         if (res.ok) {
           const updated = await res.json()
@@ -158,7 +175,7 @@ export default function AdminPage() {
           toast.success('Cập nhật sản phẩm thành công')
         }
       } else {
-        const newProduct = { id: Date.now(), ...formData }
+        const newProduct = { id: Date.now(), ...productFormData }
         const res = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -196,7 +213,7 @@ export default function AdminPage() {
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product)
-    setFormData({
+    setProductFormData({
       name: product.name,
       price: product.price,
       category: product.category,
@@ -209,6 +226,80 @@ export default function AdminPage() {
     setShowProductDialog(true)
   }
 
+  // Category Handlers
+  const handleCategoryFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setCategoryFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      if (editingCategory) {
+        const res = await fetch(`/api/categories/${editingCategory.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoryFormData),
+        })
+        if (res.ok) {
+          const updated = await res.json()
+          setCategories(categories.map((c) => (c.id === editingCategory.id ? updated : c)))
+          toast.success('Cập nhật danh mục thành công')
+        }
+      } else {
+        const res = await fetch('/api/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoryFormData),
+        })
+        if (res.ok) {
+          const created = await res.json()
+          setCategories([...categories, created])
+          toast.success('Thêm danh mục mới thành công')
+        } else {
+          const error = await res.json()
+          toast.error(error.error || 'Lỗi khi thêm danh mục')
+          return
+        }
+      }
+    } catch (error) {
+      console.error('Error saving category:', error)
+      toast.error('Lỗi khi lưu danh mục')
+    }
+
+    setShowCategoryDialog(false)
+    setEditingCategory(null)
+  }
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa danh mục này? Điều này có thể ảnh hưởng đến sản phẩm thuộc danh mục này.')) return
+
+    try {
+      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setCategories(categories.filter((c) => c.id !== id))
+        toast.success('Xóa danh mục thành công')
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error)
+      toast.error('Lỗi khi xóa danh mục')
+    }
+  }
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category)
+    setCategoryFormData({
+      id: category.id,
+      name: category.name,
+    })
+    setShowCategoryDialog(true)
+  }
+
+  // Order Handlers
   const handleOrderStatusChange = async (orderId: number, newStatus: string) => {
     try {
       const res = await fetch(`/api/orders/${orderId}`, {
@@ -226,6 +317,7 @@ export default function AdminPage() {
     }
   }
 
+  // Message Handlers
   const handleDeleteMessage = async (messageId: number) => {
     if (!confirm('Xóa tin nhắn này?')) return
 
@@ -241,11 +333,12 @@ export default function AdminPage() {
     }
   }
 
+  // CSV Handlers
   const handleDownloadTemplate = () => {
     const headers = ['name', 'price', 'category', 'stock', 'weight', 'origin', 'description', 'image']
     const csvContent = headers.join(',') + '\n' +
-      'Sản phẩm mẫu 1,50000,spices,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
-      'Sản phẩm mẫu 2,120000,oils,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
+      'Sản phẩm mẫu 1,50000,gia-vi,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
+      'Sản phẩm mẫu 2,120000,dau-bo,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
 
     const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -320,6 +413,7 @@ export default function AdminPage() {
   // Calculate statistics
   const stats = {
     totalProducts: products.length,
+    totalCategories: categories.length,
     totalOrders: orders.length,
     totalMessages: messages.length,
     totalRevenue: orders
@@ -332,6 +426,10 @@ export default function AdminPage() {
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const getCategoryName = (id: string) => {
+    return categories.find(c => c.id === id)?.name || id
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8">
@@ -360,10 +458,10 @@ export default function AdminPage() {
           <Button
             onClick={() => {
               setEditingProduct(null)
-              setFormData({
+              setProductFormData({
                 name: '',
                 price: 0,
-                category: 'spices',
+                category: categories[0]?.id || '',
                 stock: 0,
                 weight: '',
                 origin: '',
@@ -381,9 +479,10 @@ export default function AdminPage() {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         {[
           { label: 'Sản phẩm', value: stats.totalProducts, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Danh mục', value: stats.totalCategories, icon: LayoutGrid, color: 'text-orange-600', bg: 'bg-orange-50' },
           { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-amber-600', bg: 'bg-amber-50' },
           { label: 'Tin nhắn', value: stats.totalMessages, icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50' },
           { label: 'Doanh thu', value: `${(stats.totalRevenue / 1000000).toFixed(1)}M đ`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
@@ -406,23 +505,27 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="products" className="space-y-6">
-        <div className="flex items-center justify-between">
-          <TabsList className="bg-white border p-1 h-12">
-            <TabsTrigger value="products" className="px-6 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <TabsList className="bg-white border p-1 h-12 w-fit">
+            <TabsTrigger value="products" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <Package className="w-4 h-4 mr-2" />
               Sản phẩm
             </TabsTrigger>
-            <TabsTrigger value="orders" className="px-6 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+            <TabsTrigger value="categories" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+              <LayoutGrid className="w-4 h-4 mr-2" />
+              Danh mục
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <ShoppingBag className="w-4 h-4 mr-2" />
               Đơn hàng
             </TabsTrigger>
-            <TabsTrigger value="messages" className="px-6 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+            <TabsTrigger value="messages" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <MessageSquare className="w-4 h-4 mr-2" />
               Tin nhắn
             </TabsTrigger>
           </TabsList>
 
-          <div className="hidden md:flex items-center relative w-64">
+          <div className="flex items-center relative w-full sm:w-64">
             <Search className="absolute left-3 w-4 h-4 text-gray-400" />
             <Input
               placeholder="Tìm kiếm..."
@@ -478,7 +581,7 @@ export default function AdminPage() {
                         <TableCell className="font-medium text-gray-900">{product.name}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className="bg-gray-50">
-                            {categoryMap[product.category] ?? product.category}
+                            {getCategoryName(product.category)}
                           </Badge>
                         </TableCell>
                         <TableCell>{product.price.toLocaleString('vi-VN')} đ</TableCell>
@@ -504,6 +607,83 @@ export default function AdminPage() {
                               size="icon"
                               variant="ghost"
                               onClick={() => handleDeleteProduct(product.id)}
+                              className="text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Categories Tab */}
+        <TabsContent value="categories">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle>Danh sách danh mục</CardTitle>
+                <CardDescription>Quản lý các nhóm sản phẩm trong cửa hàng.</CardDescription>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setEditingCategory(null)
+                  setCategoryFormData({ id: '', name: '' })
+                  setShowCategoryDialog(true)
+                }}
+                className="bg-amber-700 hover:bg-amber-800"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Thêm danh mục
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Mã danh mục (ID)</TableHead>
+                    <TableHead>Tên danh mục</TableHead>
+                    <TableHead>Số sản phẩm</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {categories.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-32 text-center text-gray-500">
+                        Chưa có danh mục nào
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    categories.map((category) => (
+                      <TableRow key={category.id}>
+                        <TableCell className="font-mono text-sm">{category.id}</TableCell>
+                        <TableCell className="font-medium">{category.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {products.filter(p => p.category === category.id).length}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleEditCategory(category)}
+                              className="text-amber-700 hover:bg-amber-50"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteCategory(category.id)}
                               className="text-red-600 hover:bg-red-50"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -703,7 +883,7 @@ export default function AdminPage() {
                     id="name"
                     name="name"
                     placeholder="Ví dụ: Nước mắm Hưng Thịnh"
-                    value={formData.name}
+                    value={productFormData.name}
                     onChange={handleProductFormChange}
                     required
                   />
@@ -715,7 +895,7 @@ export default function AdminPage() {
                     type="number"
                     name="price"
                     placeholder="0"
-                    value={formData.price}
+                    value={productFormData.price}
                     onChange={handleProductFormChange}
                     required
                   />
@@ -728,13 +908,15 @@ export default function AdminPage() {
                   <select
                     id="category"
                     name="category"
-                    value={formData.category}
+                    value={productFormData.category}
                     onChange={handleProductFormChange}
                     className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <option value="spices">Gia vị</option>
-                    <option value="condiments">Gia vị nêm</option>
-                    <option value="oils">Dầu</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="grid gap-2">
@@ -744,7 +926,7 @@ export default function AdminPage() {
                     type="number"
                     name="stock"
                     placeholder="0"
-                    value={formData.stock}
+                    value={productFormData.stock}
                     onChange={handleProductFormChange}
                     required
                   />
@@ -755,7 +937,7 @@ export default function AdminPage() {
                     id="weight"
                     name="weight"
                     placeholder="Ví dụ: 500ml, 1kg"
-                    value={formData.weight}
+                    value={productFormData.weight}
                     onChange={handleProductFormChange}
                   />
                 </div>
@@ -768,7 +950,7 @@ export default function AdminPage() {
                     id="origin"
                     name="origin"
                     placeholder="Ví dụ: Việt Nam"
-                    value={formData.origin}
+                    value={productFormData.origin}
                     onChange={handleProductFormChange}
                   />
                 </div>
@@ -778,7 +960,7 @@ export default function AdminPage() {
                     id="image"
                     name="image"
                     placeholder="https://..."
-                    value={formData.image}
+                    value={productFormData.image}
                     onChange={handleProductFormChange}
                   />
                 </div>
@@ -790,7 +972,7 @@ export default function AdminPage() {
                   id="description"
                   name="description"
                   placeholder="Nhập mô tả chi tiết sản phẩm..."
-                  value={formData.description}
+                  value={productFormData.description}
                   onChange={handleProductFormChange}
                   rows={4}
                 />
@@ -803,6 +985,54 @@ export default function AdminPage() {
               </Button>
               <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
                 {editingProduct ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Category Form Dialog */}
+      <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <form onSubmit={handleCategorySubmit}>
+            <DialogHeader>
+              <DialogTitle>{editingCategory ? 'Cập nhật danh mục' : 'Thêm danh mục mới'}</DialogTitle>
+              <DialogDescription>
+                Tạo mã định danh (ID) và tên cho danh mục mới.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="cat-id">Mã danh mục (ID)</Label>
+                <Input
+                  id="cat-id"
+                  name="id"
+                  placeholder="ví-du: rau-cu"
+                  value={categoryFormData.id}
+                  onChange={handleCategoryFormChange}
+                  disabled={!!editingCategory}
+                  required
+                />
+                {!editingCategory && <p className="text-[10px] text-gray-500 italic">* Viết liền không dấu, dùng dấu gạch ngang.</p>}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="cat-name">Tên danh mục</Label>
+                <Input
+                  id="cat-name"
+                  name="name"
+                  placeholder="Ví dụ: Rau Củ Quả"
+                  value={categoryFormData.name}
+                  onChange={handleCategoryFormChange}
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowCategoryDialog(false)}>
+                Hủy
+              </Button>
+              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+                {editingCategory ? 'Lưu thay đổi' : 'Thêm danh mục'}
               </Button>
             </DialogFooter>
           </form>

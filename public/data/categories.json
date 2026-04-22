@@ -1,0 +1,10 @@
+[
+  { "id": "rau-cu", "name": "Rau Củ Quả" },
+  { "id": "gia-vi", "name": "Gia Vị Các Loại" },
+  { "id": "dau-bo", "name": "Dầu, Bơ" },
+  { "id": "do-hop", "name": "Đồ Hộp" },
+  { "id": "do-kho", "name": "Đồ Khô" },
+  { "id": "bot-nau-an", "name": "Bột Nấu Ăn" },
+  { "id": "mien-banh-da", "name": "Miến, Bánh Đa" },
+  { "id": "dung-cu-bep", "name": "Dụng Cụ Bếp" }
+]
