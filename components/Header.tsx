@@ -15,15 +15,27 @@ import {
   ChevronDown,
   Mail,
   Home,
-  ChevronUp
+  ChevronUp,
+  Plus,
+  Minus,
+  Trash2
 } from 'lucide-react'
 import { useState } from 'react'
 import { OrderModal } from './OrderModal'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  PopoverAnchor,
+} from "@/components/ui/popover"
+import * as PopoverPrimitive from '@radix-ui/react-popover'
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
 
 export function Header() {
-  const { items } = useCart()
+  const { items, updateQuantity, removeItem, total } = useCart()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [productsExpanded, setProductsExpanded] = useState(true)
   const [orderModalOpen, setOrderModalOpen] = useState(false)
@@ -86,17 +98,110 @@ export function Header() {
                 <span className="text-[11px] font-medium mt-1">Tài khoản</span>
               </button>
 
-              <Link href="/cart" className="relative flex flex-col items-center justify-center hover:opacity-80 transition-opacity">
-                <div className="relative">
-                  <ShoppingCart className="w-6 h-6" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                      {cartCount}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[11px] font-medium mt-1">Giỏ hàng</span>
-              </Link>
+              {/* Cart Dropdown */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="relative flex flex-col items-center justify-center hover:opacity-80 transition-opacity focus:outline-none">
+                    <div className="relative">
+                      <ShoppingCart className="w-6 h-6" />
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                          {cartCount}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] font-medium mt-1">Giỏ hàng</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-96 p-0" align="end" sideOffset={10}>
+                  <PopoverPrimitive.Arrow className="fill-white" width={20} height={10} />
+                  <div className="p-4 bg-white rounded-md">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-gray-900 uppercase tracking-wider text-center flex-1">
+                        GIỎ HÀNG
+                      </h3>
+                    </div>
+                    <Separator className="mb-4" />
+
+                    {items.length === 0 ? (
+                      <div className="py-8 text-center text-gray-500">
+                        <ShoppingCart className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                        <p>Giỏ hàng của bạn đang trống</p>
+                      </div>
+                    ) : (
+                      <>
+                        <ScrollArea className="h-[300px] pr-4">
+                          <div className="space-y-4">
+                            {items.map((item) => (
+                              <div key={item.id} className="flex gap-4">
+                                <div className="h-16 w-16 rounded border overflow-hidden flex-shrink-0">
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                </div>
+                                <div className="flex-1 flex flex-col justify-between">
+                                  <div>
+                                    <div className="flex justify-between items-start gap-2">
+                                      <h4 className="text-sm font-bold text-gray-800 leading-tight line-clamp-2">
+                                        {item.name}
+                                      </h4>
+                                      <button
+                                        onClick={() => removeItem(item.id)}
+                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                    <p className="text-[10px] text-gray-500 mt-1 uppercase">Đơn vị: chiếc</p>
+                                  </div>
+
+                                  <div className="flex items-center justify-between mt-2">
+                                    <div className="flex items-center border rounded-sm">
+                                      <button
+                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                        className="p-1 hover:bg-gray-100 transition-colors"
+                                      >
+                                        <Minus className="w-3 h-3" />
+                                      </button>
+                                      <span className="w-8 text-center text-xs font-bold">{item.quantity}</span>
+                                      <button
+                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                        className="p-1 hover:bg-gray-100 transition-colors"
+                                      >
+                                        <Plus className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                    <span className="text-sm font-bold text-gray-900">
+                                      {item.price.toLocaleString('vi-VN')}đ
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </ScrollArea>
+
+                        <Separator className="my-4" />
+
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm font-bold text-gray-600 uppercase">TỔNG TIỀN:</span>
+                          <span className="text-lg font-bold text-red-600">
+                            {total.toLocaleString('vi-VN')}đ
+                          </span>
+                        </div>
+
+                        <Link href="/cart" className="block">
+                          <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-12 rounded-sm uppercase tracking-wide">
+                            XEM GIỎ HÀNG
+                          </Button>
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
 
               <div className="flex items-center gap-1 border border-white/30 px-2 py-1 rounded-sm">
                 <span className="text-xl">🇻🇳</span>
