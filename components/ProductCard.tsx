@@ -52,8 +52,9 @@ export function ProductCard({ id, name, price, originalPrice, image, category }:
           />
           {/* Discount Badge */}
           {hasDiscount && (
-            <div className="absolute top-0 left-0 bg-red-600 text-white text-[11px] font-bold px-1.5 py-0.5">
-              -{discount}%
+            <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-black px-2 py-1 flex items-center gap-1 shadow-md">
+              <span className="uppercase">Sale</span>
+              <span className="bg-white text-red-600 px-1 rounded-sm">{discount}%</span>
             </div>
           )}
           {/* Brand Logo Overlay (Hải Trang) */}

@@ -50,6 +50,8 @@ export default function HomePage() {
     products.some(p => p.category === cat.id)
   )
 
+  const saleProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price)
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
       {/* Banner Section */}
@@ -135,6 +137,48 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Daily Sale Section */}
+      {saleProducts.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 mt-16">
+          <div className="bg-white rounded-2xl border-2 border-red-500 overflow-hidden shadow-xl">
+            <div className="bg-red-500 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="bg-white text-red-600 p-2 rounded-lg animate-pulse">
+                  <svg className="w-6 h-6 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                  <h2 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-wider">Khuyến Mãi Hot Trong Ngày</h2>
+                  <p className="text-red-100 text-xs font-bold uppercase tracking-widest">Số lượng có hạn • Giá tốt mỗi ngày</p>
+                </div>
+              </div>
+              <div className="hidden md:flex items-center gap-2 text-white font-bold">
+                <span className="text-sm">Kết thúc sau:</span>
+                <div className="flex gap-1">
+                  <span className="bg-black/20 px-2 py-1 rounded">08</span>:
+                  <span className="bg-black/20 px-2 py-1 rounded">45</span>:
+                  <span className="bg-black/20 px-2 py-1 rounded">22</span>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 md:p-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {saleProducts.slice(0, 5).map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    name={product.name}
+                    price={product.price}
+                    originalPrice={product.originalPrice}
+                    image={product.image}
+                    category={categories.find(c => c.id === product.category)?.name || ''}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Store Benefits */}
       <section className="max-w-7xl mx-auto px-4 mt-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -196,6 +240,7 @@ export default function HomePage() {
                   id={product.id}
                   name={product.name}
                   price={product.price}
+                  originalPrice={product.originalPrice}
                   image={product.image}
                   category={cat.name}
                 />

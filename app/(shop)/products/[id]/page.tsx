@@ -23,6 +23,7 @@ import {
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Separator } from '@/components/ui/separator'
+import { ProductCard } from '@/components/ProductCard'
 
 interface Product {
   id: number
@@ -349,26 +350,15 @@ export default function ProductDetailPage() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                 {relatedProducts.map((item) => (
-                    <Link key={item.id} href={`/products/${item.id}`} className="group">
-                      <Card className="h-full border-none shadow-none group-hover:shadow-xl transition-all duration-300 overflow-hidden bg-gray-50">
-                        <div className="aspect-[4/5] relative overflow-hidden bg-gray-200">
-                          <Image
-                            src={item.image || '/images/placeholder.jpg'}
-                            alt={item.name}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                          />
-                        </div>
-                        <CardContent className="p-4 bg-white">
-                          <h3 className="font-bold text-gray-900 group-hover:text-[#00483d] transition-colors truncate mb-1">
-                            {item.name}
-                          </h3>
-                          <p className="text-[#00483d] font-extrabold">
-                            {item.price.toLocaleString('vi-VN')}đ
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </Link>
+                  <ProductCard
+                    key={item.id}
+                    id={item.id}
+                    name={item.name}
+                    price={item.price}
+                    originalPrice={item.originalPrice}
+                    image={item.image}
+                    category={getCategoryName(item.category)}
+                  />
                 ))}
               </div>
             </div>
