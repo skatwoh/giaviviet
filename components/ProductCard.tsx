@@ -12,11 +12,12 @@ interface ProductCardProps {
   id: number
   name: string
   price: number
+  originalPrice?: number
   image: string
   category: string
 }
 
-export function ProductCard({ id, name, price, image, category }: ProductCardProps) {
+export function ProductCard({ id, name, price, originalPrice, image, category }: ProductCardProps) {
   const { addItem } = useCart()
 
   const formatPrice = (p: number) => {
@@ -32,7 +33,8 @@ export function ProductCard({ id, name, price, image, category }: ProductCardPro
     toast.success(`Đã thêm ${name} vào giỏ hàng`)
   }
 
-  const discount = 15 // Mock discount
+  const hasDiscount = originalPrice && originalPrice > price
+  const discount = hasDiscount ? Math.round((1 - price / originalPrice) * 100) : 0
 
   return (
     <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300 border-gray-200 group flex flex-col bg-white rounded-none">
@@ -49,9 +51,11 @@ export function ProductCard({ id, name, price, image, category }: ProductCardPro
             }}
           />
           {/* Discount Badge */}
-          <div className="absolute top-0 left-0 bg-red-600 text-white text-[11px] font-bold px-1.5 py-0.5">
-            -{discount}%
-          </div>
+          {hasDiscount && (
+            <div className="absolute top-0 left-0 bg-red-600 text-white text-[11px] font-bold px-1.5 py-0.5">
+              -{discount}%
+            </div>
+          )}
           {/* Brand Logo Overlay (Hải Trang) */}
           <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[#00483d]/10 flex items-center justify-center p-1">
              <div className="text-[6px] font-bold text-[#00483d] leading-[1] text-center">HẢI<br/>TRANG</div>
@@ -75,9 +79,11 @@ export function ProductCard({ id, name, price, image, category }: ProductCardPro
             <span className="text-sm font-bold text-gray-900">
               {formatPrice(price)}
             </span>
-            <span className="text-[11px] text-gray-400 line-through">
-              {formatPrice(Math.round(price / (1 - discount / 100)))}
-            </span>
+            {hasDiscount && (
+              <span className="text-[11px] text-gray-400 line-through">
+                {formatPrice(originalPrice)}
+              </span>
+            )}
           </div>
         </div>
       </CardContent>

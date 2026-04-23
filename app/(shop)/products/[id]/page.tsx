@@ -28,6 +28,7 @@ interface Product {
   id: number
   name: string
   price: number
+  originalPrice?: number
   image: string
   category: string
   description: string
@@ -228,10 +229,15 @@ export default function ProductDetailPage() {
                   <span className="text-4xl font-extrabold text-[#00483d]">
                     {product.price.toLocaleString('vi-VN')}đ
                   </span>
-                  {product.price > 100000 && (
-                    <span className="text-xl text-gray-400 line-through">
-                      {(product.price * 1.2).toLocaleString('vi-VN')}đ
-                    </span>
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <>
+                      <span className="text-xl text-gray-400 line-through">
+                        {product.originalPrice.toLocaleString('vi-VN')}đ
+                      </span>
+                      <Badge className="bg-red-50 text-red-600 border-red-100 px-2 py-1">
+                        -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                      </Badge>
+                    </>
                   )}
                 </div>
 

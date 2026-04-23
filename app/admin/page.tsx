@@ -32,13 +32,9 @@ import {
   Package,
   ShoppingBag,
   MessageSquare,
-  TrendingUp,
   Search,
-  CheckCircle,
   Clock,
-  AlertCircle,
   DollarSign,
-  ChevronRight,
   Download,
   Upload,
   LayoutGrid,
@@ -49,6 +45,7 @@ interface Product {
   id: number
   name: string
   price: number
+  originalPrice?: number
   category: string
   stock: number
   weight: string
@@ -106,6 +103,7 @@ export default function AdminPage() {
   const [productFormData, setProductFormData] = useState({
     name: '',
     price: 0,
+    originalPrice: 0,
     category: '',
     stock: 0,
     weight: '',
@@ -155,7 +153,7 @@ export default function AdminPage() {
     const { name, value } = e.target
     setProductFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' || name === 'stock' ? Number(value) : value,
+      [name]: name === 'price' || name === 'originalPrice' || name === 'stock' ? Number(value) : value,
     }))
   }
 
@@ -216,6 +214,7 @@ export default function AdminPage() {
     setProductFormData({
       name: product.name,
       price: product.price,
+      originalPrice: product.originalPrice || 0,
       category: product.category,
       stock: product.stock,
       weight: product.weight,
@@ -335,10 +334,10 @@ export default function AdminPage() {
 
   // CSV Handlers
   const handleDownloadTemplate = () => {
-    const headers = ['name', 'price', 'category', 'stock', 'weight', 'origin', 'description', 'image']
+    const headers = ['name', 'price', 'originalPrice', 'category', 'stock', 'weight', 'origin', 'description', 'image']
     const csvContent = headers.join(',') + '\n' +
-      'Sản phẩm mẫu 1,50000,gia-vi,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
-      'Sản phẩm mẫu 2,120000,dau-bo,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
+      'Sản phẩm mẫu 1,50000,60000,gia-vi,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
+      'Sản phẩm mẫu 2,120000,,dau-bo,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
 
     const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -383,8 +382,8 @@ export default function AdminPage() {
         const productData: any = {}
         headers.forEach((header, index) => {
           let value: any = values[index]?.replace(/^"|"$/g, '')
-          if (header === 'price' || header === 'stock') {
-            value = Number(value) || 0
+          if (header === 'price' || header === 'originalPrice' || header === 'stock') {
+            value = value ? Number(value) : (header === 'originalPrice' ? undefined : 0)
           }
           productData[header] = value
         })
@@ -461,6 +460,7 @@ export default function AdminPage() {
               setProductFormData({
                 name: '',
                 price: 0,
+                originalPrice: 0,
                 category: categories[0]?.id || '',
                 stock: 0,
                 weight: '',
@@ -584,7 +584,21 @@ export default function AdminPage() {
                             {getCategoryName(product.category)}
                           </Badge>
                         </TableCell>
-                        <TableCell>{product.price.toLocaleString('vi-VN')} đ</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-gray-900">{product.price.toLocaleString('vi-VN')} đ</span>
+                            {product.originalPrice && product.originalPrice > product.price && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-400 line-through">
+                                  {product.originalPrice.toLocaleString('vi-VN')} đ
+                                </span>
+                                <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1 py-0 h-4">
+                                  -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <span className={`h-2 w-2 rounded-full ${product.stock > 5 ? 'bg-green-500' : 'bg-red-500'}`} />
@@ -876,8 +890,8 @@ export default function AdminPage() {
             <Separator className="my-4" />
 
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="grid gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid gap-2 sm:col-span-1">
                   <Label htmlFor="name">Tên sản phẩm</Label>
                   <Input
                     id="name"
@@ -898,6 +912,17 @@ export default function AdminPage() {
                     value={productFormData.price}
                     onChange={handleProductFormChange}
                     required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="originalPrice">Giá gốc (đ)</Label>
+                  <Input
+                    id="originalPrice"
+                    type="number"
+                    name="originalPrice"
+                    placeholder="Không có"
+                    value={productFormData.originalPrice || ''}
+                    onChange={handleProductFormChange}
                   />
                 </div>
               </div>
