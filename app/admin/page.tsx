@@ -379,7 +379,9 @@ export default function AdminPage() {
         }
         values.push(current.trim())
 
-        const productData: any = {}
+        const productData: any = {
+          id: Date.now() + i // Generate a unique-ish ID for the batch
+        }
         headers.forEach((header, index) => {
           let value: any = values[index]?.replace(/^"|"$/g, '')
           if (header === 'price' || header === 'originalPrice' || header === 'stock') {
