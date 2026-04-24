@@ -21,6 +21,7 @@ import { useState } from 'react'
 import { OrderModal } from './OrderModal'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { CartDropdown } from './CartDropdown'
 
 export function Header() {
   const { items } = useCart()
@@ -86,17 +87,7 @@ export function Header() {
                 <span className="text-[11px] font-medium mt-1">Tài khoản</span>
               </button>
 
-              <Link href="/cart" className="relative flex flex-col items-center justify-center hover:opacity-80 transition-opacity">
-                <div className="relative">
-                  <ShoppingCart className="w-6 h-6" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                      {cartCount}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[11px] font-medium mt-1">Giỏ hàng</span>
-              </Link>
+              <CartDropdown />
 
               <div className="flex items-center gap-1 border border-white/30 px-2 py-1 rounded-sm">
                 <span className="text-xl">🇻🇳</span>
