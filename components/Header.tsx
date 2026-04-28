@@ -22,6 +22,7 @@ import { OrderModal } from './OrderModal'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { CartDropdown } from './CartDropdown'
+import { AccountDropdown } from './AccountDropdown'
 
 export function Header() {
   const { items } = useCart()
@@ -82,10 +83,7 @@ export function Header() {
 
             {/* Utility Icons */}
             <div className="hidden lg:flex items-center space-x-6">
-              <button className="flex flex-col items-center justify-center hover:opacity-80 transition-opacity">
-                <User className="w-6 h-6" />
-                <span className="text-[11px] font-medium mt-1">Tài khoản</span>
-              </button>
+              <AccountDropdown />
 
               <CartDropdown />
 

@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 
 export function CartDropdown() {
-  const { items, removeFromCart, updateQuantity } = useCart()
+  const { items, removeItem, updateQuantity } = useCart()
 
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0)
   const cartCount = items.length
@@ -94,7 +94,7 @@ export function CartDropdown() {
                       </div>
                     </div>
                     <button
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeItem(item.id)}
                       className="text-gray-400 hover:text-red-500 transition-colors self-start pt-1"
                     >
                       <Trash2 className="w-4 h-4" />
