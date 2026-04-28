@@ -16,9 +16,10 @@ interface ProductCardProps {
   image: string
   category: string
   stock?: number
+  unit?: string
 }
 
-export function ProductCard({ id, name, price, originalPrice, image, category, stock = 1 }: ProductCardProps) {
+export function ProductCard({ id, name, price, originalPrice, image, category, stock = 1, unit }: ProductCardProps) {
   const { addItem } = useCart()
 
   const formatPrice = (p: number) => {
@@ -101,12 +102,17 @@ export function ProductCard({ id, name, price, originalPrice, image, category, s
         </Link>
 
         <div className="mt-auto">
-          <div className="flex items-end gap-2">
+          <div className="flex items-end gap-1 flex-wrap">
             <span className="text-lg font-black text-brand-green">
               {formatPrice(price)}
             </span>
+            {unit && (
+              <span className="text-[10px] text-gray-500 font-bold mb-1">
+                / {unit}
+              </span>
+            )}
             {hasDiscount && (
-              <span className="text-xs text-gray-400 line-through mb-0.5 font-medium">
+              <span className="text-xs text-gray-400 line-through mb-0.5 font-medium ml-1">
                 {formatPrice(originalPrice)}
               </span>
             )}

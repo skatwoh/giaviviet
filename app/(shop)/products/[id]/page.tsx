@@ -36,6 +36,7 @@ interface Product {
   origin: string
   weight: string
   stock: number
+  unit: string
 }
 
 interface Category {
@@ -226,10 +227,15 @@ export default function ProductDetailPage() {
                   {product.name}
                 </h1>
 
-                <div className="flex items-baseline gap-4 mb-6">
+                <div className="flex items-baseline gap-2 mb-6 flex-wrap">
                   <span className="text-4xl font-extrabold text-[#00483d]">
                     {product.price.toLocaleString('vi-VN')}đ
                   </span>
+                  {product.unit && (
+                    <span className="text-lg font-bold text-gray-500">
+                      / {product.unit}
+                    </span>
+                  )}
                   {product.originalPrice && product.originalPrice > product.price && (
                     <>
                       <span className="text-xl text-gray-400 line-through">
@@ -358,6 +364,8 @@ export default function ProductDetailPage() {
                     originalPrice={item.originalPrice}
                     image={item.image}
                     category={getCategoryName(item.category)}
+                    unit={(item as any).unit}
+                    stock={item.stock}
                   />
                 ))}
               </div>

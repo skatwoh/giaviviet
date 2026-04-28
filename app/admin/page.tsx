@@ -52,6 +52,7 @@ interface Product {
   originalPrice?: number // Effective original price from API
   category: string
   stock: number
+  unit: string
   weight: string
   origin: string
   description: string
@@ -112,6 +113,7 @@ export default function AdminPage() {
     saleEnd: '',
     category: '',
     stock: 0,
+    unit: '',
     weight: '',
     origin: '',
     description: '',
@@ -239,6 +241,7 @@ export default function AdminPage() {
       saleEnd: toLocalISO(product.saleEnd),
       category: product.category,
       stock: product.stock,
+      unit: product.unit || '',
       weight: product.weight,
       origin: product.origin,
       description: product.description,
@@ -489,6 +492,7 @@ export default function AdminPage() {
                 saleEnd: '',
                 category: categories[0]?.id || '',
                 stock: 0,
+                unit: '',
                 weight: '',
                 origin: '',
                 description: '',
@@ -1011,6 +1015,17 @@ export default function AdminPage() {
                     name="stock"
                     placeholder="0"
                     value={productFormData.stock}
+                    onChange={handleProductFormChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="unit">Đơn vị tính</Label>
+                  <Input
+                    id="unit"
+                    name="unit"
+                    placeholder="Ví dụ: Túi, Quả, Thùng..."
+                    value={productFormData.unit}
                     onChange={handleProductFormChange}
                     required
                   />

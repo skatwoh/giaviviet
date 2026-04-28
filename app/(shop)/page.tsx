@@ -237,6 +237,7 @@ export default function HomePage() {
                     image={product.image}
                     category={categories.find(c => c.id === product.category)?.name || ''}
                     stock={product.stock}
+                    unit={product.unit}
                   />
                 ))}
               </div>
@@ -310,6 +311,7 @@ export default function HomePage() {
                   image={product.image}
                   category={cat.name}
                   stock={product.stock}
+                  unit={product.unit}
                 />
               ))}
           </div>
