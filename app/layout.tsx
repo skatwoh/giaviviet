@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/app/context/CartContext'
+import { AuthProvider } from '@/app/context/AuthContext'
 import { Toaster } from 'sonner'
 import './globals.css'
 
@@ -39,9 +40,11 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className="font-sans antialiased">
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            {children}
+          </CartProvider>
+        </AuthProvider>
         <Toaster
           position="top-right"
           richColors
