@@ -64,6 +64,11 @@ interface Category {
   name: string
 }
 
+interface Unit {
+  id: string
+  name: string
+}
+
 interface Order {
   id: number
   customer: {
@@ -93,6 +98,7 @@ interface Message {
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [units, setUnits] = useState<Unit[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [messages, setMessages] = useState<Message[]>([])
 
@@ -101,6 +107,9 @@ export default function AdminPage() {
 
   const [showCategoryDialog, setShowCategoryDialog] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+
+  const [showUnitDialog, setShowUnitDialog] = useState(false)
+  const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
 
   const [searchTerm, setSearchTerm] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -125,13 +134,18 @@ export default function AdminPage() {
     name: '',
   })
 
+  const [unitFormData, setUnitFormData] = useState({
+    name: '',
+  })
+
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, categoriesRes, ordersRes, messagesRes] = await Promise.all([
+        const [productsRes, categoriesRes, unitsRes, ordersRes, messagesRes] = await Promise.all([
           fetch('/api/products'),
           fetch('/api/categories'),
+          fetch('/api/units'),
           fetch('/api/orders'),
           fetch('/api/messages'),
         ])
@@ -142,6 +156,9 @@ export default function AdminPage() {
         }
         if (categoriesRes.ok) {
           setCategories(await categoriesRes.json())
+        }
+        if (unitsRes.ok) {
+          setUnits(await unitsRes.json())
         }
         if (ordersRes.ok) setOrders(await ordersRes.json())
         if (messagesRes.ok) setMessages(await messagesRes.json())
@@ -323,6 +340,78 @@ export default function AdminPage() {
     setShowCategoryDialog(true)
   }
 
+  // Unit Handlers
+  const handleUnitFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setUnitFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleUnitSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      if (editingUnit) {
+        const res = await fetch(`/api/units/${editingUnit.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(unitFormData),
+        })
+        if (res.ok) {
+          const updated = await res.json()
+          setUnits(units.map((u) => (u.id === editingUnit.id ? updated : u)))
+          toast.success('Cập nhật đơn vị thành công')
+        }
+      } else {
+        const res = await fetch('/api/units', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(unitFormData),
+        })
+        if (res.ok) {
+          const created = await res.json()
+          setUnits([...units, created])
+          toast.success('Thêm đơn vị mới thành công')
+        } else {
+          const error = await res.json()
+          toast.error(error.error || 'Lỗi khi thêm đơn vị')
+          return
+        }
+      }
+    } catch (error) {
+      console.error('Error saving unit:', error)
+      toast.error('Lỗi khi lưu đơn vị')
+    }
+
+    setShowUnitDialog(false)
+    setEditingUnit(null)
+  }
+
+  const handleDeleteUnit = async (id: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa đơn vị này?')) return
+
+    try {
+      const res = await fetch(`/api/units/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setUnits(units.filter((u) => u.id !== id))
+        toast.success('Xóa đơn vị thành công')
+      }
+    } catch (error) {
+      console.error('Error deleting unit:', error)
+      toast.error('Lỗi khi xóa đơn vị')
+    }
+  }
+
+  const handleEditUnit = (unit: Unit) => {
+    setEditingUnit(unit)
+    setUnitFormData({
+      name: unit.name,
+    })
+    setShowUnitDialog(true)
+  }
+
   // Order Handlers
   const handleOrderStatusChange = async (orderId: number, newStatus: string) => {
     try {
@@ -359,10 +448,10 @@ export default function AdminPage() {
 
   // CSV Handlers
   const handleDownloadTemplate = () => {
-    const headers = ['name', 'regularPrice', 'salePrice', 'saleStart', 'saleEnd', 'category', 'stock', 'weight', 'origin', 'description', 'image']
+    const headers = ['name', 'regularPrice', 'salePrice', 'saleStart', 'saleEnd', 'category', 'stock', 'unit', 'weight', 'origin', 'description', 'image']
     const csvContent = headers.join(',') + '\n' +
-      'Sản phẩm mẫu 1,60000,50000,2024-01-01T00:00,2024-12-31T23:59,gia-vi,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
-      'Sản phẩm mẫu 2,120000,,,,dau-bo,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
+      'Sản phẩm mẫu 1,60000,50000,2024-01-01T00:00,2024-12-31T23:59,gia-vi,10,Túi,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
+      'Sản phẩm mẫu 2,120000,,,,dau-bo,5,Thùng,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
 
     const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -544,6 +633,10 @@ export default function AdminPage() {
             <TabsTrigger value="categories" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <LayoutGrid className="w-4 h-4 mr-2" />
               Danh mục
+            </TabsTrigger>
+            <TabsTrigger value="units" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+              <Clock className="w-4 h-4 mr-2" />
+              Đơn vị
             </TabsTrigger>
             <TabsTrigger value="orders" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <ShoppingBag className="w-4 h-4 mr-2" />
@@ -732,6 +825,81 @@ export default function AdminPage() {
                               size="icon"
                               variant="ghost"
                               onClick={() => handleDeleteCategory(category.id)}
+                              className="text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Units Tab */}
+        <TabsContent value="units">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle>Danh sách đơn vị</CardTitle>
+                <CardDescription>Quản lý các đơn vị tính sản phẩm (túi, quả, thùng...).</CardDescription>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setEditingUnit(null)
+                  setUnitFormData({ name: '' })
+                  setShowUnitDialog(true)
+                }}
+                className="bg-amber-700 hover:bg-amber-800"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Thêm đơn vị
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tên đơn vị</TableHead>
+                    <TableHead>Số sản phẩm</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {units.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} className="h-32 text-center text-gray-500">
+                        Chưa có đơn vị nào
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    units.map((unit) => (
+                      <TableRow key={unit.id}>
+                        <TableCell className="font-medium">{unit.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {products.filter(p => p.unit === unit.name).length}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleEditUnit(unit)}
+                              className="text-amber-700 hover:bg-amber-50"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteUnit(unit.id)}
                               className="text-red-600 hover:bg-red-50"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1021,14 +1189,21 @@ export default function AdminPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="unit">Đơn vị tính</Label>
-                  <Input
+                  <select
                     id="unit"
                     name="unit"
-                    placeholder="Ví dụ: Túi, Quả, Thùng..."
                     value={productFormData.unit}
                     onChange={handleProductFormChange}
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     required
-                  />
+                  >
+                    <option value="">Chọn đơn vị</option>
+                    {units.map((u) => (
+                      <option key={u.id} value={u.name}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="weight">Khối lượng</Label>
@@ -1084,6 +1259,41 @@ export default function AdminPage() {
               </Button>
               <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
                 {editingProduct ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unit Form Dialog */}
+      <Dialog open={showUnitDialog} onOpenChange={setShowUnitDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <form onSubmit={handleUnitSubmit}>
+            <DialogHeader>
+              <DialogTitle>{editingUnit ? 'Cập nhật đơn vị' : 'Thêm đơn vị mới'}</DialogTitle>
+              <DialogDescription>
+                Tên đơn vị tính (ví dụ: Túi, Thùng, Hộp).
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="unit-name">Tên đơn vị</Label>
+                <Input
+                  id="unit-name"
+                  name="name"
+                  placeholder="Ví dụ: Thùng"
+                  value={unitFormData.name}
+                  onChange={handleUnitFormChange}
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowUnitDialog(false)}>
+                Hủy
+              </Button>
+              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+                {editingUnit ? 'Lưu thay đổi' : 'Thêm đơn vị'}
               </Button>
             </DialogFooter>
           </form>
