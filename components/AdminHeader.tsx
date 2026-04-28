@@ -3,8 +3,18 @@
 import Link from 'next/link'
 import { LayoutDashboard, Home, LogOut, Bell, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/app/context/AuthContext'
+import { useRouter } from 'next/navigation'
 
 export function AdminHeader() {
+  const { logout } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    logout()
+    router.push('/login')
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -33,7 +43,12 @@ export function AdminHeader() {
             <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs border border-amber-200">
               AD
             </div>
-            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-2"
+            >
               <LogOut className="h-4 w-4" />
               <span className="hidden md:inline-block">Đăng xuất</span>
             </Button>
