@@ -1,22 +1,62 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Trash2, Plus, Edit2, Package, ShoppingBag, MessageSquare, TrendingUp, Search, CheckCircle, Clock } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import {
+  Trash2,
+  Plus,
+  Edit2,
+  Package,
+  ShoppingBag,
+  MessageSquare,
+  Search,
+  Clock,
+  DollarSign,
+  Download,
+  Upload,
+  LayoutGrid,
+} from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Product {
   id: number
   name: string
   price: number
+  originalPrice?: number
   category: string
   stock: number
   weight: string
   origin: string
   description: string
   image: string
+}
+
+interface Category {
+  id: string
+  name: string
 }
 
 interface Order {
@@ -47,15 +87,24 @@ interface Message {
 
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [messages, setMessages] = useState<Message[]>([])
-  const [showProductForm, setShowProductForm] = useState(false)
+
+  const [showProductDialog, setShowProductDialog] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+
   const [searchTerm, setSearchTerm] = useState('')
-  const [formData, setFormData] = useState({
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [productFormData, setProductFormData] = useState({
     name: '',
     price: 0,
-    category: 'spices',
+    originalPrice: 0,
+    category: '',
     stock: 0,
     weight: '',
     origin: '',
@@ -63,18 +112,18 @@ export default function AdminPage() {
     image: '',
   })
 
-  const categoryMap: Record<string, string> = {
-    spices: 'Gia vị',
-    condiments: 'Gia vị nêm',
-    oils: 'Dầu',
-  }
+  const [categoryFormData, setCategoryFormData] = useState({
+    id: '',
+    name: '',
+  })
 
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, ordersRes, messagesRes] = await Promise.all([
+        const [productsRes, categoriesRes, ordersRes, messagesRes] = await Promise.all([
           fetch('/api/products'),
+          fetch('/api/categories'),
           fetch('/api/orders'),
           fetch('/api/messages'),
         ])
@@ -83,23 +132,28 @@ export default function AdminPage() {
           const data = await productsRes.json()
           setProducts(data.products || [])
         }
+        if (categoriesRes.ok) {
+          setCategories(await categoriesRes.json())
+        }
         if (ordersRes.ok) setOrders(await ordersRes.json())
         if (messagesRes.ok) setMessages(await messagesRes.json())
       } catch (error) {
         console.error('Error fetching data:', error)
+        toast.error('Không thể tải dữ liệu')
       }
     }
 
     fetchData()
   }, [])
 
+  // Product Handlers
   const handleProductFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
+    setProductFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' || name === 'stock' ? Number(value) : value,
+      [name]: name === 'price' || name === 'originalPrice' || name === 'stock' ? Number(value) : value,
     }))
   }
 
@@ -111,14 +165,15 @@ export default function AdminPage() {
         const res = await fetch(`/api/products/${editingProduct.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: editingProduct.id, ...formData }),
+          body: JSON.stringify({ id: editingProduct.id, ...productFormData }),
         })
         if (res.ok) {
           const updated = await res.json()
           setProducts(products.map((p) => (p.id === editingProduct.id ? updated : p)))
+          toast.success('Cập nhật sản phẩm thành công')
         }
       } else {
-        const newProduct = { id: Date.now(), ...formData }
+        const newProduct = { id: Date.now(), ...productFormData }
         const res = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -127,23 +182,15 @@ export default function AdminPage() {
         if (res.ok) {
           const created = await res.json()
           setProducts([...products, created])
+          toast.success('Thêm sản phẩm mới thành công')
         }
       }
     } catch (error) {
       console.error('Error saving product:', error)
+      toast.error('Lỗi khi lưu sản phẩm')
     }
 
-    setFormData({
-      name: '',
-      price: 0,
-      category: 'spices',
-      stock: 0,
-      weight: '',
-      origin: '',
-      description: '',
-      image: '',
-    })
-    setShowProductForm(false)
+    setShowProductDialog(false)
     setEditingProduct(null)
   }
 
@@ -154,17 +201,20 @@ export default function AdminPage() {
       const res = await fetch(`/api/products/${id}`, { method: 'DELETE' })
       if (res.ok) {
         setProducts(products.filter((p) => p.id !== id))
+        toast.success('Xóa sản phẩm thành công')
       }
     } catch (error) {
       console.error('Error deleting product:', error)
+      toast.error('Lỗi khi xóa sản phẩm')
     }
   }
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product)
-    setFormData({
+    setProductFormData({
       name: product.name,
       price: product.price,
+      originalPrice: product.originalPrice || 0,
       category: product.category,
       stock: product.stock,
       weight: product.weight,
@@ -172,9 +222,83 @@ export default function AdminPage() {
       description: product.description,
       image: product.image,
     })
-    setShowProductForm(true)
+    setShowProductDialog(true)
   }
 
+  // Category Handlers
+  const handleCategoryFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setCategoryFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      if (editingCategory) {
+        const res = await fetch(`/api/categories/${editingCategory.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoryFormData),
+        })
+        if (res.ok) {
+          const updated = await res.json()
+          setCategories(categories.map((c) => (c.id === editingCategory.id ? updated : c)))
+          toast.success('Cập nhật danh mục thành công')
+        }
+      } else {
+        const res = await fetch('/api/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoryFormData),
+        })
+        if (res.ok) {
+          const created = await res.json()
+          setCategories([...categories, created])
+          toast.success('Thêm danh mục mới thành công')
+        } else {
+          const error = await res.json()
+          toast.error(error.error || 'Lỗi khi thêm danh mục')
+          return
+        }
+      }
+    } catch (error) {
+      console.error('Error saving category:', error)
+      toast.error('Lỗi khi lưu danh mục')
+    }
+
+    setShowCategoryDialog(false)
+    setEditingCategory(null)
+  }
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa danh mục này? Điều này có thể ảnh hưởng đến sản phẩm thuộc danh mục này.')) return
+
+    try {
+      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setCategories(categories.filter((c) => c.id !== id))
+        toast.success('Xóa danh mục thành công')
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error)
+      toast.error('Lỗi khi xóa danh mục')
+    }
+  }
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category)
+    setCategoryFormData({
+      id: category.id,
+      name: category.name,
+    })
+    setShowCategoryDialog(true)
+  }
+
+  // Order Handlers
   const handleOrderStatusChange = async (orderId: number, newStatus: string) => {
     try {
       const res = await fetch(`/api/orders/${orderId}`, {
@@ -184,12 +308,15 @@ export default function AdminPage() {
       })
       if (res.ok) {
         setOrders(orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)))
+        toast.success('Cập nhật trạng thái đơn hàng thành công')
       }
     } catch (error) {
       console.error('Error updating order:', error)
+      toast.error('Lỗi khi cập nhật đơn hàng')
     }
   }
 
+  // Message Handlers
   const handleDeleteMessage = async (messageId: number) => {
     if (!confirm('Xóa tin nhắn này?')) return
 
@@ -197,15 +324,97 @@ export default function AdminPage() {
       const res = await fetch(`/api/messages/${messageId}`, { method: 'DELETE' })
       if (res.ok) {
         setMessages(messages.filter((m) => m.id !== messageId))
+        toast.success('Xóa tin nhắn thành công')
       }
     } catch (error) {
       console.error('Error deleting message:', error)
+      toast.error('Lỗi khi xóa tin nhắn')
     }
+  }
+
+  // CSV Handlers
+  const handleDownloadTemplate = () => {
+    const headers = ['name', 'price', 'originalPrice', 'category', 'stock', 'weight', 'origin', 'description', 'image']
+    const csvContent = headers.join(',') + '\n' +
+      'Sản phẩm mẫu 1,50000,60000,gia-vi,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
+      'Sản phẩm mẫu 2,120000,,dau-bo,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
+
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'template_san_pham.csv')
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success('Đã tải xuống template mẫu')
+  }
+
+  const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const text = event.target?.result as string
+      const lines = text.split('\n')
+      const headers = lines[0].split(',').map(h => h.trim())
+
+      let importCount = 0
+
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue
+
+        // Simple CSV parser that handles quotes
+        const values: string[] = []
+        let current = ''
+        let inQuotes = false
+        for (let char of lines[i]) {
+          if (char === '"') inQuotes = !inQuotes
+          else if (char === ',' && !inQuotes) {
+            values.push(current.trim())
+            current = ''
+          } else current += char
+        }
+        values.push(current.trim())
+
+        const productData: any = {
+          id: Date.now() + i // Generate a unique-ish ID for the batch
+        }
+        headers.forEach((header, index) => {
+          let value: any = values[index]?.replace(/^"|"$/g, '')
+          if (header === 'price' || header === 'originalPrice' || header === 'stock') {
+            value = value ? Number(value) : (header === 'originalPrice' ? undefined : 0)
+          }
+          productData[header] = value
+        })
+
+        try {
+          const res = await fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData),
+          })
+          if (res.ok) {
+            const created = await res.json()
+            setProducts(prev => [...prev, created])
+            importCount++
+          }
+        } catch (err) {
+          console.error('Error importing product:', err)
+        }
+      }
+      toast.success(`Đã nhập thành công ${importCount} sản phẩm`)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+    reader.readAsText(file)
   }
 
   // Calculate statistics
   const stats = {
     totalProducts: products.length,
+    totalCategories: categories.length,
     totalOrders: orders.length,
     totalMessages: messages.length,
     totalRevenue: orders
@@ -219,376 +428,364 @@ export default function AdminPage() {
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const getCategoryName = (id: string) => {
+    return categories.find(c => c.id === id)?.name || id
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Bảng quản lý</h1>
-
-          {/* Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Sản phẩm</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
-                  </div>
-                  <Package className="w-8 h-8 text-amber-700" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Đơn hàng</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalOrders}</p>
-                  </div>
-                  <ShoppingBag className="w-8 h-8 text-amber-700" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Tin nhắn</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalMessages}</p>
-                  </div>
-                  <MessageSquare className="w-8 h-8 text-amber-700" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Doanh thu</p>
-                    <p className="text-lg font-bold text-amber-700">
-                      {(stats.totalRevenue / 1000000).toFixed(1)}M đ
-                    </p>
-                  </div>
-                  <TrendingUp className="w-8 h-8 text-amber-700" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Chờ xử lý</p>
-                    <p className="text-2xl font-bold text-red-600">{stats.pendingOrders}</p>
-                  </div>
-                  <Clock className="w-8 h-8 text-red-600" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Tổng quan</h1>
+          <p className="text-gray-500">Quản lý cửa hàng, sản phẩm và đơn hàng của bạn.</p>
         </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept=".csv"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleImportExcel}
+          />
+          <Button variant="outline" onClick={handleDownloadTemplate} className="hidden sm:flex">
+            <Download className="w-4 h-4 mr-2" />
+            Tải mẫu
+          </Button>
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="w-4 h-4 mr-2" />
+            Nhập Excel
+          </Button>
+          <Button
+            onClick={() => {
+              setEditingProduct(null)
+              setProductFormData({
+                name: '',
+                price: 0,
+                originalPrice: 0,
+                category: categories[0]?.id || '',
+                stock: 0,
+                weight: '',
+                origin: '',
+                description: '',
+                image: '',
+              })
+              setShowProductDialog(true)
+            }}
+            className="bg-amber-700 hover:bg-amber-800"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Sản phẩm mới
+          </Button>
+        </div>
+      </div>
 
-        <Tabs defaultValue="products" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="products">
+      {/* Statistics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        {[
+          { label: 'Sản phẩm', value: stats.totalProducts, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Danh mục', value: stats.totalCategories, icon: LayoutGrid, color: 'text-orange-600', bg: 'bg-orange-50' },
+          { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Tin nhắn', value: stats.totalMessages, icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50' },
+          { label: 'Doanh thu', value: `${(stats.totalRevenue / 1000000).toFixed(1)}M đ`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Chờ xử lý', value: stats.pendingOrders, icon: Clock, color: 'text-red-600', bg: 'bg-red-50' },
+        ].map((stat, i) => (
+          <Card key={i} className="border-none shadow-sm overflow-hidden">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                  <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                </div>
+                <div className={`${stat.bg} ${stat.color} p-3 rounded-xl`}>
+                  <stat.icon className="w-6 h-6" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Tabs defaultValue="products" className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <TabsList className="bg-white border p-1 h-12 w-fit">
+            <TabsTrigger value="products" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <Package className="w-4 h-4 mr-2" />
               Sản phẩm
             </TabsTrigger>
-            <TabsTrigger value="orders">
+            <TabsTrigger value="categories" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+              <LayoutGrid className="w-4 h-4 mr-2" />
+              Danh mục
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <ShoppingBag className="w-4 h-4 mr-2" />
               Đơn hàng
             </TabsTrigger>
-            <TabsTrigger value="messages">
+            <TabsTrigger value="messages" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <MessageSquare className="w-4 h-4 mr-2" />
               Tin nhắn
             </TabsTrigger>
           </TabsList>
 
-          {/* Products Tab */}
-          <TabsContent value="products">
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex-1 w-full">
-                    <CardTitle>Quản lý sản phẩm ({filteredProducts.length})</CardTitle>
-                    <div className="mt-4 flex items-center border border-gray-300 rounded-lg">
-                      <Search className="w-5 h-5 text-gray-400 ml-3" />
-                      <input
-                        type="text"
-                        placeholder="Tìm sản phẩm..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex-1 px-3 py-2 border-0 outline-none"
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      setEditingProduct(null)
-                      setFormData({
-                        name: '',
-                        price: 0,
-                        category: 'spices',
-                        stock: 0,
-                        weight: '',
-                        origin: '',
-                        description: '',
-                        image: '',
-                      })
-                      setShowProductForm(!showProductForm)
-                    }}
-                    className="bg-amber-700 hover:bg-amber-800 whitespace-nowrap"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Thêm sản phẩm
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {showProductForm && (
-                  <form
-                    onSubmit={handleProductSubmit}
-                    className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Input
-                        type="text"
-                        name="name"
-                        placeholder="Tên sản phẩm"
-                        value={formData.name}
-                        onChange={handleProductFormChange}
-                        required
-                      />
-                      <Input
-                        type="number"
-                        name="price"
-                        placeholder="Giá"
-                        value={formData.price}
-                        onChange={handleProductFormChange}
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleProductFormChange}
-                        className="border border-gray-300 rounded-md px-3 py-2"
-                      >
-                        <option value="spices">Gia vị</option>
-                        <option value="condiments">Gia vị nêm</option>
-                        <option value="oils">Dầu</option>
-                      </select>
-                      <Input
-                        type="number"
-                        name="stock"
-                        placeholder="Số lượng kho"
-                        value={formData.stock}
-                        onChange={handleProductFormChange}
-                        required
-                      />
-                      <Input
-                        type="text"
-                        name="weight"
-                        placeholder="Cân nặng"
-                        value={formData.weight}
-                        onChange={handleProductFormChange}
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Input
-                        type="text"
-                        name="origin"
-                        placeholder="Xuất xứ"
-                        value={formData.origin}
-                        onChange={handleProductFormChange}
-                      />
-                      <Input
-                        type="text"
-                        name="image"
-                        placeholder="URL hình ảnh"
-                        value={formData.image}
-                        onChange={handleProductFormChange}
-                      />
-                    </div>
-                    <textarea
-                      name="description"
-                      placeholder="Mô tả sản phẩm"
-                      value={formData.description}
-                      onChange={handleProductFormChange}
-                      rows={3}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    />
-                    <div className="flex space-x-2">
-                      <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
-                        {editingProduct ? 'Cập nhật' : 'Thêm mới'}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setShowProductForm(false)}
-                      >
-                        Hủy
-                      </Button>
-                    </div>
-                  </form>
-                )}
+          <div className="flex items-center relative w-full sm:w-64">
+            <Search className="absolute left-3 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Tìm kiếm..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-white"
+            />
+          </div>
+        </div>
 
-                <div className="space-y-2">
+        {/* Products Tab */}
+        <TabsContent value="products">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="pb-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Danh sách sản phẩm</CardTitle>
+                  <CardDescription>Hiển thị {filteredProducts.length} sản phẩm hiện có trong kho.</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0 sm:p-6 pt-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[80px]">Hình ảnh</TableHead>
+                    <TableHead>Tên sản phẩm</TableHead>
+                    <TableHead>Danh mục</TableHead>
+                    <TableHead>Giá</TableHead>
+                    <TableHead>Kho</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {filteredProducts.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">Không có sản phẩm nào</p>
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                        Không tìm thấy sản phẩm nào
+                      </TableCell>
+                    </TableRow>
                   ) : (
                     filteredProducts.map((product) => (
-                      <div
-                        key={product.id}
-                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
-                      >
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {product.price.toLocaleString('vi-VN')} đ | Danh mục:{' '}
-                            {categoryMap[product.category] ?? product.category}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Kho:{' '}
-                            {product.stock > 5 ? (
-                              <span className="text-green-600">✓ {product.stock}</span>
+                      <TableRow key={product.id}>
+                        <TableCell>
+                          <div className="h-10 w-10 rounded-md overflow-hidden bg-gray-100 border">
+                            {product.image ? (
+                              <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
                             ) : (
-                              <span className="text-red-600">⚠ {product.stock}</span>
+                              <Package className="h-full w-full p-2 text-gray-400" />
                             )}
-                          </p>
-                        </div>
-                        <div className="flex space-x-2 mt-3 sm:mt-0">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEditProduct(product)}
-                            className="text-amber-700 hover:bg-amber-50"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteProduct(product.id)}
-                            className="text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Orders Tab */}
-          <TabsContent value="orders">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quản lý đơn hàng ({orders.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {orders.length === 0 ? (
-                  <div className="text-center py-12">
-                    <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">Chưa có đơn hàng nào</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <div
-                        key={order.id}
-                        className="p-4 border border-gray-200 rounded-lg hover:border-amber-300 transition"
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase">Mã đơn hàng</p>
-                            <p className="font-bold text-gray-900">#{order.id}</p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {new Date(order.createdAt).toLocaleString('vi-VN')}
-                            </p>
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase">Khách hàng</p>
-                            <p className="font-semibold text-gray-900">
-                              {order.customer.customerName}
-                            </p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {order.customer.phoneNumber}
-                            </p>
-                          </div>
-                          <div className="flex flex-col justify-between">
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase">Tổng tiền</p>
-                              <p className="text-lg font-bold text-amber-700">
-                                {order.total.toLocaleString('vi-VN')} đ
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-gray-50 p-3 rounded mb-3">
-                          <p className="text-sm font-semibold text-gray-900 mb-2">
-                            Địa chỉ giao hàng:
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {order.customer.address}, {order.customer.district},{' '}
-                            {order.customer.city}
-                          </p>
-                          <p className="text-sm text-gray-600 mt-2">
-                            <strong>Sản phẩm:</strong>{' '}
-                            {order.items.map((i) => `${i.name} (x${i.quantity})`).join(', ')}
-                          </p>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                          <div className="flex gap-2 items-center">
-                            {order.status === 'pending' && (
-                              <Clock className="w-5 h-5 text-yellow-600" />
+                        </TableCell>
+                        <TableCell className="font-medium text-gray-900">{product.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="bg-gray-50">
+                            {getCategoryName(product.category)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-gray-900">{product.price.toLocaleString('vi-VN')} đ</span>
+                            {product.originalPrice && product.originalPrice > product.price && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-400 line-through">
+                                  {product.originalPrice.toLocaleString('vi-VN')} đ
+                                </span>
+                                <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1 py-0 h-4">
+                                  -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                                </Badge>
+                              </div>
                             )}
-                            {(order.status === 'confirmed' || order.status === 'delivered') && (
-                              <CheckCircle
-                                className={`w-5 h-5 ${
-                                  order.status === 'delivered'
-                                    ? 'text-green-600'
-                                    : 'text-blue-600'
-                                }`}
-                              />
-                            )}
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                order.status === 'pending'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : order.status === 'confirmed'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : order.status === 'cancelled'
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-green-100 text-green-800'
-                              }`}
-                            >
-                              {order.status === 'pending'
-                                ? 'Chờ xác nhận'
-                                : order.status === 'confirmed'
-                                ? 'Đã xác nhận'
-                                : order.status === 'cancelled'
-                                ? 'Đã hủy'
-                                : 'Đã giao'}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <span className={`h-2 w-2 rounded-full ${product.stock > 5 ? 'bg-green-500' : 'bg-red-500'}`} />
+                            <span className={product.stock > 5 ? 'text-gray-700' : 'text-red-600 font-medium'}>
+                              {product.stock} sản phẩm
                             </span>
                           </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleEditProduct(product)}
+                              className="text-amber-700 hover:bg-amber-50"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                          <div className="flex gap-2 w-full sm:w-auto">
+        {/* Categories Tab */}
+        <TabsContent value="categories">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle>Danh sách danh mục</CardTitle>
+                <CardDescription>Quản lý các nhóm sản phẩm trong cửa hàng.</CardDescription>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setEditingCategory(null)
+                  setCategoryFormData({ id: '', name: '' })
+                  setShowCategoryDialog(true)
+                }}
+                className="bg-amber-700 hover:bg-amber-800"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Thêm danh mục
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Mã danh mục (ID)</TableHead>
+                    <TableHead>Tên danh mục</TableHead>
+                    <TableHead>Số sản phẩm</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {categories.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-32 text-center text-gray-500">
+                        Chưa có danh mục nào
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    categories.map((category) => (
+                      <TableRow key={category.id}>
+                        <TableCell className="font-mono text-sm">{category.id}</TableCell>
+                        <TableCell className="font-medium">{category.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {products.filter(p => p.category === category.id).length}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleEditCategory(category)}
+                              className="text-amber-700 hover:bg-amber-50"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteCategory(category.id)}
+                              className="text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Orders Tab */}
+        <TabsContent value="orders">
+          <Card className="border-none shadow-sm">
+            <CardHeader>
+              <CardTitle>Quản lý đơn hàng</CardTitle>
+              <CardDescription>Theo dõi và cập nhật trạng thái đơn hàng từ khách hàng.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Mã đơn</TableHead>
+                    <TableHead>Khách hàng</TableHead>
+                    <TableHead>Ngày đặt</TableHead>
+                    <TableHead>Tổng tiền</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {orders.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                        Chưa có đơn hàng nào
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    orders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-mono text-xs font-bold">#{order.id}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900">{order.customer.customerName}</span>
+                            <span className="text-xs text-gray-500">{order.customer.phoneNumber}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-600">
+                          {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                        </TableCell>
+                        <TableCell className="font-semibold text-amber-700">
+                          {order.total.toLocaleString('vi-VN')} đ
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={
+                              order.status === 'pending'
+                                ? 'bg-yellow-100 text-yellow-800 border-yellow-200 shadow-none'
+                                : order.status === 'confirmed'
+                                ? 'bg-blue-100 text-blue-800 border-blue-200 shadow-none'
+                                : order.status === 'cancelled'
+                                ? 'bg-red-100 text-red-800 border-red-200 shadow-none'
+                                : 'bg-green-100 text-green-800 border-green-200 shadow-none'
+                            }
+                          >
+                            {order.status === 'pending'
+                              ? 'Chờ xác nhận'
+                              : order.status === 'confirmed'
+                              ? 'Đã xác nhận'
+                              : order.status === 'cancelled'
+                              ? 'Đã hủy'
+                              : 'Đã giao'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
                             {order.status === 'pending' && (
                               <>
                                 <Button
                                   size="sm"
                                   onClick={() => handleOrderStatusChange(order.id, 'confirmed')}
-                                  className="bg-blue-600 hover:bg-blue-700 flex-1 sm:flex-none"
+                                  className="bg-blue-600 hover:bg-blue-700 h-8"
                                 >
                                   Xác nhận
                                 </Button>
@@ -596,7 +793,7 @@ export default function AdminPage() {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => handleOrderStatusChange(order.id, 'cancelled')}
-                                  className="flex-1 sm:flex-none"
+                                  className="h-8"
                                 >
                                   Hủy
                                 </Button>
@@ -606,83 +803,268 @@ export default function AdminPage() {
                               <Button
                                 size="sm"
                                 onClick={() => handleOrderStatusChange(order.id, 'delivered')}
-                                className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none"
+                                className="bg-green-600 hover:bg-green-700 h-8"
                               >
-                                Xác nhận giao
+                                Giao hàng
                               </Button>
                             )}
                           </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          {/* Messages Tab */}
-          <TabsContent value="messages">
-            <Card>
-              <CardHeader>
-                <CardTitle>Tin nhắn liên hệ ({messages.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {messages.length === 0 ? (
-                  <div className="text-center py-12">
-                    <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">Chưa có tin nhắn nào</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className="p-4 border border-gray-200 rounded-lg hover:border-amber-300 transition"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-gray-900 text-lg">{message.subject}</h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                              <strong>Từ:</strong> {message.name} ({message.email})
-                            </p>
+        {/* Messages Tab */}
+        <TabsContent value="messages">
+          <div className="grid grid-cols-1 gap-4">
+            {messages.length === 0 ? (
+              <Card className="border-none shadow-sm">
+                <CardContent className="h-32 flex items-center justify-center text-gray-500">
+                  Chưa có tin nhắn nào
+                </CardContent>
+              </Card>
+            ) : (
+              messages.map((message) => (
+                <Card key={message.id} className="border-none shadow-sm overflow-hidden">
+                  <div className="flex items-start">
+                    <div className="w-1 bg-amber-700 self-stretch" />
+                    <CardContent className="p-6 w-full">
+                      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">{message.subject}</h3>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <strong>Người gửi:</strong> {message.name}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <strong>Email:</strong> {message.email}
+                            </span>
                             {message.phone && (
-                              <p className="text-sm text-gray-600">
-                                <strong>Điện thoại:</strong> {message.phone}
-                              </p>
+                              <span className="flex items-center gap-1">
+                                <strong>SĐT:</strong> {message.phone}
+                              </span>
                             )}
                           </div>
-                          <div className="text-right">
-                            <p className="text-xs text-gray-500">
-                              {new Date(message.createdAt).toLocaleString('vi-VN')}
-                            </p>
-                          </div>
                         </div>
-
-                        <div className="bg-gray-50 p-4 rounded-lg mb-3 border-l-4 border-amber-700">
-                          <p className="text-gray-700 whitespace-pre-wrap">{message.message}</p>
-                        </div>
-
-                        <div className="flex justify-end">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteMessage(message.id)}
-                            className="text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Xóa
-                          </Button>
+                        <div className="text-sm text-gray-400 font-medium">
+                          {new Date(message.createdAt).toLocaleString('vi-VN')}
                         </div>
                       </div>
-                    ))}
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 whitespace-pre-wrap leading-relaxed">
+                        {message.message}
+                      </div>
+                      <div className="flex justify-end mt-4">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteMessage(message.id)}
+                          className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Xóa tin nhắn
+                        </Button>
+                      </div>
+                    </CardContent>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Product Form Dialog */}
+      <Dialog open={showProductDialog} onOpenChange={setShowProductDialog}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <form onSubmit={handleProductSubmit}>
+            <DialogHeader>
+              <DialogTitle>{editingProduct ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'}</DialogTitle>
+              <DialogDescription>
+                Điền thông tin chi tiết của sản phẩm vào form bên dưới.
+              </DialogDescription>
+            </DialogHeader>
+
+            <Separator className="my-4" />
+
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid gap-2 sm:col-span-1">
+                  <Label htmlFor="name">Tên sản phẩm</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Ví dụ: Nước mắm Hưng Thịnh"
+                    value={productFormData.name}
+                    onChange={handleProductFormChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="price">Giá bán (đ)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    name="price"
+                    placeholder="0"
+                    value={productFormData.price}
+                    onChange={handleProductFormChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="originalPrice">Giá gốc (đ)</Label>
+                  <Input
+                    id="originalPrice"
+                    type="number"
+                    name="originalPrice"
+                    placeholder="Không có"
+                    value={productFormData.originalPrice || ''}
+                    onChange={handleProductFormChange}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="category">Danh mục</Label>
+                  <select
+                    id="category"
+                    name="category"
+                    value={productFormData.category}
+                    onChange={handleProductFormChange}
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="stock">Số lượng kho</Label>
+                  <Input
+                    id="stock"
+                    type="number"
+                    name="stock"
+                    placeholder="0"
+                    value={productFormData.stock}
+                    onChange={handleProductFormChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="weight">Khối lượng</Label>
+                  <Input
+                    id="weight"
+                    name="weight"
+                    placeholder="Ví dụ: 500ml, 1kg"
+                    value={productFormData.weight}
+                    onChange={handleProductFormChange}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="origin">Xuất xứ</Label>
+                  <Input
+                    id="origin"
+                    name="origin"
+                    placeholder="Ví dụ: Việt Nam"
+                    value={productFormData.origin}
+                    onChange={handleProductFormChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="image">URL Hình ảnh</Label>
+                  <Input
+                    id="image"
+                    name="image"
+                    placeholder="https://..."
+                    value={productFormData.image}
+                    onChange={handleProductFormChange}
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="description">Mô tả sản phẩm</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  placeholder="Nhập mô tả chi tiết sản phẩm..."
+                  value={productFormData.description}
+                  onChange={handleProductFormChange}
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button type="button" variant="outline" onClick={() => setShowProductDialog(false)}>
+                Hủy bỏ
+              </Button>
+              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+                {editingProduct ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Category Form Dialog */}
+      <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <form onSubmit={handleCategorySubmit}>
+            <DialogHeader>
+              <DialogTitle>{editingCategory ? 'Cập nhật danh mục' : 'Thêm danh mục mới'}</DialogTitle>
+              <DialogDescription>
+                Tạo mã định danh (ID) và tên cho danh mục mới.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="cat-id">Mã danh mục (ID)</Label>
+                <Input
+                  id="cat-id"
+                  name="id"
+                  placeholder="ví-du: rau-cu"
+                  value={categoryFormData.id}
+                  onChange={handleCategoryFormChange}
+                  disabled={!!editingCategory}
+                  required
+                />
+                {!editingCategory && <p className="text-[10px] text-gray-500 italic">* Viết liền không dấu, dùng dấu gạch ngang.</p>}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="cat-name">Tên danh mục</Label>
+                <Input
+                  id="cat-name"
+                  name="name"
+                  placeholder="Ví dụ: Rau Củ Quả"
+                  value={categoryFormData.name}
+                  onChange={handleCategoryFormChange}
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowCategoryDialog(false)}>
+                Hủy
+              </Button>
+              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+                {editingCategory ? 'Lưu thay đổi' : 'Thêm danh mục'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

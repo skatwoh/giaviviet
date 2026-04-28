@@ -27,7 +27,22 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
+    // Ensure product has an ID
+    if (!body.id) {
+      body.id = Date.now()
+    }
+
     const data = readProducts()
+
+    // Check if ID already exists to avoid duplicates
+    const exists = data.products.find((p: any) => p.id === body.id)
+    if (exists) {
+      const maxId = data.products.reduce((max: number, p: any) => {
+        const id = Number(p.id)
+        return isNaN(id) ? max : Math.max(max, id)
+      }, 0)
+      body.id = maxId + 1
+    }
 
     data.products.push(body)
 
