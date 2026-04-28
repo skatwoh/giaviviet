@@ -28,11 +28,11 @@ export default function HomePage() {
       .then(data => setCategories(data || []))
   }, [])
 
-  const saleProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price)
-
   const [timeLeft, setTimeLeft] = useState<{h: number, m: number, s: number} | null>(null)
 
   useEffect(() => {
+    const saleProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price)
+
     if (saleProducts.length === 0) {
       setTimeLeft(null)
       return
@@ -104,6 +104,8 @@ export default function HomePage() {
   const activeCategories = categories.filter(cat =>
     products.some(p => p.category === cat.id)
   )
+
+  const saleProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price)
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
@@ -234,6 +236,7 @@ export default function HomePage() {
                     originalPrice={product.originalPrice}
                     image={product.image}
                     category={categories.find(c => c.id === product.category)?.name || ''}
+                    stock={product.stock}
                   />
                 ))}
               </div>
@@ -306,6 +309,7 @@ export default function HomePage() {
                   originalPrice={product.originalPrice}
                   image={product.image}
                   category={cat.name}
+                  stock={product.stock}
                 />
               ))}
           </div>

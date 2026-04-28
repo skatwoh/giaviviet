@@ -166,12 +166,18 @@ export default function AdminPage() {
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const formattedData = {
+      ...productFormData,
+      saleStart: productFormData.saleStart ? new Date(productFormData.saleStart).toISOString() : null,
+      saleEnd: productFormData.saleEnd ? new Date(productFormData.saleEnd).toISOString() : null,
+    }
+
     try {
       if (editingProduct) {
         const res = await fetch(`/api/products/${editingProduct.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: editingProduct.id, ...productFormData }),
+          body: JSON.stringify({ id: editingProduct.id, ...formattedData }),
         })
         if (res.ok) {
           const updated = await res.json()
@@ -179,7 +185,7 @@ export default function AdminPage() {
           toast.success('Cập nhật sản phẩm thành công')
         }
       } else {
-        const newProduct = { id: Date.now(), ...productFormData }
+        const newProduct = { id: Date.now(), ...formattedData }
         const res = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -215,14 +221,22 @@ export default function AdminPage() {
     }
   }
 
+  const toLocalISO = (dateStr: string | null) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    const tzOffset = date.getTimezoneOffset() * 60000
+    const localDate = new Date(date.getTime() - tzOffset)
+    return localDate.toISOString().slice(0, 16)
+  }
+
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product)
     setProductFormData({
       name: product.name,
       regularPrice: product.regularPrice,
       salePrice: product.salePrice || 0,
-      saleStart: product.saleStart ? new Date(product.saleStart).toISOString().slice(0, 16) : '',
-      saleEnd: product.saleEnd ? new Date(product.saleEnd).toISOString().slice(0, 16) : '',
+      saleStart: toLocalISO(product.saleStart),
+      saleEnd: toLocalISO(product.saleEnd),
       category: product.category,
       stock: product.stock,
       weight: product.weight,

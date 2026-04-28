@@ -20,7 +20,8 @@ export async function GET() {
 
     const processedProducts = data.products.map((p: any) => {
       const isSaleActive =
-        p.salePrice &&
+        p.salePrice !== undefined &&
+        p.salePrice !== null &&
         p.saleStart &&
         p.saleEnd &&
         new Date(p.saleStart) <= now &&
