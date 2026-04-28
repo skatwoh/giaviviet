@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/app/context/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -11,12 +11,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from 'sonner'
 import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react'
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect') || '/'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,7 +36,7 @@ export default function LoginPage() {
       if (res.ok) {
         login(data)
         toast.success('Đăng nhập thành công')
-        router.push('/')
+        router.push(redirect)
       } else {
         toast.error(data.error || 'Đăng nhập thất bại')
       }
@@ -123,5 +125,17 @@ export default function LoginPage() {
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#00483d]" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }
