@@ -28,6 +28,61 @@ export default function HomePage() {
       .then(data => setCategories(data || []))
   }, [])
 
+  const saleProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price)
+
+  const [timeLeft, setTimeLeft] = useState<{h: number, m: number, s: number} | null>(null)
+
+  useEffect(() => {
+    if (saleProducts.length === 0) {
+      setTimeLeft(null)
+      return
+    }
+
+    // Find the soonest sale end date among active sales
+    const activeSales = saleProducts
+      .filter(p => p.saleEnd)
+      .map(p => new Date(p.saleEnd).getTime())
+      .sort((a, b) => a - b)
+
+    if (activeSales.length === 0) {
+      setTimeLeft(null)
+      return
+    }
+
+    const targetTime = activeSales[0]
+
+    const updateTimer = () => {
+      const now = new Date().getTime()
+      const difference = targetTime - now
+
+      if (difference <= 0) {
+        setTimeLeft({ h: 0, m: 0, s: 0 })
+        // Refresh products to update prices automatically when sale ends
+        fetch('/api/products')
+          .then(res => res.json())
+          .then(data => setProducts(data.products || []))
+        return false
+      } else {
+        const h = Math.floor(difference / (1000 * 60 * 60))
+        const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+        const s = Math.floor((difference % (1000 * 60)) / 1000)
+        setTimeLeft({ h, m, s })
+        return true
+      }
+    }
+
+    // Initial update
+    const isActive = updateTimer()
+    if (!isActive) return
+
+    const timer = setInterval(() => {
+      const stillActive = updateTimer()
+      if (!stillActive) clearInterval(timer)
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [products])
+
   if (!mounted) return null
 
   const banners = [
@@ -49,8 +104,6 @@ export default function HomePage() {
   const activeCategories = categories.filter(cat =>
     products.some(p => p.category === cat.id)
   )
-
-  const saleProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price)
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
@@ -151,14 +204,24 @@ export default function HomePage() {
                   <p className="text-red-100 text-xs font-bold uppercase tracking-widest">Số lượng có hạn • Giá tốt mỗi ngày</p>
                 </div>
               </div>
-              <div className="hidden md:flex items-center gap-2 text-white font-bold">
-                <span className="text-sm">Kết thúc sau:</span>
-                <div className="flex gap-1">
-                  <span className="bg-black/20 px-2 py-1 rounded">08</span>:
-                  <span className="bg-black/20 px-2 py-1 rounded">45</span>:
-                  <span className="bg-black/20 px-2 py-1 rounded">22</span>
+              {timeLeft && (
+                <div className="flex items-center gap-2 text-white font-bold">
+                  <span className="text-xs md:text-sm whitespace-nowrap">Kết thúc sau:</span>
+                  <div className="flex gap-1">
+                    <span className="bg-black/20 px-1.5 md:px-2 py-0.5 md:py-1 rounded min-w-[2rem] text-center text-sm md:text-base">
+                      {timeLeft.h.toString().padStart(2, '0')}
+                    </span>
+                    <span className="self-center">:</span>
+                    <span className="bg-black/20 px-1.5 md:px-2 py-0.5 md:py-1 rounded min-w-[2rem] text-center text-sm md:text-base">
+                      {timeLeft.m.toString().padStart(2, '0')}
+                    </span>
+                    <span className="self-center">:</span>
+                    <span className="bg-black/20 px-1.5 md:px-2 py-0.5 md:py-1 rounded min-w-[2rem] text-center text-sm md:text-base">
+                      {timeLeft.s.toString().padStart(2, '0')}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="p-4 md:p-6">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">

@@ -32,11 +32,13 @@ export async function PUT(
             return NextResponse.json({ error: 'Product not found' }, { status: 404 })
         }
 
-        data.products[index] = body
+        // Filter out effective fields if they were accidentally sent from client
+        const { price, originalPrice, ...cleanBody } = body
+        data.products[index] = cleanBody
 
         writeProducts(data)
 
-        return NextResponse.json(body)
+        return NextResponse.json(cleanBody)
 
     } catch (error) {
         console.error('Error updating product:', error)

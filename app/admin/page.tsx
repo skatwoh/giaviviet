@@ -44,8 +44,12 @@ import { toast } from 'sonner'
 interface Product {
   id: number
   name: string
-  price: number
-  originalPrice?: number
+  regularPrice: number
+  salePrice: number | null
+  saleStart: string | null
+  saleEnd: string | null
+  price?: number // Effective price from API
+  originalPrice?: number // Effective original price from API
   category: string
   stock: number
   weight: string
@@ -102,8 +106,10 @@ export default function AdminPage() {
 
   const [productFormData, setProductFormData] = useState({
     name: '',
-    price: 0,
-    originalPrice: 0,
+    regularPrice: 0,
+    salePrice: 0,
+    saleStart: '',
+    saleEnd: '',
     category: '',
     stock: 0,
     weight: '',
@@ -153,7 +159,7 @@ export default function AdminPage() {
     const { name, value } = e.target
     setProductFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' || name === 'originalPrice' || name === 'stock' ? Number(value) : value,
+      [name]: name === 'regularPrice' || name === 'salePrice' || name === 'stock' ? Number(value) : value,
     }))
   }
 
@@ -213,8 +219,10 @@ export default function AdminPage() {
     setEditingProduct(product)
     setProductFormData({
       name: product.name,
-      price: product.price,
-      originalPrice: product.originalPrice || 0,
+      regularPrice: product.regularPrice,
+      salePrice: product.salePrice || 0,
+      saleStart: product.saleStart ? new Date(product.saleStart).toISOString().slice(0, 16) : '',
+      saleEnd: product.saleEnd ? new Date(product.saleEnd).toISOString().slice(0, 16) : '',
       category: product.category,
       stock: product.stock,
       weight: product.weight,
@@ -334,10 +342,10 @@ export default function AdminPage() {
 
   // CSV Handlers
   const handleDownloadTemplate = () => {
-    const headers = ['name', 'price', 'originalPrice', 'category', 'stock', 'weight', 'origin', 'description', 'image']
+    const headers = ['name', 'regularPrice', 'salePrice', 'saleStart', 'saleEnd', 'category', 'stock', 'weight', 'origin', 'description', 'image']
     const csvContent = headers.join(',') + '\n' +
-      'Sản phẩm mẫu 1,50000,60000,gia-vi,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
-      'Sản phẩm mẫu 2,120000,,dau-bo,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
+      'Sản phẩm mẫu 1,60000,50000,2024-01-01T00:00,2024-12-31T23:59,gia-vi,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
+      'Sản phẩm mẫu 2,120000,,,,dau-bo,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
 
     const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -384,8 +392,8 @@ export default function AdminPage() {
         }
         headers.forEach((header, index) => {
           let value: any = values[index]?.replace(/^"|"$/g, '')
-          if (header === 'price' || header === 'originalPrice' || header === 'stock') {
-            value = value ? Number(value) : (header === 'originalPrice' ? undefined : 0)
+          if (header === 'regularPrice' || header === 'salePrice' || header === 'stock') {
+            value = value ? Number(value) : (header === 'salePrice' ? undefined : 0)
           }
           productData[header] = value
         })
@@ -461,8 +469,10 @@ export default function AdminPage() {
               setEditingProduct(null)
               setProductFormData({
                 name: '',
-                price: 0,
-                originalPrice: 0,
+                regularPrice: 0,
+                salePrice: 0,
+                saleStart: '',
+                saleEnd: '',
                 category: categories[0]?.id || '',
                 stock: 0,
                 weight: '',
@@ -588,16 +598,20 @@ export default function AdminPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col">
-                            <span className="font-bold text-gray-900">{product.price.toLocaleString('vi-VN')} đ</span>
-                            {product.originalPrice && product.originalPrice > product.price && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-400 line-through">
-                                  {product.originalPrice.toLocaleString('vi-VN')} đ
-                                </span>
-                                <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1 py-0 h-4">
-                                  -{Math.round((1 - product.price / product.originalPrice) * 100)}%
-                                </Badge>
-                              </div>
+                            {product.salePrice && product.salePrice < product.regularPrice ? (
+                              <>
+                                <span className="font-bold text-red-600">{product.salePrice.toLocaleString('vi-VN')} đ</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-400 line-through">
+                                    {product.regularPrice.toLocaleString('vi-VN')} đ
+                                  </span>
+                                  <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1 py-0 h-4">
+                                    -{Math.round((1 - product.salePrice / product.regularPrice) * 100)}%
+                                  </Badge>
+                                </div>
+                              </>
+                            ) : (
+                              <span className="font-bold text-gray-900">{product.regularPrice.toLocaleString('vi-VN')} đ</span>
                             )}
                           </div>
                         </TableCell>
@@ -892,8 +906,8 @@ export default function AdminPage() {
             <Separator className="my-4" />
 
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="grid gap-2 sm:col-span-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid gap-2">
                   <Label htmlFor="name">Tên sản phẩm</Label>
                   <Input
                     id="name"
@@ -905,28 +919,57 @@ export default function AdminPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="price">Giá bán (đ)</Label>
+                  <Label htmlFor="regularPrice">Giá bán thường (đ)</Label>
                   <Input
-                    id="price"
+                    id="regularPrice"
                     type="number"
-                    name="price"
+                    name="regularPrice"
                     placeholder="0"
-                    value={productFormData.price}
+                    value={productFormData.regularPrice}
                     onChange={handleProductFormChange}
                     required
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="originalPrice">Giá gốc (đ)</Label>
-                  <Input
-                    id="originalPrice"
-                    type="number"
-                    name="originalPrice"
-                    placeholder="Không có"
-                    value={productFormData.originalPrice || ''}
-                    onChange={handleProductFormChange}
-                  />
+              </div>
+
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                <h4 className="text-sm font-bold text-amber-900 mb-3 uppercase tracking-wider">Cài đặt khuyến mãi (Tự động)</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="salePrice">Giá khuyến mãi (đ)</Label>
+                    <Input
+                      id="salePrice"
+                      type="number"
+                      name="salePrice"
+                      placeholder="Không có"
+                      value={productFormData.salePrice || ''}
+                      onChange={handleProductFormChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="saleStart">Ngày bắt đầu</Label>
+                    <Input
+                      id="saleStart"
+                      type="datetime-local"
+                      name="saleStart"
+                      value={productFormData.saleStart}
+                      onChange={handleProductFormChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="saleEnd">Ngày kết thúc</Label>
+                    <Input
+                      id="saleEnd"
+                      type="datetime-local"
+                      name="saleEnd"
+                      value={productFormData.saleEnd}
+                      onChange={handleProductFormChange}
+                    />
+                  </div>
                 </div>
+                <p className="text-[10px] text-amber-700 mt-2 italic">
+                  * Sản phẩm sẽ tự động giảm giá khi đến thời gian và về giá cũ khi hết hạn.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
