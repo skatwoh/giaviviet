@@ -44,10 +44,15 @@ import { toast } from 'sonner'
 interface Product {
   id: number
   name: string
-  price: number
-  originalPrice?: number
+  regularPrice: number
+  salePrice: number | null
+  saleStart: string | null
+  saleEnd: string | null
+  price?: number // Effective price from API
+  originalPrice?: number // Effective original price from API
   category: string
   stock: number
+  unit: string
   weight: string
   origin: string
   description: string
@@ -55,6 +60,11 @@ interface Product {
 }
 
 interface Category {
+  id: string
+  name: string
+}
+
+interface Unit {
   id: string
   name: string
 }
@@ -88,6 +98,7 @@ interface Message {
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [units, setUnits] = useState<Unit[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [messages, setMessages] = useState<Message[]>([])
 
@@ -97,15 +108,21 @@ export default function AdminPage() {
   const [showCategoryDialog, setShowCategoryDialog] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
+  const [showUnitDialog, setShowUnitDialog] = useState(false)
+  const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
+
   const [searchTerm, setSearchTerm] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [productFormData, setProductFormData] = useState({
     name: '',
-    price: 0,
-    originalPrice: 0,
+    regularPrice: 0,
+    salePrice: 0,
+    saleStart: '',
+    saleEnd: '',
     category: '',
     stock: 0,
+    unit: '',
     weight: '',
     origin: '',
     description: '',
@@ -117,13 +134,18 @@ export default function AdminPage() {
     name: '',
   })
 
+  const [unitFormData, setUnitFormData] = useState({
+    name: '',
+  })
+
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, categoriesRes, ordersRes, messagesRes] = await Promise.all([
+        const [productsRes, categoriesRes, unitsRes, ordersRes, messagesRes] = await Promise.all([
           fetch('/api/products'),
           fetch('/api/categories'),
+          fetch('/api/units'),
           fetch('/api/orders'),
           fetch('/api/messages'),
         ])
@@ -134,6 +156,9 @@ export default function AdminPage() {
         }
         if (categoriesRes.ok) {
           setCategories(await categoriesRes.json())
+        }
+        if (unitsRes.ok) {
+          setUnits(await unitsRes.json())
         }
         if (ordersRes.ok) setOrders(await ordersRes.json())
         if (messagesRes.ok) setMessages(await messagesRes.json())
@@ -153,19 +178,25 @@ export default function AdminPage() {
     const { name, value } = e.target
     setProductFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' || name === 'originalPrice' || name === 'stock' ? Number(value) : value,
+      [name]: name === 'regularPrice' || name === 'salePrice' || name === 'stock' ? Number(value) : value,
     }))
   }
 
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const formattedData = {
+      ...productFormData,
+      saleStart: productFormData.saleStart ? new Date(productFormData.saleStart).toISOString() : null,
+      saleEnd: productFormData.saleEnd ? new Date(productFormData.saleEnd).toISOString() : null,
+    }
+
     try {
       if (editingProduct) {
         const res = await fetch(`/api/products/${editingProduct.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: editingProduct.id, ...productFormData }),
+          body: JSON.stringify({ id: editingProduct.id, ...formattedData }),
         })
         if (res.ok) {
           const updated = await res.json()
@@ -173,7 +204,7 @@ export default function AdminPage() {
           toast.success('Cập nhật sản phẩm thành công')
         }
       } else {
-        const newProduct = { id: Date.now(), ...productFormData }
+        const newProduct = { id: Date.now(), ...formattedData }
         const res = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -209,14 +240,25 @@ export default function AdminPage() {
     }
   }
 
+  const toLocalISO = (dateStr: string | null) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    const tzOffset = date.getTimezoneOffset() * 60000
+    const localDate = new Date(date.getTime() - tzOffset)
+    return localDate.toISOString().slice(0, 16)
+  }
+
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product)
     setProductFormData({
       name: product.name,
-      price: product.price,
-      originalPrice: product.originalPrice || 0,
+      regularPrice: product.regularPrice,
+      salePrice: product.salePrice || 0,
+      saleStart: toLocalISO(product.saleStart),
+      saleEnd: toLocalISO(product.saleEnd),
       category: product.category,
       stock: product.stock,
+      unit: product.unit || '',
       weight: product.weight,
       origin: product.origin,
       description: product.description,
@@ -298,6 +340,78 @@ export default function AdminPage() {
     setShowCategoryDialog(true)
   }
 
+  // Unit Handlers
+  const handleUnitFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setUnitFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleUnitSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      if (editingUnit) {
+        const res = await fetch(`/api/units/${editingUnit.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(unitFormData),
+        })
+        if (res.ok) {
+          const updated = await res.json()
+          setUnits(units.map((u) => (u.id === editingUnit.id ? updated : u)))
+          toast.success('Cập nhật đơn vị thành công')
+        }
+      } else {
+        const res = await fetch('/api/units', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(unitFormData),
+        })
+        if (res.ok) {
+          const created = await res.json()
+          setUnits([...units, created])
+          toast.success('Thêm đơn vị mới thành công')
+        } else {
+          const error = await res.json()
+          toast.error(error.error || 'Lỗi khi thêm đơn vị')
+          return
+        }
+      }
+    } catch (error) {
+      console.error('Error saving unit:', error)
+      toast.error('Lỗi khi lưu đơn vị')
+    }
+
+    setShowUnitDialog(false)
+    setEditingUnit(null)
+  }
+
+  const handleDeleteUnit = async (id: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa đơn vị này?')) return
+
+    try {
+      const res = await fetch(`/api/units/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setUnits(units.filter((u) => u.id !== id))
+        toast.success('Xóa đơn vị thành công')
+      }
+    } catch (error) {
+      console.error('Error deleting unit:', error)
+      toast.error('Lỗi khi xóa đơn vị')
+    }
+  }
+
+  const handleEditUnit = (unit: Unit) => {
+    setEditingUnit(unit)
+    setUnitFormData({
+      name: unit.name,
+    })
+    setShowUnitDialog(true)
+  }
+
   // Order Handlers
   const handleOrderStatusChange = async (orderId: number, newStatus: string) => {
     try {
@@ -334,10 +448,10 @@ export default function AdminPage() {
 
   // CSV Handlers
   const handleDownloadTemplate = () => {
-    const headers = ['name', 'price', 'originalPrice', 'category', 'stock', 'weight', 'origin', 'description', 'image']
+    const headers = ['name', 'regularPrice', 'salePrice', 'saleStart', 'saleEnd', 'category', 'stock', 'unit', 'weight', 'origin', 'description', 'image']
     const csvContent = headers.join(',') + '\n' +
-      'Sản phẩm mẫu 1,50000,60000,gia-vi,10,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
-      'Sản phẩm mẫu 2,120000,,dau-bo,5,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
+      'Sản phẩm mẫu 1,60000,50000,2024-01-01T00:00,2024-12-31T23:59,gia-vi,10,Túi,500g,Việt Nam,Mô tả mẫu 1,https://example.com/image1.jpg\n' +
+      'Sản phẩm mẫu 2,120000,,,,dau-bo,5,Thùng,1L,Thái Lan,Mô tả mẫu 2,https://example.com/image2.jpg'
 
     const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -384,8 +498,8 @@ export default function AdminPage() {
         }
         headers.forEach((header, index) => {
           let value: any = values[index]?.replace(/^"|"$/g, '')
-          if (header === 'price' || header === 'originalPrice' || header === 'stock') {
-            value = value ? Number(value) : (header === 'originalPrice' ? undefined : 0)
+          if (header === 'regularPrice' || header === 'salePrice' || header === 'stock') {
+            value = value ? Number(value) : (header === 'salePrice' ? undefined : 0)
           }
           productData[header] = value
         })
@@ -461,10 +575,13 @@ export default function AdminPage() {
               setEditingProduct(null)
               setProductFormData({
                 name: '',
-                price: 0,
-                originalPrice: 0,
+                regularPrice: 0,
+                salePrice: 0,
+                saleStart: '',
+                saleEnd: '',
                 category: categories[0]?.id || '',
                 stock: 0,
+                unit: '',
                 weight: '',
                 origin: '',
                 description: '',
@@ -516,6 +633,10 @@ export default function AdminPage() {
             <TabsTrigger value="categories" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <LayoutGrid className="w-4 h-4 mr-2" />
               Danh mục
+            </TabsTrigger>
+            <TabsTrigger value="units" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+              <Clock className="w-4 h-4 mr-2" />
+              Đơn vị
             </TabsTrigger>
             <TabsTrigger value="orders" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
               <ShoppingBag className="w-4 h-4 mr-2" />
@@ -588,16 +709,20 @@ export default function AdminPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col">
-                            <span className="font-bold text-gray-900">{product.price.toLocaleString('vi-VN')} đ</span>
-                            {product.originalPrice && product.originalPrice > product.price && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-400 line-through">
-                                  {product.originalPrice.toLocaleString('vi-VN')} đ
-                                </span>
-                                <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1 py-0 h-4">
-                                  -{Math.round((1 - product.price / product.originalPrice) * 100)}%
-                                </Badge>
-                              </div>
+                            {product.salePrice && product.salePrice < product.regularPrice ? (
+                              <>
+                                <span className="font-bold text-red-600">{product.salePrice.toLocaleString('vi-VN')} đ</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-400 line-through">
+                                    {product.regularPrice.toLocaleString('vi-VN')} đ
+                                  </span>
+                                  <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] px-1 py-0 h-4">
+                                    -{Math.round((1 - product.salePrice / product.regularPrice) * 100)}%
+                                  </Badge>
+                                </div>
+                              </>
+                            ) : (
+                              <span className="font-bold text-gray-900">{product.regularPrice.toLocaleString('vi-VN')} đ</span>
                             )}
                           </div>
                         </TableCell>
@@ -700,6 +825,81 @@ export default function AdminPage() {
                               size="icon"
                               variant="ghost"
                               onClick={() => handleDeleteCategory(category.id)}
+                              className="text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Units Tab */}
+        <TabsContent value="units">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle>Danh sách đơn vị</CardTitle>
+                <CardDescription>Quản lý các đơn vị tính sản phẩm (túi, quả, thùng...).</CardDescription>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setEditingUnit(null)
+                  setUnitFormData({ name: '' })
+                  setShowUnitDialog(true)
+                }}
+                className="bg-amber-700 hover:bg-amber-800"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Thêm đơn vị
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tên đơn vị</TableHead>
+                    <TableHead>Số sản phẩm</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {units.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} className="h-32 text-center text-gray-500">
+                        Chưa có đơn vị nào
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    units.map((unit) => (
+                      <TableRow key={unit.id}>
+                        <TableCell className="font-medium">{unit.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {products.filter(p => p.unit === unit.name).length}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleEditUnit(unit)}
+                              className="text-amber-700 hover:bg-amber-50"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteUnit(unit.id)}
                               className="text-red-600 hover:bg-red-50"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -892,8 +1092,8 @@ export default function AdminPage() {
             <Separator className="my-4" />
 
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="grid gap-2 sm:col-span-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid gap-2">
                   <Label htmlFor="name">Tên sản phẩm</Label>
                   <Input
                     id="name"
@@ -905,28 +1105,57 @@ export default function AdminPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="price">Giá bán (đ)</Label>
+                  <Label htmlFor="regularPrice">Giá bán thường (đ)</Label>
                   <Input
-                    id="price"
+                    id="regularPrice"
                     type="number"
-                    name="price"
+                    name="regularPrice"
                     placeholder="0"
-                    value={productFormData.price}
+                    value={productFormData.regularPrice}
                     onChange={handleProductFormChange}
                     required
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="originalPrice">Giá gốc (đ)</Label>
-                  <Input
-                    id="originalPrice"
-                    type="number"
-                    name="originalPrice"
-                    placeholder="Không có"
-                    value={productFormData.originalPrice || ''}
-                    onChange={handleProductFormChange}
-                  />
+              </div>
+
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                <h4 className="text-sm font-bold text-amber-900 mb-3 uppercase tracking-wider">Cài đặt khuyến mãi (Tự động)</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="salePrice">Giá khuyến mãi (đ)</Label>
+                    <Input
+                      id="salePrice"
+                      type="number"
+                      name="salePrice"
+                      placeholder="Không có"
+                      value={productFormData.salePrice || ''}
+                      onChange={handleProductFormChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="saleStart">Ngày bắt đầu</Label>
+                    <Input
+                      id="saleStart"
+                      type="datetime-local"
+                      name="saleStart"
+                      value={productFormData.saleStart}
+                      onChange={handleProductFormChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="saleEnd">Ngày kết thúc</Label>
+                    <Input
+                      id="saleEnd"
+                      type="datetime-local"
+                      name="saleEnd"
+                      value={productFormData.saleEnd}
+                      onChange={handleProductFormChange}
+                    />
+                  </div>
                 </div>
+                <p className="text-[10px] text-amber-700 mt-2 italic">
+                  * Sản phẩm sẽ tự động giảm giá khi đến thời gian và về giá cũ khi hết hạn.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -957,6 +1186,24 @@ export default function AdminPage() {
                     onChange={handleProductFormChange}
                     required
                   />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="unit">Đơn vị tính</Label>
+                  <select
+                    id="unit"
+                    name="unit"
+                    value={productFormData.unit}
+                    onChange={handleProductFormChange}
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    required
+                  >
+                    <option value="">Chọn đơn vị</option>
+                    {units.map((u) => (
+                      <option key={u.id} value={u.name}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="weight">Khối lượng</Label>
@@ -1012,6 +1259,41 @@ export default function AdminPage() {
               </Button>
               <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
                 {editingProduct ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unit Form Dialog */}
+      <Dialog open={showUnitDialog} onOpenChange={setShowUnitDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <form onSubmit={handleUnitSubmit}>
+            <DialogHeader>
+              <DialogTitle>{editingUnit ? 'Cập nhật đơn vị' : 'Thêm đơn vị mới'}</DialogTitle>
+              <DialogDescription>
+                Tên đơn vị tính (ví dụ: Túi, Thùng, Hộp).
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="unit-name">Tên đơn vị</Label>
+                <Input
+                  id="unit-name"
+                  name="name"
+                  placeholder="Ví dụ: Thùng"
+                  value={unitFormData.name}
+                  onChange={handleUnitFormChange}
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowUnitDialog(false)}>
+                Hủy
+              </Button>
+              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+                {editingUnit ? 'Lưu thay đổi' : 'Thêm đơn vị'}
               </Button>
             </DialogFooter>
           </form>

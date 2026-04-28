@@ -16,7 +16,28 @@ function writeProducts(data: any) {
 export async function GET() {
   try {
     const data = readProducts()
-    return NextResponse.json(data)
+    const now = new Date()
+
+    const processedProducts = data.products.map((p: any) => {
+      const isSaleActive =
+        p.salePrice !== undefined &&
+        p.salePrice !== null &&
+        p.saleStart &&
+        p.saleEnd &&
+        new Date(p.saleStart) <= now &&
+        new Date(p.saleEnd) >= now
+
+      const price = isSaleActive ? p.salePrice : p.regularPrice
+      const originalPrice = isSaleActive ? p.regularPrice : undefined
+
+      return {
+        ...p,
+        price,
+        originalPrice,
+      }
+    })
+
+    return NextResponse.json({ products: processedProducts })
   } catch (error) {
     console.error('Error reading products:', error)
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
@@ -44,11 +65,13 @@ export async function POST(req: Request) {
       body.id = maxId + 1
     }
 
-    data.products.push(body)
+    // Filter out effective fields if they were accidentally sent from client
+    const { price, originalPrice, ...cleanBody } = body
+    data.products.push(cleanBody)
 
     writeProducts(data)
 
-    return NextResponse.json(body)
+    return NextResponse.json(cleanBody)
   } catch (error) {
     console.error('Error adding product:', error)
     return NextResponse.json({ error: 'Failed to add product' }, { status: 500 })

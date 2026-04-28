@@ -15,9 +15,11 @@ interface ProductCardProps {
   originalPrice?: number
   image: string
   category: string
+  stock?: number
+  unit?: string
 }
 
-export function ProductCard({ id, name, price, originalPrice, image, category }: ProductCardProps) {
+export function ProductCard({ id, name, price, originalPrice, image, category, stock = 1, unit }: ProductCardProps) {
   const { addItem } = useCart()
 
   const formatPrice = (p: number) => {
@@ -37,51 +39,80 @@ export function ProductCard({ id, name, price, originalPrice, image, category }:
   const discount = hasDiscount ? Math.round((1 - price / originalPrice) * 100) : 0
 
   return (
-    <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300 border-gray-200 group flex flex-col bg-white rounded-none">
-      <Link href={`/products/${id}`} className="relative block">
+    <Card className="h-full overflow-hidden hover:shadow-2xl hover:shadow-brand-green/10 transition-all duration-500 border border-gray-100 group flex flex-col bg-white rounded-2xl">
+      <Link href={`/products/${id}`} className="relative block overflow-hidden">
         {/* Image Container */}
-        <div className="relative aspect-square w-full bg-white overflow-hidden p-2">
+        <div className="relative aspect-square w-full bg-white p-4">
           <Image
             src={image}
             alt={name}
             fill
-            className="object-contain p-2 group-hover:scale-105 transition-transform duration-500"
+            className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-110"
             onError={(e) => {
               e.currentTarget.src = '/images/placeholder.png'
             }}
           />
+
           {/* Discount Badge */}
           {hasDiscount && (
-            <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-black px-2 py-1 flex items-center gap-1 shadow-md">
-              <span className="uppercase">Sale</span>
-              <span className="bg-white text-red-600 px-1 rounded-sm">{discount}%</span>
+            <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
+              <div className="bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-full shadow-lg flex items-center gap-1 animate-pulse">
+                <span className="uppercase">SALE</span>
+              </div>
+              <div className="bg-amber-500 text-black text-[11px] font-black px-2 py-0.5 rounded-full shadow-lg text-center">
+                -{discount}%
+              </div>
             </div>
           )}
-          {/* Brand Logo Overlay (Hải Trang) */}
-          <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[#00483d]/10 flex items-center justify-center p-1">
-             <div className="text-[6px] font-bold text-[#00483d] leading-[1] text-center">HẢI<br/>TRANG</div>
+
+          {/* Quick View Overlay */}
+          <div className="absolute inset-0 bg-brand-green/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+             <span className="text-white font-bold text-xs uppercase tracking-widest bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30">
+               Xem chi tiết
+             </span>
+          </div>
+
+          {/* Brand Indicator */}
+          <div className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center p-1 border border-gray-50 transform translate-y-12 group-hover:translate-y-0 transition-transform duration-500">
+             <div className="text-[7px] font-black text-brand-green leading-[1] text-center italic">HẢI<br/>TRANG</div>
           </div>
         </div>
       </Link>
 
       {/* Content */}
-      <CardContent className="p-3 flex-1 flex flex-col">
-        <div className="text-[10px] text-gray-400 uppercase font-medium mb-1">
-          {category === 'spices' ? 'HẢI TRANG' : 'THƯƠNG HIỆU'}
+      <CardContent className="p-4 flex-1 flex flex-col">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] text-brand-green font-black uppercase tracking-widest bg-brand-green/5 px-2 py-0.5 rounded">
+            {category || 'Hải Trang'}
+          </span>
+          {stock > 0 ? (
+             <span className="text-[9px] text-green-600 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                Sẵn hàng
+             </span>
+          ) : (
+             <span className="text-[9px] text-red-500 font-bold">Hết hàng</span>
+          )}
         </div>
-        <Link href={`/products/${id}`} className="block mb-2">
-          <h3 className="font-bold text-gray-800 text-xs md:text-[13px] line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-brand-green transition-colors">
+
+        <Link href={`/products/${id}`} className="block mb-3">
+          <h3 className="font-bold text-gray-800 text-sm md:text-base line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-brand-green transition-colors decoration-brand-green/30 decoration-2 underline-offset-4 group-hover:underline">
             {name}
           </h3>
         </Link>
 
         <div className="mt-auto">
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-900">
+          <div className="flex items-end gap-1 flex-wrap">
+            <span className="text-lg font-black text-brand-green">
               {formatPrice(price)}
             </span>
+            {unit && (
+              <span className="text-[10px] text-gray-500 font-bold mb-1">
+                / {unit}
+              </span>
+            )}
             {hasDiscount && (
-              <span className="text-[11px] text-gray-400 line-through">
+              <span className="text-xs text-gray-400 line-through mb-0.5 font-medium ml-1">
                 {formatPrice(originalPrice)}
               </span>
             )}
@@ -90,15 +121,14 @@ export function ProductCard({ id, name, price, originalPrice, image, category }:
       </CardContent>
 
       {/* Footer */}
-      <CardFooter className="p-3 pt-0">
+      <CardFooter className="p-4 pt-0">
         <Button
           onClick={handleAddToCart}
           size="sm"
-          variant="outline"
-          className="w-full border-[#00483d] text-[#00483d] hover:bg-[#00483d] hover:text-white font-bold text-[11px] h-8 rounded-sm transition-all flex items-center justify-center gap-1.5 uppercase"
+          className="w-full bg-brand-green hover:bg-[#00362d] text-white font-bold text-xs h-10 rounded-xl transition-all duration-300 shadow-lg shadow-brand-green/10 hover:shadow-brand-green/20 flex items-center justify-center gap-2 uppercase tracking-wider"
         >
-          <ShoppingBag className="w-3.5 h-3.5" />
-          CHỌN MUA
+          <ShoppingBag className="w-4 h-4" />
+          Thêm vào giỏ
         </Button>
       </CardFooter>
     </Card>
