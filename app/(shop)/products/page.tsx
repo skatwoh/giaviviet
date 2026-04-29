@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { ProductCard } from '@/components/ProductCard'
 import { ProductFilters } from '@/components/ProductFilters'
 import { Input } from '@/components/ui/input'
@@ -25,16 +26,36 @@ interface Category {
 
 type SortOption = 'newest' | 'price-low' | 'price-high' | 'name'
 
-export default function ProductsPage() {
+function ProductsContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams.get('category')
+
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500000])
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [isLoading, setIsLoading] = useState(true)
   const [showSortMenu, setShowSortMenu] = useState(false)
+
+  const selectedCategory = categoryParam
+
+  // Reset search when category changes from any source
+  useEffect(() => {
+    setSearchQuery('')
+  }, [categoryParam])
+
+  const handleCategoryChange = (categoryId: string | null) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (categoryId) {
+      params.set('category', categoryId)
+    } else {
+      params.delete('category')
+    }
+    router.push(`/products?${params.toString()}`, { scroll: false })
+  }
 
   // Fetch products and categories
   useEffect(() => {
@@ -101,10 +122,10 @@ export default function ProductsPage() {
   }, [products, selectedCategory, priceRange, searchQuery, sortBy])
 
   const handleReset = () => {
-    setSelectedCategory(null)
     setPriceRange([0, 500000])
     setSearchQuery('')
     setSortBy('newest')
+    router.push('/products', { scroll: false })
   }
 
   const getSortLabel = () => {
@@ -151,7 +172,7 @@ export default function ProductsPage() {
               categories={categories}
               selectedCategory={selectedCategory}
               priceRange={priceRange}
-              onCategoryChange={setSelectedCategory}
+              onCategoryChange={handleCategoryChange}
               onPriceChange={setPriceRange}
               onReset={handleReset}
             />
@@ -301,5 +322,17 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#a08679] border-t-transparent"></div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   )
 }
