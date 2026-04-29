@@ -12,9 +12,21 @@ import {
 } from '@/components/ui/carousel'
 import { ProductCard } from '@/components/ProductCard'
 
+interface Product {
+  id: number
+  name: string
+  price: number
+  originalPrice?: number
+  image: string
+  category: string
+  stock: number
+  unit: string
+  saleEnd: string | null
+}
+
 export default function HomePage() {
   const [mounted, setMounted] = useState(false)
-  const [products, setProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<any[]>([])
 
   useEffect(() => {

@@ -15,6 +15,7 @@ interface Product {
   image: string
   category: string
   stock: number
+  unit?: string
 }
 
 type SortOption = 'newest' | 'price-low' | 'price-high' | 'name'

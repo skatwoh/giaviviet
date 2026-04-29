@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 const filePath = join(process.cwd(), 'public/data/units.json')
 
 function readUnits() {
+    if (!existsSync(filePath)) return []
     const fileContent = readFileSync(filePath, 'utf-8')
     return JSON.parse(fileContent)
 }
