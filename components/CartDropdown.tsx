@@ -50,7 +50,7 @@ export function CartDropdown() {
               <ShoppingCart className="w-6 h-6 text-gray-400" />
             </div>
             <p className="text-sm text-gray-500">Giỏ hàng của bạn đang trống</p>
-            <Button asChild variant="link" className="mt-2 text-[#00483d]">
+            <Button asChild variant="link" className="mt-2 text-[#a08679]">
               <Link href="/products">Tiếp tục mua sắm</Link>
             </Button>
           </div>
@@ -76,19 +76,19 @@ export function CartDropdown() {
                         <div className="flex items-center border rounded-md h-7">
                           <button
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                            className="px-1 hover:text-[#00483d]"
+                            className="px-1 hover:text-[#a08679]"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
                           <span className="w-6 text-center text-xs">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="px-1 hover:text-[#00483d]"
+                            className="px-1 hover:text-[#a08679]"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>
-                        <p className="text-sm font-semibold text-[#00483d]">
+                        <p className="text-sm font-semibold text-[#a08679]">
                           {(item.price * item.quantity).toLocaleString()}đ
                         </p>
                       </div>
@@ -115,7 +115,7 @@ export function CartDropdown() {
                 <Button asChild variant="outline" size="sm" className="w-full">
                   <Link href="/cart">Xem giỏ hàng</Link>
                 </Button>
-                <Button asChild size="sm" className="w-full bg-[#00483d] hover:bg-[#00362e]">
+                <Button asChild size="sm" className="w-full bg-[#a08679] hover:bg-[#8c756a]">
                   <Link href="/checkout">Thanh toán</Link>
                 </Button>
               </div>

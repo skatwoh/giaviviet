@@ -66,7 +66,7 @@ export function AccountDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex flex-col items-center justify-center hover:opacity-80 transition-opacity outline-none">
-          <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-[#00483d] font-bold text-[10px] border border-amber-200">
+          <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-[#a08679] font-bold text-[10px] border border-amber-200">
             {user.name.charAt(0).toUpperCase()}
           </div>
           <span className="text-[11px] font-medium mt-1 truncate max-w-[60px]">

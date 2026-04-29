@@ -589,7 +589,7 @@ export default function AdminPage() {
               })
               setShowProductDialog(true)
             }}
-            className="bg-amber-700 hover:bg-amber-800"
+            className="bg-[#a08679] hover:bg-[#8c756a]"
           >
             <Plus className="w-4 h-4 mr-2" />
             Sản phẩm mới
@@ -602,7 +602,7 @@ export default function AdminPage() {
         {[
           { label: 'Sản phẩm', value: stats.totalProducts, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
           { label: 'Danh mục', value: stats.totalCategories, icon: LayoutGrid, color: 'text-orange-600', bg: 'bg-orange-50' },
-          { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-[#a08679]', bg: 'bg-amber-50' },
           { label: 'Tin nhắn', value: stats.totalMessages, icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50' },
           { label: 'Doanh thu', value: `${(stats.totalRevenue / 1000000).toFixed(1)}M đ`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: 'Chờ xử lý', value: stats.pendingOrders, icon: Clock, color: 'text-red-600', bg: 'bg-red-50' },
@@ -626,23 +626,23 @@ export default function AdminPage() {
       <Tabs defaultValue="products" className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <TabsList className="bg-white border p-1 h-12 w-fit">
-            <TabsTrigger value="products" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+            <TabsTrigger value="products" className="px-4 h-10 data-[state=active]:bg-gray-50 data-[state=active]:text-[#a08679]">
               <Package className="w-4 h-4 mr-2" />
               Sản phẩm
             </TabsTrigger>
-            <TabsTrigger value="categories" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+            <TabsTrigger value="categories" className="px-4 h-10 data-[state=active]:bg-gray-50 data-[state=active]:text-[#a08679]">
               <LayoutGrid className="w-4 h-4 mr-2" />
               Danh mục
             </TabsTrigger>
-            <TabsTrigger value="units" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+            <TabsTrigger value="units" className="px-4 h-10 data-[state=active]:bg-gray-50 data-[state=active]:text-[#a08679]">
               <Clock className="w-4 h-4 mr-2" />
               Đơn vị
             </TabsTrigger>
-            <TabsTrigger value="orders" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+            <TabsTrigger value="orders" className="px-4 h-10 data-[state=active]:bg-gray-50 data-[state=active]:text-[#a08679]">
               <ShoppingBag className="w-4 h-4 mr-2" />
               Đơn hàng
             </TabsTrigger>
-            <TabsTrigger value="messages" className="px-4 h-10 data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">
+            <TabsTrigger value="messages" className="px-4 h-10 data-[state=active]:bg-gray-50 data-[state=active]:text-[#a08679]">
               <MessageSquare className="w-4 h-4 mr-2" />
               Tin nhắn
             </TabsTrigger>
@@ -740,7 +740,7 @@ export default function AdminPage() {
                               size="icon"
                               variant="ghost"
                               onClick={() => handleEditProduct(product)}
-                              className="text-amber-700 hover:bg-amber-50"
+                              className="text-[#a08679] hover:bg-gray-50"
                             >
                               <Edit2 className="w-4 h-4" />
                             </Button>
@@ -778,7 +778,7 @@ export default function AdminPage() {
                   setCategoryFormData({ id: '', name: '' })
                   setShowCategoryDialog(true)
                 }}
-                className="bg-amber-700 hover:bg-amber-800"
+                className="bg-[#a08679] hover:bg-[#8c756a]"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Thêm danh mục
@@ -817,7 +817,7 @@ export default function AdminPage() {
                               size="icon"
                               variant="ghost"
                               onClick={() => handleEditCategory(category)}
-                              className="text-amber-700 hover:bg-amber-50"
+                              className="text-[#a08679] hover:bg-gray-50"
                             >
                               <Edit2 className="w-4 h-4" />
                             </Button>
@@ -855,7 +855,7 @@ export default function AdminPage() {
                   setUnitFormData({ name: '' })
                   setShowUnitDialog(true)
                 }}
-                className="bg-amber-700 hover:bg-amber-800"
+                className="bg-[#a08679] hover:bg-[#8c756a]"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Thêm đơn vị
@@ -892,7 +892,7 @@ export default function AdminPage() {
                               size="icon"
                               variant="ghost"
                               onClick={() => handleEditUnit(unit)}
-                              className="text-amber-700 hover:bg-amber-50"
+                              className="text-[#a08679] hover:bg-gray-50"
                             >
                               <Edit2 className="w-4 h-4" />
                             </Button>
@@ -954,7 +954,7 @@ export default function AdminPage() {
                         <TableCell className="text-sm text-gray-600">
                           {new Date(order.createdAt).toLocaleDateString('vi-VN')}
                         </TableCell>
-                        <TableCell className="font-semibold text-amber-700">
+                        <TableCell className="font-semibold text-[#a08679]">
                           {order.total.toLocaleString('vi-VN')} đ
                         </TableCell>
                         <TableCell>
@@ -1032,7 +1032,7 @@ export default function AdminPage() {
               messages.map((message) => (
                 <Card key={message.id} className="border-none shadow-sm overflow-hidden">
                   <div className="flex items-start">
-                    <div className="w-1 bg-amber-700 self-stretch" />
+                    <div className="w-1 bg-[#a08679] self-stretch" />
                     <CardContent className="p-6 w-full">
                       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
                         <div>
@@ -1257,7 +1257,7 @@ export default function AdminPage() {
               <Button type="button" variant="outline" onClick={() => setShowProductDialog(false)}>
                 Hủy bỏ
               </Button>
-              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+              <Button type="submit" className="bg-[#a08679] hover:bg-[#8c756a]">
                 {editingProduct ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
               </Button>
             </DialogFooter>
@@ -1292,7 +1292,7 @@ export default function AdminPage() {
               <Button type="button" variant="outline" onClick={() => setShowUnitDialog(false)}>
                 Hủy
               </Button>
-              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+              <Button type="submit" className="bg-[#a08679] hover:bg-[#8c756a]">
                 {editingUnit ? 'Lưu thay đổi' : 'Thêm đơn vị'}
               </Button>
             </DialogFooter>
@@ -1340,7 +1340,7 @@ export default function AdminPage() {
               <Button type="button" variant="outline" onClick={() => setShowCategoryDialog(false)}>
                 Hủy
               </Button>
-              <Button type="submit" className="bg-amber-700 hover:bg-amber-800">
+              <Button type="submit" className="bg-[#a08679] hover:bg-[#8c756a]">
                 {editingCategory ? 'Lưu thay đổi' : 'Thêm danh mục'}
               </Button>
             </DialogFooter>

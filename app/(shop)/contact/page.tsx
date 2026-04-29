@@ -68,28 +68,28 @@ export default function ContactPage() {
           {/* Contact Info Cards */}
           <Card>
             <CardContent className="pt-6 text-center">
-              <Phone className="w-8 h-8 text-amber-700 mx-auto mb-3" />
+              <Phone className="w-8 h-8 text-[#a08679] mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Điện thoại</h3>
-              <p className="text-gray-600">+84 123 456 789</p>
-              <p className="text-gray-600">+84 987 654 321</p>
+              <p className="text-gray-600">036 85 88886</p>
+              <p className="text-gray-600">Hỗ trợ 24/7</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="pt-6 text-center">
-              <Mail className="w-8 h-8 text-amber-700 mx-auto mb-3" />
+              <Mail className="w-8 h-8 text-[#a08679] mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-              <p className="text-gray-600">info@giaviviet.com</p>
-              <p className="text-gray-600">support@giaviviet.com</p>
+              <p className="text-gray-600">giatothuyhuong@gmail.com</p>
+              <p className="text-gray-600">thuyhuongfood@gmail.com</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="pt-6 text-center">
-              <MapPin className="w-8 h-8 text-amber-700 mx-auto mb-3" />
+              <MapPin className="w-8 h-8 text-[#a08679] mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Địa chỉ</h3>
-              <p className="text-gray-600">123 Đường Trần Hưng Đạo</p>
-              <p className="text-gray-600">Hà Nội, Việt Nam</p>
+              <p className="text-gray-600">Chợ đầu mối phía Nam</p>
+              <p className="text-gray-600">Hoàng Mai, Hà Nội</p>
             </CardContent>
           </Card>
         </div>
@@ -189,7 +189,7 @@ export default function ContactPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-amber-700 hover:bg-amber-800 h-10 font-semibold"
+                  className="w-full bg-[#a08679] hover:bg-[#8c756a] h-10 font-semibold"
                 >
                   {isSubmitting ? 'Đang gửi...' : 'Gửi tin nhắn'}
                 </Button>

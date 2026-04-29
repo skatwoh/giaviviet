@@ -19,9 +19,9 @@ export function AdminHeader() {
     <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Link href="/admin" className="flex items-center gap-2 font-bold text-xl text-amber-700">
+          <Link href="/admin" className="flex items-center gap-2 font-bold text-xl text-[#a08679]">
             <LayoutDashboard className="h-6 w-6" />
-            <span className="hidden sm:inline-block">Hải Trang Admin</span>
+            <span className="hidden sm:inline-block">Thủy Hương Admin</span>
           </Link>
         </div>
 
@@ -40,7 +40,7 @@ export function AdminHeader() {
             <Button variant="ghost" size="icon" className="text-gray-500">
               <Settings className="h-5 w-5" />
             </Button>
-            <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs border border-amber-200">
+            <div className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center text-[#a08679] font-bold text-xs border border-gray-200">
               AD
             </div>
             <Button

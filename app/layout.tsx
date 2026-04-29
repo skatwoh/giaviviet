@@ -10,8 +10,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Cửa hàng Hải Trang - Gia vị và thực phẩm sạch',
-  description: 'Cửa hàng Hải Trang chuyên cung cấp các loại gia vị, dầu ăn, thực phẩm khô và dụng cụ bếp chất lượng cao.',
+  title: 'Thủy Hương - Nhà phân phối gia vị Việt',
+  description: 'Thủy Hương chuyên cung cấp sỉ và lẻ các loại gia vị, thực phẩm khô chất lượng cao.',
   generator: 'v0.app',
   icons: {
     icon: [

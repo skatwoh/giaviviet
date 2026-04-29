@@ -10,13 +10,13 @@ export default function AuthLayout({
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Simplified Header for Auth Pages */}
       <header className="w-full h-16 border-b bg-white flex items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-[#00483d]">
+        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-[#a08679]">
           <ShoppingBag className="h-6 w-6" />
-          <span>Hải Trang</span>
+          <span>Thủy Hương</span>
         </Link>
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#00483d] transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#a08679] transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Quay lại trang chủ
@@ -28,7 +28,7 @@ export default function AuthLayout({
       </main>
 
       <footer className="py-6 text-center text-sm text-gray-400">
-        &copy; {new Date().getFullYear()} Cửa hàng Hải Trang. All rights reserved.
+        &copy; {new Date().getFullYear()} Cửa hàng Thủy Hương. All rights reserved.
       </footer>
     </div>
   )

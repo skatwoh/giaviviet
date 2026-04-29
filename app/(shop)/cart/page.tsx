@@ -25,7 +25,7 @@ export default function CartPage() {
             Có vẻ như bạn chưa thêm sản phẩm nào vào giỏ hàng. Hãy khám phá các sản phẩm chất lượng của chúng tôi nhé!
           </p>
           <Link href="/products">
-            <Button className="bg-[#00483d] hover:bg-[#00362e] text-white px-8 h-12 rounded-full font-bold">
+            <Button className="bg-[#a08679] hover:bg-[#8c756a] text-white px-8 h-12 rounded-full font-bold">
               Tiếp tục mua sắm
             </Button>
           </Link>
@@ -38,7 +38,7 @@ export default function CartPage() {
     <div className="min-h-screen bg-gray-50/50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2 mb-8">
-          <Link href="/products" className="text-[#00483d] hover:underline flex items-center gap-1 text-sm font-medium">
+          <Link href="/products" className="text-[#a08679] hover:underline flex items-center gap-1 text-sm font-medium">
             <ArrowLeft className="w-4 h-4" />
             Tiếp tục mua sắm
           </Link>
@@ -72,7 +72,7 @@ export default function CartPage() {
                           />
                         </div>
                         <div className="flex flex-col justify-center">
-                          <Link href={`/products/${item.id}`} className="font-bold text-gray-900 hover:text-[#00483d] transition-colors line-clamp-2">
+                          <Link href={`/products/${item.id}`} className="font-bold text-gray-900 hover:text-[#a08679] transition-colors line-clamp-2">
                             {item.name}
                           </Link>
                           <p className="text-xs text-gray-500 mt-1">Mã SP: #{item.id}</p>
@@ -122,7 +122,7 @@ export default function CartPage() {
                       {/* Total & Remove - Desktop */}
                       <div className="col-span-1 sm:col-span-2 text-right">
                         <div className="flex flex-col items-end">
-                          <span className="font-bold text-[#00483d]">
+                          <span className="font-bold text-[#a08679]">
                             {(item.price * item.quantity).toLocaleString('vi-VN')} đ
                           </span>
                           <button
@@ -182,7 +182,7 @@ export default function CartPage() {
                 <div className="flex justify-between items-end">
                   <span className="font-bold text-lg text-gray-900">Tổng cộng</span>
                   <div className="text-right">
-                    <p className="text-2xl font-black text-[#00483d]">{total.toLocaleString('vi-VN')} đ</p>
+                    <p className="text-2xl font-black text-[#a08679]">{total.toLocaleString('vi-VN')} đ</p>
                     <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">Đã bao gồm VAT</p>
                   </div>
                 </div>

@@ -52,7 +52,7 @@ function LoginContent() {
     <div className="container mx-auto px-4 py-12 flex justify-center items-center min-h-[70vh]">
       <Card className="w-full max-w-md border-none shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold text-[#00483d]">Đăng nhập</CardTitle>
+          <CardTitle className="text-2xl font-bold text-[#a08679]">Đăng nhập</CardTitle>
           <CardDescription>
             Nhập email và mật khẩu để truy cập tài khoản của bạn
           </CardDescription>
@@ -79,7 +79,7 @@ function LoginContent() {
                 <Label htmlFor="password">Mật khẩu</Label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-[#00483d] hover:underline"
+                  className="text-xs text-[#a08679] hover:underline"
                 >
                   Quên mật khẩu?
                 </Link>
@@ -98,7 +98,7 @@ function LoginContent() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-[#00483d] hover:bg-[#00362e]"
+              className="w-full bg-[#a08679] hover:bg-[#8c756a]"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -118,7 +118,7 @@ function LoginContent() {
         <CardFooter className="flex flex-col space-y-4 text-center">
           <div className="text-sm text-gray-500">
             Chưa có tài khoản?{' '}
-            <Link href="/register" className="text-[#00483d] font-semibold hover:underline">
+            <Link href="/register" className="text-[#a08679] font-semibold hover:underline">
               Đăng ký ngay
             </Link>
           </div>
@@ -132,7 +132,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-[70vh] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#00483d]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#a08679]" />
       </div>
     }>
       <LoginContent />

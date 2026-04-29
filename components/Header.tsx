@@ -45,7 +45,7 @@ export function Header() {
   return (
     <header className="w-full sticky top-0 z-50 shadow-sm font-sans">
       {/* Main Header */}
-      <div className="bg-[#00483d] text-white py-2">
+      <div className="bg-[#a08679] text-white py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4">
             {/* Menu Trigger (All devices) */}
@@ -58,11 +58,11 @@ export function Header() {
             </button>
 
             {/* Logo */}
-            <Link href="/" className="flex-shrink-0 flex items-center gap-1">
+            <Link href="/" className="flex-shrink-0 flex items-center gap-1 group">
               <div className="flex items-center">
-                <span className="font-bold text-xl sm:text-2xl tracking-tight">HẢI TRANG</span>
-                <div className="ml-0.5">
-                  <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" fill="white" />
+                <span className="font-black text-xl sm:text-2xl tracking-tighter uppercase italic text-amber-100 group-hover:text-white transition-colors">THỦY HƯƠNG</span>
+                <div className="ml-1 -rotate-12 group-hover:rotate-0 transition-transform duration-300">
+                  <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" fill="#fbbf24" stroke="none" />
                 </div>
               </div>
             </Link>
@@ -112,7 +112,7 @@ export function Header() {
       <div className="bg-[#f8f8f8] border-b border-gray-200 py-2 hidden md:block overflow-x-auto scrollbar-hide">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-2">
           <Link href="/" className="p-2 border border-gray-300 rounded-sm bg-white hover:bg-gray-50 transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00483d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a08679" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </Link>
           {categories.map((cat, i) => (
             <Link
@@ -195,13 +195,13 @@ export function Header() {
                 <span className="block text-xs font-bold text-gray-400 uppercase mb-4">BẠN CẦN HỖ TRỢ?</span>
 
                 <div className="space-y-4">
-                  <a href="tel:0945501989" className="flex items-center gap-3 text-gray-700 hover:text-brand-green">
+                  <a href="tel:0368588886" className="flex items-center gap-3 text-gray-700 hover:text-brand-green">
                     <Phone className="w-5 h-5" />
-                    <span className="text-sm font-medium">094.550.1989</span>
+                    <span className="text-sm font-medium">036 85 88886</span>
                   </a>
-                  <a href="mailto:cuahanghaitrang@gmail.com" className="flex items-center gap-3 text-gray-700 hover:text-brand-green">
+                  <a href="mailto:giatothuyhuong@gmail.com" className="flex items-center gap-3 text-gray-700 hover:text-brand-green">
                     <Mail className="w-5 h-5" />
-                    <span className="text-sm font-medium">cuahanghaitrang@gmail.com</span>
+                    <span className="text-sm font-medium">giatothuyhuong@gmail.com</span>
                   </a>
                 </div>
               </div>
