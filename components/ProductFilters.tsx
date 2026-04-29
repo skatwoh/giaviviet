@@ -4,10 +4,15 @@ import { useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcw, Filter } from 'lucide-react'
+
+interface Category {
+  id: string
+  name: string
+}
 
 interface ProductFiltersProps {
-  categories: string[]
+  categories: Category[]
   selectedCategory: string | null
   priceRange: [number, number]
   onCategoryChange: (category: string | null) => void
@@ -39,68 +44,62 @@ export function ProductFilters({
     [priceRange, onPriceChange]
   )
 
-  const getCategoryLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      'spices': 'Gia vị',
-      'condiments': 'Gia vị nêm',
-      'oils': 'Dầu'
-    }
-    return labels[category] || category
-  }
-
   return (
-    <Card className="sticky top-24 h-fit border-violet-200 shadow-sm">
-      <CardHeader className="border-b border-violet-100">
+    <Card className="sticky top-24 h-fit border-[#a08679]/20 shadow-xl rounded-2xl overflow-hidden">
+      <CardHeader className="bg-[#a08679]/5 border-b border-[#a08679]/10">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg text-gray-900">Bộ lọc</CardTitle>
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-[#a08679]" />
+            <CardTitle className="text-lg font-bold text-gray-900 uppercase italic">Bộ lọc</CardTitle>
+          </div>
           <button
             onClick={onReset}
-            className="p-1.5 hover:bg-violet-50 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-[#a08679]/10 rounded-full transition-colors text-[#a08679]"
             title="Xóa tất cả bộ lọc"
           >
-            <RotateCcw className="w-4 h-4 text-violet-600" />
+            <RotateCcw className="w-4 h-4" />
           </button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6 pt-6">
+      <CardContent className="space-y-8 pt-6">
         {/* Category Filter */}
         <div>
-          <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <span className="text-sm uppercase tracking-wide">Danh mục</span>
-            <span className="text-xs text-gray-400">({categories.length + 1})</span>
+          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="text-xs uppercase tracking-widest text-[#a08679]">Danh mục</span>
+            <div className="flex-1 h-[1px] bg-gray-100"></div>
           </h3>
-          <div className="space-y-2">
-            <label className={`flex items-center px-3 py-2 rounded-lg cursor-pointer transition-all border-2 ${
+          <div className="space-y-1.5">
+            <label className={`group flex items-center px-4 py-2.5 rounded-xl cursor-pointer transition-all border ${
               selectedCategory === null
-                ? 'bg-violet-50 border-violet-300 text-violet-700'
-                : 'border-transparent hover:bg-gray-50 text-gray-900'
+                ? 'bg-[#a08679] border-[#a08679] text-white shadow-lg shadow-[#a08679]/20'
+                : 'border-transparent hover:bg-gray-50 text-gray-700'
             }`}>
               <input
                 type="radio"
                 name="category"
                 checked={selectedCategory === null}
                 onChange={() => onCategoryChange(null)}
-                className="w-4 h-4 accent-violet-600"
+                className="hidden"
               />
-              <span className="ml-2 font-medium text-sm">Tất cả danh mục</span>
+              <span className="font-bold text-sm">Tất cả sản phẩm</span>
             </label>
             {categories.map((category) => (
               <label
-                key={category}
-                className={`flex items-center px-3 py-2 rounded-lg cursor-pointer transition-all border-2 ${
-                  selectedCategory === category
-                    ? 'bg-violet-50 border-violet-300 text-violet-700'
-                    : 'border-transparent hover:bg-gray-50 text-gray-900'
+                key={category.id}
+                className={`group flex items-center px-4 py-2.5 rounded-xl cursor-pointer transition-all border ${
+                  selectedCategory === category.id
+                    ? 'bg-[#a08679] border-[#a08679] text-white shadow-lg shadow-[#a08679]/20'
+                    : 'border-transparent hover:bg-gray-50 text-gray-700'
                 }`}
               >
                 <input
                   type="radio"
                   name="category"
-                  checked={selectedCategory === category}
-                  onChange={() => onCategoryChange(category)}
-                  className="w-4 h-4 accent-violet-600"
+                  checked={selectedCategory === category.id}
+                  onChange={() => onCategoryChange(category.id)}
+                  className="hidden"
                 />
-                <span className="ml-2 font-medium text-sm">{getCategoryLabel(category)}</span>
+                <span className="font-bold text-sm">{category.name}</span>
               </label>
             ))}
           </div>
@@ -108,31 +107,38 @@ export function ProductFilters({
 
         {/* Price Filter */}
         <div>
-          <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Khoảng giá</h3>
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs text-gray-600 font-medium mb-1.5 block">Giá tối thiểu</label>
-              <Input
-                type="number"
-                value={priceRange[0]}
-                onChange={handleMinPriceChange}
-                placeholder="0"
-                className="border-gray-300 text-sm h-9"
-              />
+          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="text-xs uppercase tracking-widest text-[#a08679]">Khoảng giá</span>
+            <div className="flex-1 h-[1px] bg-gray-100"></div>
+          </h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-gray-400 font-black uppercase tracking-tighter block ml-1">Từ (đ)</label>
+                <Input
+                  type="number"
+                  value={priceRange[0]}
+                  onChange={handleMinPriceChange}
+                  placeholder="0"
+                  className="border-gray-200 focus-visible:ring-[#a08679] text-sm h-10 font-bold rounded-xl"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-gray-400 font-black uppercase tracking-tighter block ml-1">Đến (đ)</label>
+                <Input
+                  type="number"
+                  value={priceRange[1]}
+                  onChange={handleMaxPriceChange}
+                  placeholder="200k"
+                  className="border-gray-200 focus-visible:ring-[#a08679] text-sm h-10 font-bold rounded-xl"
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-xs text-gray-600 font-medium mb-1.5 block">Giá tối đa</label>
-              <Input
-                type="number"
-                value={priceRange[1]}
-                onChange={handleMaxPriceChange}
-                placeholder="200000"
-                className="border-gray-300 text-sm h-9"
-              />
-            </div>
-            <div className="bg-gradient-to-r from-violet-50 to-indigo-50 px-3 py-2.5 rounded-lg border border-violet-100">
-              <p className="text-sm font-semibold text-violet-900">
-                {priceRange[0].toLocaleString('vi-VN')} - {priceRange[1].toLocaleString('vi-VN')} đ
+
+            <div className="bg-[#a08679]/5 px-4 py-3 rounded-xl border border-[#a08679]/10 flex justify-between items-center">
+              <span className="text-xs font-bold text-gray-500 uppercase">Đang chọn:</span>
+              <p className="text-sm font-black text-[#a08679]">
+                {priceRange[0].toLocaleString('vi-VN')}đ - {priceRange[1].toLocaleString('vi-VN')}đ
               </p>
             </div>
           </div>
@@ -140,18 +146,21 @@ export function ProductFilters({
 
         {/* Quick Price Filters */}
         <div>
-          <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Giá phổ biến</h3>
+          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="text-xs uppercase tracking-widest text-[#a08679]">Giá phổ biến</span>
+            <div className="flex-1 h-[1px] bg-gray-100"></div>
+          </h3>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { label: 'Dưới 50K', min: 0, max: 50000 },
+              { label: '< 50K', min: 0, max: 50000 },
               { label: '50K - 100K', min: 50000, max: 100000 },
               { label: '100K - 150K', min: 100000, max: 150000 },
-              { label: 'Trên 150K', min: 150000, max: 200000 }
+              { label: '> 150K', min: 150000, max: 500000 }
             ].map((range) => (
               <button
                 key={range.label}
                 onClick={() => onPriceChange([range.min, range.max])}
-                className="text-xs font-medium px-2 py-1.5 rounded-lg transition-all border border-gray-200 hover:border-violet-300 hover:bg-violet-50 text-gray-700 hover:text-violet-700"
+                className="text-xs font-black px-2 py-2 rounded-xl transition-all border border-gray-100 hover:border-[#a08679] hover:bg-[#a08679]/5 text-gray-600 hover:text-[#a08679]"
               >
                 {range.label}
               </button>
@@ -163,10 +172,10 @@ export function ProductFilters({
         <Button
           onClick={onReset}
           variant="outline"
-          className="w-full border-violet-300 text-violet-600 hover:bg-violet-50 hover:text-violet-700 font-medium"
+          className="w-full border-[#a08679] text-[#a08679] hover:bg-[#a08679] hover:text-white font-black text-xs uppercase tracking-widest h-12 rounded-xl shadow-sm transition-all"
         >
           <RotateCcw className="w-4 h-4 mr-2" />
-          Xóa bộ lọc
+          Xóa tất cả
         </Button>
       </CardContent>
     </Card>

@@ -53,7 +53,7 @@ export default function HomePage() {
     // Find the soonest sale end date among active sales
     const activeSales = saleProducts
       .filter(p => p.saleEnd)
-      .map(p => new Date(p.saleEnd).getTime())
+      .map(p => new Date(p.saleEnd!).getTime())
       .sort((a, b) => a - b)
 
     if (activeSales.length === 0) {
