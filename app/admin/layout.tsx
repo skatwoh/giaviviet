@@ -36,13 +36,9 @@ export default function AdminLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gray-50/50">
-        <Suspense fallback={<div className="w-64 bg-white border-r" />}>
-          <AdminSidebar />
-        </Suspense>
+        <AdminSidebar />
         <SidebarInset className="flex flex-col">
-          <Suspense fallback={<header className="h-16 border-b bg-white" />}>
-            <AdminHeader />
-          </Suspense>
+          <AdminHeader />
           <main className="flex-1 p-0">
             {children}
           </main>

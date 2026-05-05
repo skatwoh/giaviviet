@@ -13,7 +13,7 @@ import {
   ChevronRight,
   User
 } from 'lucide-react'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/app/context/AuthContext'
 import {
@@ -42,45 +42,42 @@ export function AdminSidebar() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const searchParams = useSearchParams()
-  const currentTab = searchParams.get('tab') || 'overview'
-
   const navMain = [
     {
       title: "Tổng quan",
-      url: "/admin?tab=overview",
+      url: "/admin",
       icon: LayoutDashboard,
-      isActive: currentTab === "overview",
+      isActive: pathname === "/admin",
     },
     {
       title: "Sản phẩm",
-      url: "/admin?tab=products",
+      url: "/admin/products",
       icon: Package,
-      isActive: currentTab === "products",
+      isActive: pathname.startsWith("/admin/products"),
     },
     {
       title: "Danh mục",
-      url: "/admin?tab=categories",
+      url: "/admin/categories",
       icon: Layers,
-      isActive: currentTab === "categories",
+      isActive: pathname.startsWith("/admin/categories"),
     },
     {
       title: "Đơn vị tính",
-      url: "/admin?tab=units",
+      url: "/admin/units",
       icon: Hash,
-      isActive: currentTab === "units",
+      isActive: pathname.startsWith("/admin/units"),
     },
     {
       title: "Đơn hàng",
-      url: "/admin?tab=orders",
+      url: "/admin/orders",
       icon: ShoppingBag,
-      isActive: currentTab === "orders",
+      isActive: pathname.startsWith("/admin/orders"),
     },
     {
       title: "Tin nhắn",
-      url: "/admin?tab=messages",
+      url: "/admin/messages",
       icon: MessageSquare,
-      isActive: currentTab === "messages",
+      isActive: pathname.startsWith("/admin/messages"),
     },
   ]
 
