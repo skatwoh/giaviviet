@@ -13,7 +13,8 @@ import {
   ChevronRight,
   User
 } from 'lucide-react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/app/context/AuthContext'
 import {
   Sidebar,
@@ -41,41 +42,45 @@ export function AdminSidebar() {
   const router = useRouter()
   const pathname = usePathname()
 
+  const searchParams = useSearchParams()
+  const currentTab = searchParams.get('tab') || 'overview'
+
   const navMain = [
     {
       title: "Tổng quan",
-      url: "/admin",
+      url: "/admin?tab=overview",
       icon: LayoutDashboard,
-      isActive: pathname === "/admin",
+      isActive: currentTab === "overview",
     },
     {
       title: "Sản phẩm",
-      url: "#",
+      url: "/admin?tab=products",
       icon: Package,
-      items: [
-        { title: "Tất cả sản phẩm", url: "/admin?tab=products" },
-        { title: "Thêm mới", url: "/admin?tab=products&action=new" },
-      ],
+      isActive: currentTab === "products",
     },
     {
       title: "Danh mục",
       url: "/admin?tab=categories",
       icon: Layers,
+      isActive: currentTab === "categories",
     },
     {
       title: "Đơn vị tính",
       url: "/admin?tab=units",
       icon: Hash,
+      isActive: currentTab === "units",
     },
     {
       title: "Đơn hàng",
       url: "/admin?tab=orders",
       icon: ShoppingBag,
+      isActive: currentTab === "orders",
     },
     {
       title: "Tin nhắn",
       url: "/admin?tab=messages",
       icon: MessageSquare,
+      isActive: currentTab === "messages",
     },
   ]
 
@@ -108,10 +113,10 @@ export function AdminSidebar() {
                 tooltip={item.title}
                 className={`h-10 transition-all ${item.isActive ? 'bg-[#a08679]/10 text-[#a08679]' : 'hover:bg-gray-100'}`}
               >
-                <a href={item.url} className="flex items-center gap-3">
+                <Link href={item.url} className="flex items-center gap-3">
                   <item.icon className={`h-5 w-5 ${item.isActive ? 'text-[#a08679]' : 'text-gray-500'}`} />
                   <span className="font-bold text-sm">{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
@@ -123,10 +128,10 @@ export function AdminSidebar() {
            <SidebarMenu>
              <SidebarMenuItem>
                <SidebarMenuButton asChild className="h-10 text-gray-500 hover:text-brand-green">
-                 <a href="/" target="_blank" className="flex items-center gap-3">
+                 <Link href="/" target="_blank" className="flex items-center gap-3">
                    <Home className="h-5 w-5" />
                    <span className="font-bold text-sm">Xem Storefront</span>
-                 </a>
+                 </Link>
                </SidebarMenuButton>
              </SidebarMenuItem>
            </SidebarMenu>

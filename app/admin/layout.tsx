@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/context/AuthContext'
 import { AdminHeader } from '@/components/AdminHeader'
@@ -36,9 +36,13 @@ export default function AdminLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gray-50/50">
-        <AdminSidebar />
+        <Suspense fallback={<div className="w-64 bg-white border-r" />}>
+          <AdminSidebar />
+        </Suspense>
         <SidebarInset className="flex flex-col">
-          <AdminHeader />
+          <Suspense fallback={<header className="h-16 border-b bg-white" />}>
+            <AdminHeader />
+          </Suspense>
           <main className="flex-1 p-0">
             {children}
           </main>

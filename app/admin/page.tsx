@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -114,7 +115,11 @@ interface Message {
   createdAt: string
 }
 
-export default function AdminPage() {
+function AdminDashboardContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const activeTab = searchParams.get('tab') || 'overview'
+
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [units, setUnits] = useState<Unit[]>([])
@@ -132,6 +137,10 @@ export default function AdminPage() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleTabChange = (value: string) => {
+    router.push(`/admin?tab=${value}`)
+  }
 
   const [productFormData, setProductFormData] = useState({
     name: '',
@@ -558,16 +567,19 @@ export default function AdminPage() {
 
   // Prepare chart data
   const chartData = orders.reduce((acc: any[], order) => {
-    const date = new Date(order.createdAt).toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' })
+    const dateObj = new Date(order.createdAt)
+    const date = dateObj.toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' })
+    const timestamp = dateObj.getTime()
+
     const existing = acc.find(item => item.date === date)
     if (existing) {
       existing.revenue += order.total
       existing.orders += 1
     } else {
-      acc.push({ date, revenue: order.total, orders: 1 })
+      acc.push({ date, revenue: order.total, orders: 1, timestamp })
     }
     return acc
-  }, []).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-7)
+  }, []).sort((a, b) => a.timestamp - b.timestamp).slice(-7)
 
   // If no data, provide dummy data for visual demonstration
   const displayChartData = chartData.length > 0 ? chartData : [
@@ -642,133 +654,13 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {[
-          { label: 'Sản phẩm', value: stats.totalProducts, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50', trend: '+12%', isUp: true },
-          { label: 'Danh mục', value: stats.totalCategories, icon: LayoutGrid, color: 'text-orange-600', bg: 'bg-orange-50', trend: 'Ổn định', isUp: true },
-          { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-[#a08679]', bg: 'bg-amber-50', trend: '+5%', isUp: true },
-          { label: 'Tin nhắn', value: stats.totalMessages, icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50', trend: '-2%', isUp: false },
-          { label: 'Doanh thu', value: `${(stats.totalRevenue / 1000000).toFixed(1)}M đ`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50', trend: '+18%', isUp: true },
-          { label: 'Chờ xử lý', value: stats.pendingOrders, icon: Clock, color: 'text-red-600', bg: 'bg-red-50', trend: 'Khẩn cấp', isUp: false },
-        ].map((stat, i) => (
-          <Card key={i} className="border-none shadow-sm overflow-hidden hover:shadow-md transition-all group">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`${stat.bg} ${stat.color} p-2.5 rounded-xl group-hover:scale-110 transition-transform`}>
-                  <stat.icon className="w-5 h-5" />
-                </div>
-                <div className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter ${stat.isUp ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {stat.isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  {stat.trend}
-                </div>
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{stat.label}</p>
-                <p className="text-2xl font-black mt-1 text-gray-900 italic">{stat.value}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Analytics Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 border-none shadow-sm overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-gray-50 bg-white pb-4">
-            <div>
-              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Xu hướng doanh thu</CardTitle>
-              <CardDescription className="text-lg font-bold text-gray-900">Thống kê 7 ngày gần nhất</CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-widest">Tuần này</Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={displayChartData}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#a08679" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#a08679" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1f1" />
-                  <XAxis
-                    dataKey="date"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 10, fontWeight: 700, fill: '#9ca3af' }}
-                    dy={10}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 10, fontWeight: 700, fill: '#9ca3af' }}
-                    tickFormatter={(value) => `${value / 1000}k`}
-                  />
-                  <RechartsTooltip
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold' }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#a08679"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#colorRevenue)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-sm overflow-hidden">
-          <CardHeader className="border-b border-gray-50 bg-white pb-4">
-            <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Đơn hàng mới nhất</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="divide-y divide-gray-50">
-              {orders.slice(0, 5).map((order) => (
-                <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-amber-50 flex items-center justify-center text-[#a08679] font-bold text-xs border border-amber-100">
-                      {order.customer.customerName.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900">{order.customer.customerName}</p>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">#{order.id} • {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-black text-[#a08679]">{order.total.toLocaleString('vi-VN')} đ</p>
-                    <Badge variant="outline" className="text-[8px] py-0 h-4 uppercase tracking-tighter font-black">
-                      {order.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-              {orders.length === 0 && (
-                <div className="p-8 text-center text-gray-400 text-xs font-bold uppercase tracking-widest italic">
-                  Chưa có đơn hàng nào
-                </div>
-              )}
-            </div>
-            <div className="p-4 border-t border-gray-50">
-              <Button variant="ghost" className="w-full text-xs font-black uppercase tracking-widest text-[#a08679] hover:bg-amber-50">
-                Xem tất cả đơn hàng <ArrowRight className="w-3 h-3 ml-2" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="products" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <TabsList className="bg-white border p-1 h-12 w-fit">
+          <TabsList className="bg-white border p-1 h-12 w-fit overflow-x-auto">
+            <TabsTrigger value="overview" className="px-4 h-10 data-[state=active]:bg-gray-50 data-[state=active]:text-[#a08679]">
+              <LayoutGrid className="w-4 h-4 mr-2" />
+              Tổng quan
+            </TabsTrigger>
             <TabsTrigger value="products" className="px-4 h-10 data-[state=active]:bg-gray-50 data-[state=active]:text-[#a08679]">
               <Package className="w-4 h-4 mr-2" />
               Sản phẩm
@@ -801,6 +693,133 @@ export default function AdminPage() {
             />
           </div>
         </div>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-8 outline-none">
+          {/* Statistics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            {[
+              { label: 'Sản phẩm', value: stats.totalProducts, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50', trend: '+12%', isUp: true },
+              { label: 'Danh mục', value: stats.totalCategories, icon: LayoutGrid, color: 'text-orange-600', bg: 'bg-orange-50', trend: 'Ổn định', isUp: true },
+              { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-[#a08679]', bg: 'bg-amber-50', trend: '+5%', isUp: true },
+              { label: 'Tin nhắn', value: stats.totalMessages, icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50', trend: '-2%', isUp: false },
+              { label: 'Doanh thu', value: `${(stats.totalRevenue / 1000000).toFixed(1)}M đ`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50', trend: '+18%', isUp: true },
+              { label: 'Chờ xử lý', value: stats.pendingOrders, icon: Clock, color: 'text-red-600', bg: 'bg-red-50', trend: 'Khẩn cấp', isUp: false },
+            ].map((stat, i) => (
+              <Card key={i} className="border-none shadow-sm overflow-hidden hover:shadow-md transition-all group">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`${stat.bg} ${stat.color} p-2.5 rounded-xl group-hover:scale-110 transition-transform`}>
+                      <stat.icon className="w-5 h-5" />
+                    </div>
+                    <div className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter ${stat.isUp ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {stat.isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                      {stat.trend}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{stat.label}</p>
+                    <p className="text-2xl font-black mt-1 text-gray-900 italic">{stat.value}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Analytics Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-2 border-none shadow-sm overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-gray-50 bg-white pb-4">
+                <div>
+                  <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Xu hướng doanh thu</CardTitle>
+                  <CardDescription className="text-lg font-bold text-gray-900">Thống kê 7 ngày gần nhất</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-widest">Tuần này</Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={displayChartData}>
+                      <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#a08679" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#a08679" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1f1" />
+                      <XAxis
+                        dataKey="date"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 10, fontWeight: 700, fill: '#9ca3af' }}
+                        dy={10}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 10, fontWeight: 700, fill: '#9ca3af' }}
+                        tickFormatter={(value) => `${value / 1000}k`}
+                      />
+                      <RechartsTooltip
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold' }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#a08679"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorRevenue)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-gray-50 bg-white pb-4">
+                <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Đơn hàng mới nhất</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-gray-50">
+                  {orders.slice(0, 5).map((order) => (
+                    <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-amber-50 flex items-center justify-center text-[#a08679] font-bold text-xs border border-amber-100">
+                          {order.customer.customerName.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">{order.customer.customerName}</p>
+                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">#{order.id} • {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-black text-[#a08679]">{order.total.toLocaleString('vi-VN')} đ</p>
+                        <Badge variant="outline" className="text-[8px] py-0 h-4 uppercase tracking-tighter font-black">
+                          {order.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  {orders.length === 0 && (
+                    <div className="p-8 text-center text-gray-400 text-xs font-bold uppercase tracking-widest italic">
+                      Chưa có đơn hàng nào
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 border-t border-gray-50">
+                  <Button variant="ghost" className="w-full text-xs font-black uppercase tracking-widest text-[#a08679] hover:bg-amber-50" onClick={() => handleTabChange('orders')}>
+                    Xem tất cả đơn hàng <ArrowRight className="w-3 h-3 ml-2" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* Products Tab */}
         <TabsContent value="products">
@@ -1550,5 +1569,17 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a08679]"></div>
+      </div>
+    }>
+      <AdminDashboardContent />
+    </Suspense>
   )
 }
