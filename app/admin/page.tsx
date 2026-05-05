@@ -38,8 +38,27 @@ import {
   Download,
   Upload,
   LayoutGrid,
+  TrendingUp,
+  TrendingDown,
+  ArrowRight,
+  MoreVertical,
+  Filter
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  AreaChart,
+  Area
+} from 'recharts'
 
 interface Product {
   id: number
@@ -537,6 +556,30 @@ export default function AdminPage() {
     pendingOrders: orders.filter((o) => o.status === 'pending').length,
   }
 
+  // Prepare chart data
+  const chartData = orders.reduce((acc: any[], order) => {
+    const date = new Date(order.createdAt).toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' })
+    const existing = acc.find(item => item.date === date)
+    if (existing) {
+      existing.revenue += order.total
+      existing.orders += 1
+    } else {
+      acc.push({ date, revenue: order.total, orders: 1 })
+    }
+    return acc
+  }, []).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-7)
+
+  // If no data, provide dummy data for visual demonstration
+  const displayChartData = chartData.length > 0 ? chartData : [
+    { date: '01/05', revenue: 450000, orders: 3 },
+    { date: '02/05', revenue: 820000, orders: 5 },
+    { date: '03/05', revenue: 310000, orders: 2 },
+    { date: '04/05', revenue: 950000, orders: 6 },
+    { date: '05/05', revenue: 1200000, orders: 8 },
+    { date: '06/05', revenue: 600000, orders: 4 },
+    { date: '07/05', revenue: 1500000, orders: 9 },
+  ]
+
   // Filter products based on search
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -547,12 +590,14 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-[1600px] mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Tổng quan</h1>
-          <p className="text-gray-500">Quản lý cửa hàng, sản phẩm và đơn hàng của bạn.</p>
+          <h1 className="text-3xl font-black tracking-tight text-gray-900 uppercase italic">
+            Dashboard <span className="text-[#a08679]">Overview</span>
+          </h1>
+          <p className="text-gray-500 font-medium mt-1">Hệ thống quản lý kinh doanh Thủy Hương Food.</p>
         </div>
         <div className="flex items-center gap-2">
           <input
@@ -598,29 +643,127 @@ export default function AdminPage() {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {[
-          { label: 'Sản phẩm', value: stats.totalProducts, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Danh mục', value: stats.totalCategories, icon: LayoutGrid, color: 'text-orange-600', bg: 'bg-orange-50' },
-          { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-[#a08679]', bg: 'bg-amber-50' },
-          { label: 'Tin nhắn', value: stats.totalMessages, icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50' },
-          { label: 'Doanh thu', value: `${(stats.totalRevenue / 1000000).toFixed(1)}M đ`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Chờ xử lý', value: stats.pendingOrders, icon: Clock, color: 'text-red-600', bg: 'bg-red-50' },
+          { label: 'Sản phẩm', value: stats.totalProducts, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50', trend: '+12%', isUp: true },
+          { label: 'Danh mục', value: stats.totalCategories, icon: LayoutGrid, color: 'text-orange-600', bg: 'bg-orange-50', trend: 'Ổn định', isUp: true },
+          { label: 'Đơn hàng', value: stats.totalOrders, icon: ShoppingBag, color: 'text-[#a08679]', bg: 'bg-amber-50', trend: '+5%', isUp: true },
+          { label: 'Tin nhắn', value: stats.totalMessages, icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50', trend: '-2%', isUp: false },
+          { label: 'Doanh thu', value: `${(stats.totalRevenue / 1000000).toFixed(1)}M đ`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50', trend: '+18%', isUp: true },
+          { label: 'Chờ xử lý', value: stats.pendingOrders, icon: Clock, color: 'text-red-600', bg: 'bg-red-50', trend: 'Khẩn cấp', isUp: false },
         ].map((stat, i) => (
-          <Card key={i} className="border-none shadow-sm overflow-hidden">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                  <p className="text-2xl font-bold mt-1">{stat.value}</p>
+          <Card key={i} className="border-none shadow-sm overflow-hidden hover:shadow-md transition-all group">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`${stat.bg} ${stat.color} p-2.5 rounded-xl group-hover:scale-110 transition-transform`}>
+                  <stat.icon className="w-5 h-5" />
                 </div>
-                <div className={`${stat.bg} ${stat.color} p-3 rounded-xl`}>
-                  <stat.icon className="w-6 h-6" />
+                <div className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter ${stat.isUp ? 'text-emerald-600' : 'text-red-600'}`}>
+                  {stat.isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                  {stat.trend}
                 </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{stat.label}</p>
+                <p className="text-2xl font-black mt-1 text-gray-900 italic">{stat.value}</p>
               </div>
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Analytics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2 border-none shadow-sm overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-gray-50 bg-white pb-4">
+            <div>
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Xu hướng doanh thu</CardTitle>
+              <CardDescription className="text-lg font-bold text-gray-900">Thống kê 7 ngày gần nhất</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-widest">Tuần này</Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={displayChartData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#a08679" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#a08679" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1f1" />
+                  <XAxis
+                    dataKey="date"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fontWeight: 700, fill: '#9ca3af' }}
+                    dy={10}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fontWeight: 700, fill: '#9ca3af' }}
+                    tickFormatter={(value) => `${value / 1000}k`}
+                  />
+                  <RechartsTooltip
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold' }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#a08679"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorRevenue)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm overflow-hidden">
+          <CardHeader className="border-b border-gray-50 bg-white pb-4">
+            <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Đơn hàng mới nhất</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="divide-y divide-gray-50">
+              {orders.slice(0, 5).map((order) => (
+                <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-amber-50 flex items-center justify-center text-[#a08679] font-bold text-xs border border-amber-100">
+                      {order.customer.customerName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">{order.customer.customerName}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">#{order.id} • {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-[#a08679]">{order.total.toLocaleString('vi-VN')} đ</p>
+                    <Badge variant="outline" className="text-[8px] py-0 h-4 uppercase tracking-tighter font-black">
+                      {order.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+              {orders.length === 0 && (
+                <div className="p-8 text-center text-gray-400 text-xs font-bold uppercase tracking-widest italic">
+                  Chưa có đơn hàng nào
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t border-gray-50">
+              <Button variant="ghost" className="w-full text-xs font-black uppercase tracking-widest text-[#a08679] hover:bg-amber-50">
+                Xem tất cả đơn hàng <ArrowRight className="w-3 h-3 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs defaultValue="products" className="space-y-6">
@@ -728,10 +871,18 @@ export default function AdminPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <span className={`h-2 w-2 rounded-full ${product.stock > 5 ? 'bg-green-500' : 'bg-red-500'}`} />
-                            <span className={product.stock > 5 ? 'text-gray-700' : 'text-red-600 font-medium'}>
-                              {product.stock} sản phẩm
-                            </span>
+                            <span className={`h-2 w-2 rounded-full ${product.stock > 10 ? 'bg-emerald-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'}`} />
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "text-[10px] font-black uppercase tracking-tighter px-2 py-0 h-5",
+                                product.stock > 10 ? "text-emerald-600 bg-emerald-50 border-emerald-100" :
+                                product.stock > 0 ? "text-amber-600 bg-amber-50 border-amber-100" :
+                                "text-red-600 bg-red-50 border-red-100"
+                              )}
+                            >
+                              {product.stock > 0 ? `${product.stock} ${product.unit}` : "Hết hàng"}
+                            </Badge>
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
@@ -1080,187 +1231,238 @@ export default function AdminPage() {
 
       {/* Product Form Dialog */}
       <Dialog open={showProductDialog} onOpenChange={setShowProductDialog}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <form onSubmit={handleProductSubmit}>
-            <DialogHeader>
-              <DialogTitle>{editingProduct ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'}</DialogTitle>
-              <DialogDescription>
-                Điền thông tin chi tiết của sản phẩm vào form bên dưới.
-              </DialogDescription>
-            </DialogHeader>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl">
+          <form onSubmit={handleProductSubmit} className="flex flex-col h-full">
+            <div className="bg-[#a08679] p-6 text-white">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black uppercase italic tracking-tight flex items-center gap-3">
+                  <Package className="w-6 h-6" />
+                  {editingProduct ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'}
+                </DialogTitle>
+                <DialogDescription className="text-white/70 font-medium italic">
+                  Thông tin sản phẩm giúp khách hàng hiểu rõ hơn về chất lượng tinh hoa ẩm thực.
+                </DialogDescription>
+              </DialogHeader>
+            </div>
 
-            <Separator className="my-4" />
-
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Tên sản phẩm</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="Ví dụ: Nước mắm Hưng Thịnh"
-                    value={productFormData.name}
-                    onChange={handleProductFormChange}
-                    required
-                  />
+            <div className="p-8 space-y-10">
+              {/* Identity Section */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-xs font-black">01</span>
+                  <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs">Thông tin cơ bản</h3>
+                  <div className="flex-1 h-[1px] bg-gray-100"></div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="regularPrice">Giá bán thường (đ)</Label>
-                  <Input
-                    id="regularPrice"
-                    type="number"
-                    name="regularPrice"
-                    placeholder="0"
-                    value={productFormData.regularPrice}
-                    onChange={handleProductFormChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
-                <h4 className="text-sm font-bold text-amber-900 mb-3 uppercase tracking-wider">Cài đặt khuyến mãi (Tự động)</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="salePrice">Giá khuyến mãi (đ)</Label>
+                    <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Tên sản phẩm</Label>
                     <Input
-                      id="salePrice"
-                      type="number"
-                      name="salePrice"
-                      placeholder="Không có"
-                      value={productFormData.salePrice || ''}
+                      id="name"
+                      name="name"
+                      placeholder="Ví dụ: Nước mắm Hưng Thịnh"
+                      value={productFormData.name}
                       onChange={handleProductFormChange}
+                      className="h-11 font-bold border-gray-200 focus-visible:ring-[#a08679] rounded-xl"
+                      required
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="saleStart">Ngày bắt đầu</Label>
+                    <Label htmlFor="category" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Danh mục</Label>
+                    <select
+                      id="category"
+                      name="category"
+                      value={productFormData.category}
+                      onChange={handleProductFormChange}
+                      className="flex h-11 w-full items-center justify-between rounded-xl border border-gray-200 bg-background px-3 py-2 text-sm font-bold ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-[#a08679] disabled:cursor-not-allowed disabled:opacity-50 transition-all"
+                    >
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              {/* Pricing Section */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 text-xs font-black">02</span>
+                  <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs">Giá & Khuyến mãi</h3>
+                  <div className="flex-1 h-[1px] bg-gray-100"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid gap-2">
+                    <Label htmlFor="regularPrice" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Giá bán gốc (đ)</Label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400" />
+                      <Input
+                        id="regularPrice"
+                        type="number"
+                        name="regularPrice"
+                        placeholder="0"
+                        value={productFormData.regularPrice}
+                        onChange={handleProductFormChange}
+                        className="h-11 pl-10 font-black text-lg border-gray-200 focus-visible:ring-[#a08679] rounded-xl"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-2 bg-amber-50/50 p-4 rounded-2xl border border-amber-100">
+                    <Label htmlFor="salePrice" className="text-[10px] font-black uppercase tracking-widest text-amber-600">Giá khuyến mãi (đ)</Label>
+                    <div className="relative">
+                      <TrendingDown className="absolute left-3.5 top-3.5 w-4 h-4 text-amber-500" />
+                      <Input
+                        id="salePrice"
+                        type="number"
+                        name="salePrice"
+                        placeholder="Không có"
+                        value={productFormData.salePrice || ''}
+                        onChange={handleProductFormChange}
+                        className="h-11 pl-10 font-black text-lg bg-white border-amber-200 focus-visible:ring-amber-500 rounded-xl"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="saleStart" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Thời điểm bắt đầu sale</Label>
                     <Input
                       id="saleStart"
                       type="datetime-local"
                       name="saleStart"
                       value={productFormData.saleStart}
                       onChange={handleProductFormChange}
+                      className="h-11 font-bold border-gray-200 rounded-xl"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="saleEnd">Ngày kết thúc</Label>
+                    <Label htmlFor="saleEnd" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Thời điểm kết thúc sale</Label>
                     <Input
                       id="saleEnd"
                       type="datetime-local"
                       name="saleEnd"
                       value={productFormData.saleEnd}
                       onChange={handleProductFormChange}
+                      className="h-11 font-bold border-gray-200 rounded-xl"
+                    />
+                  </div>
+                  <p className="md:col-span-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider italic flex items-center gap-2">
+                    <Clock className="w-3 h-3" />
+                    Hệ thống tự động chuyển giá dựa trên thời gian thực.
+                  </p>
+                </div>
+              </section>
+
+              {/* Inventory & Logistics Section */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-50 text-purple-600 text-xs font-black">03</span>
+                  <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs">Kho & Logistics</h3>
+                  <div className="flex-1 h-[1px] bg-gray-100"></div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="stock" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Số lượng kho</Label>
+                    <Input
+                      id="stock"
+                      type="number"
+                      name="stock"
+                      placeholder="0"
+                      value={productFormData.stock}
+                      onChange={handleProductFormChange}
+                      className="h-11 font-black border-gray-200 rounded-xl"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="unit" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Đơn vị tính</Label>
+                    <select
+                      id="unit"
+                      name="unit"
+                      value={productFormData.unit}
+                      onChange={handleProductFormChange}
+                      className="h-11 rounded-xl border border-gray-200 font-bold text-sm px-3 focus:ring-1 focus:ring-[#a08679] transition-all"
+                      required
+                    >
+                      <option value="">Chọn đơn vị</option>
+                      {units.map((u) => (
+                        <option key={u.id} value={u.name}>
+                          {u.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="weight" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Khối lượng</Label>
+                    <Input
+                      id="weight"
+                      name="weight"
+                      placeholder="500g"
+                      value={productFormData.weight}
+                      onChange={handleProductFormChange}
+                      className="h-11 font-bold border-gray-200 rounded-xl"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="origin" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Xuất xứ</Label>
+                    <Input
+                      id="origin"
+                      name="origin"
+                      placeholder="Việt Nam"
+                      value={productFormData.origin}
+                      onChange={handleProductFormChange}
+                      className="h-11 font-bold border-gray-200 rounded-xl"
                     />
                   </div>
                 </div>
-                <p className="text-[10px] text-amber-700 mt-2 italic">
-                  * Sản phẩm sẽ tự động giảm giá khi đến thời gian và về giá cũ khi hết hạn.
-                </p>
-              </div>
+              </section>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="category">Danh mục</Label>
-                  <select
-                    id="category"
-                    name="category"
-                    value={productFormData.category}
-                    onChange={handleProductFormChange}
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+              {/* Description Section */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-50 text-orange-600 text-xs font-black">04</span>
+                  <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs">Mô tả & Hình ảnh</h3>
+                  <div className="flex-1 h-[1px] bg-gray-100"></div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="stock">Số lượng kho</Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    name="stock"
-                    placeholder="0"
-                    value={productFormData.stock}
-                    onChange={handleProductFormChange}
-                    required
-                  />
+                <div className="grid gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="image" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Đường dẫn hình ảnh (URL)</Label>
+                    <Input
+                      id="image"
+                      name="image"
+                      placeholder="https://..."
+                      value={productFormData.image}
+                      onChange={handleProductFormChange}
+                      className="h-11 font-medium border-gray-200 rounded-xl"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="description" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mô tả chi tiết</Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      placeholder="Kể câu chuyện về sản phẩm này..."
+                      value={productFormData.description}
+                      onChange={handleProductFormChange}
+                      rows={5}
+                      className="rounded-2xl border-gray-200 focus:ring-[#a08679] font-medium leading-relaxed"
+                    />
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="unit">Đơn vị tính</Label>
-                  <select
-                    id="unit"
-                    name="unit"
-                    value={productFormData.unit}
-                    onChange={handleProductFormChange}
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    required
-                  >
-                    <option value="">Chọn đơn vị</option>
-                    {units.map((u) => (
-                      <option key={u.id} value={u.name}>
-                        {u.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="weight">Khối lượng</Label>
-                  <Input
-                    id="weight"
-                    name="weight"
-                    placeholder="Ví dụ: 500ml, 1kg"
-                    value={productFormData.weight}
-                    onChange={handleProductFormChange}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="origin">Xuất xứ</Label>
-                  <Input
-                    id="origin"
-                    name="origin"
-                    placeholder="Ví dụ: Việt Nam"
-                    value={productFormData.origin}
-                    onChange={handleProductFormChange}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="image">URL Hình ảnh</Label>
-                  <Input
-                    id="image"
-                    name="image"
-                    placeholder="https://..."
-                    value={productFormData.image}
-                    onChange={handleProductFormChange}
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="description">Mô tả sản phẩm</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Nhập mô tả chi tiết sản phẩm..."
-                  value={productFormData.description}
-                  onChange={handleProductFormChange}
-                  rows={4}
-                />
-              </div>
+              </section>
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button type="button" variant="outline" onClick={() => setShowProductDialog(false)}>
+            <div className="bg-gray-50 p-6 flex items-center justify-end gap-4 border-t border-gray-100">
+              <Button type="button" variant="ghost" onClick={() => setShowProductDialog(false)} className="text-gray-500 font-bold hover:bg-gray-100 rounded-xl h-12 px-8">
                 Hủy bỏ
               </Button>
-              <Button type="submit" className="bg-[#a08679] hover:bg-[#8c756a]">
-                {editingProduct ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
+              <Button type="submit" className="bg-[#a08679] hover:bg-[#8c756a] text-white font-black uppercase tracking-widest shadow-lg shadow-amber-900/20 rounded-xl h-12 px-10">
+                {editingProduct ? 'Lưu thay đổi' : 'Tạo sản phẩm ngay'}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
