@@ -39,11 +39,11 @@ export function Footer() {
           </div>
           <div className="flex items-center gap-2 text-brand-green font-black italic text-xl uppercase tracking-tighter">
             <Phone className="w-6 h-6 fill-current" />
-            <a href="tel:0368588886">036 85 88886</a>
+            <a href="tel:0368588886">0368588886 - 0987026696</a>
           </div>
           <div className="flex items-center gap-2 text-gray-600 text-sm">
             <MapPin className="w-5 h-5 text-brand-green shrink-0" />
-            <span>03 Hàng Khoai, p. Đồng Xuân, Hoàn Kiếm, Hà Nội</span>
+            <span>135A-135C Âu Cơ, Phường Tây Hồ, Hà Nội</span>
           </div>
         </div>
       </div>
@@ -113,8 +113,7 @@ export function Footer() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xl font-black text-gray-900 tracking-tight italic">036 85 88886</p>
-                  <p className="text-xs text-gray-500 font-bold">Hotline: {`036 85 88886`}</p>
+                  <p className="text-xl font-black text-gray-900 tracking-tight italic">0368588886  0987026696</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 group">
@@ -153,11 +152,11 @@ export function Footer() {
              <div className="space-y-4">
                 <div>
                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Địa chỉ:</p>
-                   <p className="text-sm text-gray-800 font-medium">Số 03 Hàng Khoai, Phường Đồng Xuân, Quận Hoàn Kiếm, Hà Nội</p>
+                   <p className="text-sm text-gray-800 font-medium">135A-135C Âu Cơ, Phường Tây Hồ, Hà Nội</p>
                 </div>
                 <div>
                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Điện thoại:</p>
-                   <p className="text-sm text-gray-800 font-medium">036 85 88886</p>
+                   <p className="text-sm text-gray-800 font-medium">0368588886 - 0987026696</p>
                 </div>
                 <div>
                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Email:</p>

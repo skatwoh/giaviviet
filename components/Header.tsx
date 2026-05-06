@@ -216,7 +216,7 @@ export function Header() {
                     <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-brand-green group-hover:text-white transition-all">
                       <Phone className="w-5 h-5" />
                     </div>
-                    <span className="text-sm font-bold tracking-tight">036 85 88886</span>
+                    <span className="text-sm font-bold tracking-tight">0368588886 - 0987026696</span>
                   </a>
                   <a href="mailto:giatothuyhuong@gmail.com" className="flex items-center gap-4 text-gray-700 hover:text-brand-green transition-colors group">
                     <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-brand-green group-hover:text-white transition-all">

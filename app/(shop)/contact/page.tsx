@@ -70,7 +70,7 @@ export default function ContactPage() {
             <CardContent className="pt-6 text-center">
               <Phone className="w-8 h-8 text-[#a08679] mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Điện thoại</h3>
-              <p className="text-gray-600">036 85 88886</p>
+              <p className="text-gray-600">0368588886 - 0987026696</p>
               <p className="text-gray-600">Hỗ trợ 24/7</p>
             </CardContent>
           </Card>
