@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,9 +33,16 @@ interface Order {
   status: string
 }
 
-export default function AdminOrdersPage() {
+function AdminOrdersContent() {
+  const searchParams = useSearchParams()
+  const initialSearch = searchParams.get('search') || ''
+
   const [orders, setOrders] = useState<Order[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState(initialSearch)
+
+  useEffect(() => {
+    setSearchTerm(initialSearch)
+  }, [initialSearch])
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -147,5 +155,17 @@ export default function AdminOrdersPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function AdminOrdersPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a08679]"></div>
+      </div>
+    }>
+      <AdminOrdersContent />
+    </Suspense>
   )
 }

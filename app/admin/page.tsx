@@ -146,10 +146,27 @@ export default function AdminDashboardPage() {
           <CardContent className="p-0">
             <div className="divide-y divide-gray-50">
               {orders.slice(0, 5).map((order) => (
-                <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3"><div className="h-10 w-10 rounded-full bg-amber-50 flex items-center justify-center text-[#a08679] font-bold text-xs border border-amber-100">{order.customer.customerName.charAt(0).toUpperCase()}</div><div><p className="text-sm font-bold text-gray-900">{order.customer.customerName}</p><p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">#{order.id} • {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p></div></div>
-                  <div className="text-right"><p className="text-sm font-black text-[#a08679]">{order.total.toLocaleString('vi-VN')} đ</p><Badge variant="outline" className="text-[8px] py-0 h-4 uppercase tracking-tighter font-black">{order.status}</Badge></div>
-                </div>
+                <Link
+                  key={order.id}
+                  href={`/admin/orders?search=${order.id}`}
+                  className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-amber-50 flex items-center justify-center text-[#a08679] font-bold text-xs border border-amber-100 group-hover:bg-[#a08679] group-hover:text-white transition-colors">
+                      {order.customer.customerName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900 group-hover:text-[#a08679] transition-colors">{order.customer.customerName}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">#{order.id} • {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-[#a08679]">{order.total.toLocaleString('vi-VN')} đ</p>
+                    <Badge variant="outline" className="text-[8px] py-0 h-4 uppercase tracking-tighter font-black">
+                      {order.status}
+                    </Badge>
+                  </div>
+                </Link>
               ))}
               {orders.length === 0 && <div className="p-8 text-center text-gray-400 text-xs font-bold uppercase tracking-widest italic">Chưa có đơn hàng nào</div>}
             </div>
