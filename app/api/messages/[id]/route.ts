@@ -1,20 +1,19 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
-export async function PUT(
+export async function DELETE(
     req: Request,
     context: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await context.params
-        const body = await req.json()
         await db.execute({
-            sql: 'UPDATE orders SET status = ? WHERE id = ?',
-            args: [body.status, Number(id)]
+            sql: 'DELETE FROM messages WHERE id = ?',
+            args: [Number(id)]
         })
         return NextResponse.json({ success: true })
     } catch (error) {
-        console.error('Error updating order:', error)
-        return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
+        console.error('Error deleting message:', error)
+        return NextResponse.json({ error: 'Failed to delete message' }, { status: 500 })
     }
 }

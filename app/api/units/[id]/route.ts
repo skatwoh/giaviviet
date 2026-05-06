@@ -1,18 +1,5 @@
 import { NextResponse } from 'next/server'
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { join } from 'path'
-
-const filePath = join(process.cwd(), 'public/data/units.json')
-
-function readUnits() {
-    if (!existsSync(filePath)) return []
-    const fileContent = readFileSync(filePath, 'utf-8')
-    return JSON.parse(fileContent)
-}
-
-function writeUnits(data: any) {
-    writeFileSync(filePath, JSON.stringify(data, null, 2))
-}
+import { db } from '@/lib/db'
 
 export async function PUT(
     req: Request,
@@ -21,17 +8,11 @@ export async function PUT(
     try {
         const { id } = await context.params
         const body = await req.json()
-        const units = readUnits()
-
-        const index = units.findIndex((u: any) => u.id === id)
-        if (index === -1) {
-            return NextResponse.json({ error: 'Unit not found' }, { status: 404 })
-        }
-
-        units[index] = { ...units[index], name: body.name }
-        writeUnits(units)
-
-        return NextResponse.json(units[index])
+        await db.execute({
+            sql: 'UPDATE units SET name = ? WHERE id = ?',
+            args: [body.name, id]
+        })
+        return NextResponse.json(body)
     } catch (error) {
         console.error('Error updating unit:', error)
         return NextResponse.json({ error: 'Failed to update unit' }, { status: 500 })
@@ -44,11 +25,10 @@ export async function DELETE(
 ) {
     try {
         const { id } = await context.params
-        const units = readUnits()
-
-        const filtered = units.filter((u: any) => u.id !== id)
-        writeUnits(filtered)
-
+        await db.execute({
+            sql: 'DELETE FROM units WHERE id = ?',
+            args: [id]
+        })
         return NextResponse.json({ success: true })
     } catch (error) {
         console.error('Error deleting unit:', error)

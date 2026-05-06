@@ -1,45 +1,29 @@
-import { NextResponse, NextRequest } from 'next/server'
-import { readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 
 export async function GET() {
   try {
-    const filePath = join(process.cwd(), 'public/data/messages.json')
-    const fileContent = readFileSync(filePath, 'utf-8')
-    const data = JSON.parse(fileContent)
-    
-    return NextResponse.json(data.messages)
+    const res = await db.execute('SELECT * FROM messages')
+    return NextResponse.json(res.rows)
   } catch (error) {
-    console.error('Error reading messages:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch messages' },
-      { status: 500 }
-    )
+    console.error('Error fetching messages:', error)
+    return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 })
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json()
-    const filePath = join(process.cwd(), 'public/data/messages.json')
-    const fileContent = readFileSync(filePath, 'utf-8')
-    const data = JSON.parse(fileContent)
+    const body = await req.json()
+    const id = body.id || Date.now()
+    const createdAt = new Date().toISOString()
     
-    const newMessage = {
-      id: Date.now(),
-      ...body,
-      createdAt: new Date().toISOString()
-    }
-    
-    data.messages.push(newMessage)
-    writeFileSync(filePath, JSON.stringify(data, null, 2))
-    
-    return NextResponse.json(newMessage, { status: 201 })
+    await db.execute({
+      sql: 'INSERT INTO messages (id, name, email, phone, subject, message, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      args: [id, body.name, body.email, body.phone, body.subject, body.message, createdAt]
+    })
+    return NextResponse.json({ id, ...body, createdAt })
   } catch (error) {
-    console.error('Error creating message:', error)
-    return NextResponse.json(
-      { error: 'Failed to create message' },
-      { status: 500 }
-    )
+    console.error('Error adding message:', error)
+    return NextResponse.json({ error: 'Failed to add message' }, { status: 500 })
   }
 }

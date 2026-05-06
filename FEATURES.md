@@ -136,7 +136,7 @@
 - ✅ **Xóa tin nhắn**
 
 ## 💾 Lưu Trữ Dữ Liệu
-- ✅ **JSON-based storage** trong `/public/data/`
+- ✅ **Turso (SQLite) database** cho lưu trữ dữ liệu bền vững
   - `products.json` - Danh sách sản phẩm
   - `orders.json` - Lịch sử đơn hàng
   - `messages.json` - Tin nhắn liên hệ

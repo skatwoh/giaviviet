@@ -1,24 +1,13 @@
 import { NextResponse } from 'next/server'
-import { readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-
-const filePath = join(process.cwd(), 'public/data/products.json')
-
-function readProducts() {
-  const fileContent = readFileSync(filePath, 'utf-8')
-  return JSON.parse(fileContent)
-}
-
-function writeProducts(data: any) {
-  writeFileSync(filePath, JSON.stringify(data, null, 2))
-}
+import { db } from '@/lib/db'
 
 export async function GET() {
   try {
-    const data = readProducts()
+    const res = await db.execute('SELECT * FROM products')
+    const products = res.rows
     const now = new Date()
 
-    const processedProducts = data.products.map((p: any) => {
+    const processedProducts = products.map((p: any) => {
       const isSaleActive =
         p.salePrice !== undefined &&
         p.salePrice !== null &&
@@ -47,29 +36,20 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-
-    // Ensure product has an ID
-    if (!body.id) {
-      body.id = Date.now()
-    }
-
-    const data = readProducts()
-
-    // Check if ID already exists to avoid duplicates
-    const exists = data.products.find((p: any) => p.id === body.id)
-    if (exists) {
-      const maxId = data.products.reduce((max: number, p: any) => {
-        const id = Number(p.id)
-        return isNaN(id) ? max : Math.max(max, id)
-      }, 0)
-      body.id = maxId + 1
-    }
-
-    // Filter out effective fields if they were accidentally sent from client
     const { price, originalPrice, ...cleanBody } = body
-    data.products.push(cleanBody)
 
-    writeProducts(data)
+    if (!cleanBody.id) {
+        cleanBody.id = Date.now()
+    }
+
+    const keys = Object.keys(cleanBody)
+    const placeholders = keys.map(() => '?').join(', ')
+    const values = keys.map(k => cleanBody[k])
+
+    await db.execute({
+      sql: `INSERT INTO products (${keys.join(', ')}) VALUES (${placeholders})`,
+      args: values
+    })
 
     return NextResponse.json(cleanBody)
   } catch (error) {

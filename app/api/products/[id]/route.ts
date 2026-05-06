@@ -1,17 +1,5 @@
 import { NextResponse } from 'next/server'
-import { readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-
-const filePath = join(process.cwd(), 'public/data/products.json')
-
-function readProducts() {
-    const fileContent = readFileSync(filePath, 'utf-8')
-    return JSON.parse(fileContent)
-}
-
-function writeProducts(data: any) {
-    writeFileSync(filePath, JSON.stringify(data, null, 2))
-}
+import { db } from '@/lib/db'
 
 export async function GET(
     req: Request,
@@ -19,8 +7,11 @@ export async function GET(
 ) {
     try {
         const { id } = await context.params
-        const data = readProducts()
-        const product = data.products.find((p: any) => p.id === Number(id))
+        const res = await db.execute({
+            sql: 'SELECT * FROM products WHERE id = ?',
+            args: [Number(id)]
+        })
+        const product = res.rows[0] as any
 
         if (!product) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 })
@@ -54,34 +45,23 @@ export async function PUT(
     context: { params: Promise<{ id: string }> }
 ) {
     try {
-
         const { id } = await context.params
         const body = await req.json()
-
-        const data = readProducts()
-
-        const index = data.products.findIndex(
-            (p: any) => p.id === Number(id)
-        )
-
-        if (index === -1) {
-            return NextResponse.json({ error: 'Product not found' }, { status: 404 })
-        }
-
-        // Filter out effective fields if they were accidentally sent from client
         const { price, originalPrice, ...cleanBody } = body
-        data.products[index] = cleanBody
 
-        writeProducts(data)
+        const keys = Object.keys(cleanBody)
+        const setClause = keys.map(k => `${k} = ?`).join(', ')
+        const values = keys.map(k => cleanBody[k])
+
+        await db.execute({
+          sql: `UPDATE products SET ${setClause} WHERE id = ?`,
+          args: [...values, Number(id)]
+        })
 
         return NextResponse.json(cleanBody)
-
     } catch (error) {
         console.error('Error updating product:', error)
-        return NextResponse.json(
-            { error: 'Failed to update product' },
-            { status: 500 }
-        )
+        return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
     }
 }
 
@@ -90,24 +70,14 @@ export async function DELETE(
     context: { params: Promise<{ id: string }> }
 ) {
     try {
-
         const { id } = await context.params
-
-        const data = readProducts()
-
-        data.products = data.products.filter(
-            (p: any) => p.id !== Number(id)
-        )
-
-        writeProducts(data)
-
+        await db.execute({
+            sql: 'DELETE FROM products WHERE id = ?',
+            args: [Number(id)]
+        })
         return NextResponse.json({ success: true })
-
     } catch (error) {
         console.error('Error deleting product:', error)
-        return NextResponse.json(
-            { error: 'Failed to delete product' },
-            { status: 500 }
-        )
+        return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 })
     }
 }
