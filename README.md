@@ -1,389 +1,134 @@
-# 🌶️ Gia Vị Việt - Vietnamese Spices E-Commerce Store
+# 🌶️ Thủy Hương Food - Tinh Hoa Gia Vị Việt
 
-**Complete e-commerce solution for selling Vietnamese spices and condiments online.**
+**Hệ thống thương mại điện tử chuyên cung cấp gia vị và thực phẩm sạch cao cấp.**
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38B2AC?style=flat-square&logo=tailwind-css)
+![Turso](https://img.shields.io/badge/Turso-LibSQL-000000?style=flat-square&logo=sqlite)
 
 ---
 
-## ✨ Features
+## ✨ Tính năng nổi bật
 
-### 👥 Customer Features
-- ✅ **Browse Products** - Danh sách sản phẩm gia vị đa dạng
-- ✅ **Smart Search & Filter** - Tìm kiếm theo tên, danh mục, giá
-- ✅ **Product Details** - Xem chi tiết sản phẩm, xuất xứ, cân nặng
-- ✅ **Shopping Cart** - Giỏ hàng persistent (lưu lại khi F5)
-- ✅ **Checkout** - Thanh toán đầy đủ với 3 phương thức
-- ✅ **Order Tracking** - Tra cứu đơn hàng theo mã
-- ✅ **Contact Form** - Liên hệ cửa hàng trực tiếp
-- ✅ **Responsive Design** - Tối ưu mobile, tablet, desktop
+### 👥 Dành cho Khách hàng
+- ✅ **Trang chủ chuyên nghiệp** - Banner quảng bá, danh mục nổi bật và mục Khuyến mãi Hot.
+- ✅ **Hệ thống Sale tự động** - Countdown đếm ngược thời gian khuyến mãi theo thời gian thực.
+- ✅ **Tìm kiếm & Lọc thông minh** - Tìm kiếm theo tên, phân loại theo danh mục.
+- ✅ **Giỏ hàng & Thanh toán** - Quy trình checkout chuyên nghiệp, lưu giỏ hàng tự động.
+- ✅ **Tra cứu đơn hàng** - Khách hàng có thể kiểm tra trạng thái đơn hàng của mình.
 
-### 🔐 Admin Features
-- ✅ **Dashboard** - Thống kê KPI: sản phẩm, đơn hàng, tin nhắn, doanh thu
-- ✅ **Product Management** - Thêm/sửa/xóa sản phẩm
-- ✅ **Order Management** - Xem đơn hàng, cập nhật trạng thái
-- ✅ **Message Management** - Xem tin nhắn từ khách hàng
-- ✅ **Search & Filter** - Tìm kiếm nhanh sản phẩm
-- ✅ **Inventory Tracking** - Cảnh báo khi kho < 5 sản phẩm
+### 🔐 Dành cho Quản trị viên (Admin)
+- ✅ **Dashboard Overview** - Thống kê KPI: doanh thu, đơn hàng, sản phẩm, tin nhắn qua biểu đồ.
+- ✅ **Quản lý Sản phẩm Modular** - Thiết lập giá sale theo ngày, quản lý kho, khối lượng, xuất xứ.
+- ✅ **Quản lý Danh mục & Đơn vị** - Linh hoạt tùy chỉnh các nhóm sản phẩm và đơn vị tính (túi, thùng, kg).
+- ✅ **Hệ thống Đơn hàng** - Tiếp nhận và cập nhật trạng thái giao hàng.
+- ✅ **Hộp thư Liên hệ** - Quản lý phản hồi từ khách hàng tập trung.
 
-### 💾 Technical Features
-- ✅ **JSON Storage** - Dữ liệu lưu trong file JSON
-- ✅ **API Routes** - Next.js API routes untuk CRUD operations
-- ✅ **State Management** - React Context API cho cart
-- ✅ **Form Validation** - Validation đầy đủ trên form
-- ✅ **Error Handling** - Xử lý lỗi toàn diện
-- ✅ **Type Safety** - TypeScript throughout
+### 💾 Đặc tính Kỹ thuật
+- ✅ **Database SQL (Turso)** - Sử dụng LibSQL cho tốc độ cao và tính nhất quán dữ liệu.
+- ✅ **API Route & Transaction** - Xử lý đơn hàng an toàn với giao dịch SQL (Atomic orders).
+- ✅ **UI/UX Cao cấp** - Sử dụng Shadcn UI, Radix UI và font Be Vietnam Pro tối ưu tiếng Việt.
+- ✅ **Responsive** - Hoạt động hoàn hảo trên Mobile và Desktop.
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Hướng dẫn cài đặt
 
-### Installation
+### 1. Yêu cầu hệ thống
+- Node.js 18+
+- pnpm (khuyên dùng)
+
+### 2. Cài đặt chi tiết
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/gia-vi-viet.git
-cd gia-vi-viet
+# Clone repository
+git clone https://github.com/yourusername/thuy-huong-food.git
+cd thuy-huong-food
 
-# Install dependencies
+# Cài đặt thư viện
 pnpm install
 
-# Start development server
+# Cấu hình môi trường (Tạo file .env)
+# Mặc định hệ thống sẽ dùng SQLite file (local.db) nếu không có env
+echo "TURSO_DATABASE_URL=file:local.db" > .env
+
+# Khởi tạo Database và Migrations
+pnpm exec tsx scripts/setup-db.ts
+pnpm exec tsx scripts/migrate-data.ts
+
+# Chạy server phát triển
 pnpm dev
 ```
 
-### Access the Application
-
-- **Homepage**: http://localhost:3000
-- **Products**: http://localhost:3000/products
-- **Admin**: http://localhost:3000/admin
+### 3. Tài khoản Admin mặc định
+- **Email**: `admin@thuyhuong.com`
+- **Password**: `admin`
 
 ---
 
-## 📁 Project Structure
+## 📁 Cấu trúc thư mục chính
 
 ```
-gia-vi-viet/
+thuy-huong-food/
 ├── app/
-│   ├── layout.tsx                 # Root layout
-│   ├── page.tsx                   # Homepage
-│   ├── context/
-│   │   └── CartContext.tsx        # Cart state
-│   ├── api/                       # API routes
-│   │   ├── products/route.ts
-│   │   ├── orders/route.ts
-│   │   └── messages/route.ts
-│   ├── products/                  # Product pages
-│   │   ├── page.tsx               # Listing
-│   │   └── [id]/page.tsx          # Detail
-│   ├── cart/page.tsx              # Cart page
-│   ├── checkout/page.tsx          # Checkout
-│   ├── orders/page.tsx            # Order tracking
-│   ├── contact/page.tsx           # Contact form
-│   └── admin/page.tsx             # Admin dashboard
+│   ├── (shop)/                # Các trang bán hàng (Home, Products, Cart...)
+│   ├── (auth)/                # Đăng nhập & Đăng ký
+│   ├── admin/                 # Hệ thống quản trị (Modular routes)
+│   └── api/                   # API backend (LibSQL integration)
 ├── components/
-│   ├── Header.tsx                 # Navigation
-│   ├── ProductCard.tsx            # Product card
-│   ├── ProductFilters.tsx         # Search/filter
-│   └── ui/                        # shadcn/ui components
-├── public/
-│   ├── data/                      # JSON data files
-│   │   ├── products.json
-│   │   ├── orders.json
-│   │   └── messages.json
-│   └── images/                    # Product images
-├── package.json
-├── tsconfig.json
-├── next.config.mjs
-└── README.md
+│   ├── ui/                    # Thư viện UI core (Shadcn)
+│   ├── AdminSidebar.tsx       # Menu quản trị
+│   └── ProductCard.tsx        # Hiển thị sản phẩm
+├── lib/
+│   └── db.ts                  # Cấu hình kết nối Turso/LibSQL
+├── scripts/
+│   ├── setup-db.ts            # Script tạo bảng SQL
+│   └── migrate-data.ts        # Script chuyển đổi dữ liệu từ JSON sang SQL
+└── public/
+    └── images/                # Kho ảnh sản phẩm
 ```
 
 ---
 
-## 🛠 Technology Stack
+## 🛠 Công nghệ sử dụng
 
-### Frontend
-- **Next.js 16** - React framework with App Router
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Tailwind CSS v4** - Styling
-- **shadcn/ui** - Component library
-- **lucide-react** - Icons
-
-### Backend
-- **Next.js API Routes** - Serverless backend
-- **Node.js fs** - File system operations
-- **JSON** - Data storage
-
-### Tools
-- **pnpm** - Package manager
-- **VS Code** - Code editor
+- **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS v4.
+- **Backend**: Next.js API Routes, LibSQL (@libsql/client).
+- **Database**: Turso (SQLite in the cloud) hoặc Local SQLite.
+- **Thư viện chính**: Shadcn UI, Recharts (biểu đồ), Sonner (thông báo), Lucide Icons.
 
 ---
 
-## 📊 Data Structure
+## 📊 Cấu trúc Database
 
-### Products
-```json
-{
-  "id": 1,
-  "name": "Tiêu Đen Hạt",
-  "category": "spices",
-  "price": 45000,
-  "image": "/images/pepper-black.jpg",
-  "description": "...",
-  "origin": "Việt Nam",
-  "weight": "250g",
-  "stock": 50
-}
-```
+Hệ thống sử dụng các bảng chính:
+- `products`: Lưu thông tin sản phẩm và lịch trình sale.
+- `categories`: Phân loại sản phẩm.
+- `units`: Đơn vị tính tùy chỉnh.
+- `orders`: Đơn hàng và chi tiết khách hàng.
+- `messages`: Tin nhắn liên hệ.
+- `users`: Tài khoản khách hàng và admin.
 
-### Orders
-```json
-{
-  "id": 1234567890,
-  "items": [...],
-  "total": 165000,
-  "customer": {...},
-  "paymentMethod": "cash",
-  "status": "pending",
-  "createdAt": "2026-03-12T10:30:00Z"
-}
-```
-
-### Messages
-```json
-{
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "0901234567",
-  "subject": "Question about saffron",
-  "message": "...",
-  "createdAt": "2026-03-12T15:30:00Z"
-}
-```
+Chi tiết xem tại: **[DATABASE.md](./DATABASE.md)**
 
 ---
 
-## 🎯 Pages & URLs
+## 🔒 Bảo mật & Triển khai
 
-| Page | URL | Purpose |
-|------|-----|---------|
-| Home | `/` | Landing page |
-| Products | `/products` | Product listing |
-| Product Detail | `/products/[id]` | Single product |
-| Shopping Cart | `/cart` | View cart |
-| Checkout | `/checkout` | Payment |
-| Order Tracking | `/orders` | Track order |
-| Contact | `/contact` | Contact form |
-| Admin | `/admin` | Admin dashboard |
+- **Môi trường**: Luôn sử dụng `.env` để bảo mật `TURSO_AUTH_TOKEN`.
+- **Triển khai Vercel**: Kết nối repository, thêm Env variables và chạy scripts khởi tạo database trước khi live.
 
 ---
 
-## 🎨 Design System
+## 📚 Tài liệu bổ sung
 
-### Colors
-- **Primary**: Amber (#b45309) - Warm, inviting
-- **Neutrals**: Gray shades, white, black
-- **Status**: Green (success), Blue (info), Red (error), Yellow (warning)
-
-### Typography
-- **Headlines**: Bold, clear (24px-32px)
-- **Body**: Readable (14px-16px)
-- **Line Height**: 1.4-1.6
-
-### Layout
-- **Flexbox** for most layouts
-- **CSS Grid** for complex sections
-- **Mobile-first** responsive approach
+- **[DATABASE.md](./DATABASE.md)** - Chi tiết cấu trúc dữ liệu và SQL.
+- **[FEATURES.md](./FEATURES.md)** - Danh sách tính năng chi tiết.
+- **[GUIDE.md](./GUIDE.md)** - Hướng dẫn sử dụng cho người dùng.
 
 ---
 
-## 💳 Payment Methods
-
-The checkout supports 3 payment methods:
-1. **Thanh toán khi nhận hàng (COD)** - Cash on delivery
-2. **Chuyển khoản ngân hàng** - Bank transfer
-3. **Ví điện tử/Momo** - E-wallet
-
-*(Currently orders are saved without actual payment processing)*
-
----
-
-## 📱 Responsive Design
-
-Fully responsive on all devices:
-- **Mobile** (320px - 640px)
-- **Tablet** (641px - 1024px)
-- **Desktop** (1025px+)
-
----
-
-## 🔒 Security Considerations
-
-### Current Implementation
-- ✅ Client-side form validation
-- ✅ Required field validation
-- ✅ Email format validation
-
-### Recommended for Production
-- [ ] Add authentication/login
-- [ ] Password protection for admin
-- [ ] HTTPS only
-- [ ] Input sanitization
-- [ ] Rate limiting on APIs
-- [ ] CORS configuration
-- [ ] Environment variables for secrets
-
----
-
-## 🚀 Deployment
-
-### Deploy to Vercel (Recommended)
-
-```bash
-# Push to GitHub
-git push origin main
-
-# Connect to Vercel
-# https://vercel.com/new
-
-# Vercel will auto-detect Next.js and deploy
-```
-
-### Environment Variables
-
-No environment variables currently required for basic setup.
-
-For production with real database:
-```env
-DATABASE_URL=your_database_url
-PAYMENT_API_KEY=your_payment_key
-```
-
----
-
-## 📚 Documentation
-
-- **[FEATURES.md](./FEATURES.md)** - Complete feature list
-- **[GUIDE.md](./GUIDE.md)** - User guide for customers & admins
-- **[PAGES.md](./PAGES.md)** - Page descriptions & layouts
-- **[IMPLEMENTATION.md](./IMPLEMENTATION.md)** - Technical details
-
----
-
-## 🔄 Future Enhancements
-
-### Phase 2: Database
-- Replace JSON with PostgreSQL/MySQL
-- User accounts & authentication
-- Order history per user
-- Wishlist feature
-
-### Phase 3: E-Commerce
-- Payment gateway (Stripe, MoMo, PayPal)
-- Inventory management
-- Promotion/discount codes
-- Product reviews & ratings
-
-### Phase 4: Features
-- Email notifications
-- SMS order tracking
-- Multi-language support
-- Analytics dashboard
-- Email marketing
-
-### Phase 5: Performance
-- Image optimization
-- Caching strategy
-- CDN integration
-- Search indexing
-
----
-
-## 🐛 Known Limitations
-
-1. **Data Persistence**: Data stored in JSON files (not suitable for high-traffic production)
-2. **No Authentication**: Admin dashboard has no password protection
-3. **No Real Payments**: Orders are created but no actual payment processing
-4. **No Email Notifications**: Contact form submissions not emailed
-5. **Limited Scalability**: JSON file system won't handle thousands of orders
-
----
-
-## 📞 Support & Contribution
-
-### Report Issues
-Create an issue with:
-- Description of the problem
-- Steps to reproduce
-- Expected vs actual behavior
-- Browser/device information
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
----
-
-## 📄 License
-
-MIT License - Feel free to use for personal and commercial projects.
-
----
-
-## 👥 Team
-
-Created as a complete e-commerce solution for Vietnamese spice merchants.
-
----
-
-## 🙏 Credits
-
-- **shadcn/ui** - Component library
-- **Tailwind CSS** - Utility-first CSS
-- **Lucide Icons** - Icon set
-- **Next.js** - React framework
-- **Vercel** - Deployment platform
-
----
-
-## 📊 Project Stats
-
-- **Pages**: 8
-- **Components**: 20+
-- **API Routes**: 3
-- **Product Samples**: 12
-- **Features**: 50+
-- **Code**: 3000+ lines
-
----
-
-## ✅ Checklist for Going Live
-
-- [ ] Update product images with real photos
-- [ ] Add real product data
-- [ ] Implement authentication for admin
-- [ ] Add payment gateway integration
-- [ ] Set up email notifications
-- [ ] Add error tracking (Sentry)
-- [ ] Configure analytics
-- [ ] Test on all browsers
-- [ ] Test on all devices
-- [ ] Set up SSL certificate
-- [ ] Configure domain name
-- [ ] Set up backups
-- [ ] Create privacy policy
-- [ ] Create terms of service
-
----
-
-**Ready to launch your spice business online! 🚀**
-
-For questions or support, please contact support@giaviviet.com
+**Sẵn sàng đưa gia vị Việt vươn xa! 🚀**
+Hỗ trợ kỹ thuật: giatothuyhuong@gmail.com

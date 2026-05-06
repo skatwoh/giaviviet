@@ -30,7 +30,8 @@ export async function POST(req: Request) {
         const createdAt = new Date().toISOString()
 
         // Start a transaction for order creation and stock update
-        await db.transaction('write', async (tx) => {
+        const tx = await db.transaction('write')
+        try {
             await tx.execute({
                 sql: `INSERT INTO orders (
                     id, customerName, phoneNumber, email, address, city, district,
@@ -58,7 +59,11 @@ export async function POST(req: Request) {
                     args: [item.quantity, item.id || 0, item.name]
                 })
             }
-        })
+            await tx.commit()
+        } catch (err) {
+            await tx.rollback()
+            throw err
+        }
 
         return NextResponse.json({ id, ...body, createdAt }, { status: 201 })
     } catch (error) {
