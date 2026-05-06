@@ -12,9 +12,21 @@ import {
 } from '@/components/ui/carousel'
 import { ProductCard } from '@/components/ProductCard'
 
+interface Product {
+  id: number
+  name: string
+  price: number
+  originalPrice?: number
+  image: string
+  category: string
+  stock: number
+  unit: string
+  saleEnd: string | null
+}
+
 export default function HomePage() {
   const [mounted, setMounted] = useState(false)
-  const [products, setProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<any[]>([])
 
   useEffect(() => {
@@ -41,7 +53,7 @@ export default function HomePage() {
     // Find the soonest sale end date among active sales
     const activeSales = saleProducts
       .filter(p => p.saleEnd)
-      .map(p => new Date(p.saleEnd).getTime())
+      .map(p => new Date(p.saleEnd!).getTime())
       .sort((a, b) => a - b)
 
     if (activeSales.length === 0) {
@@ -127,7 +139,7 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent flex items-center px-8 md:px-20">
                       <div className="max-w-xl text-white">
                         <span className="inline-block px-3 py-1 bg-amber-500 text-black text-[10px] font-bold uppercase tracking-widest mb-4 rounded-sm">
-                          Hải Trang Food
+                          Thủy Hương Food
                         </span>
                         <h2 className="text-3xl md:text-5xl font-black leading-tight uppercase italic tracking-tight">
                           {banner.title}
@@ -327,7 +339,7 @@ export default function HomePage() {
           <div className="relative z-10 max-w-2xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-black text-white uppercase italic">Bạn cần tìm nguồn hàng sỉ?</h2>
             <p className="text-green-100 mt-4 text-lg">
-              Liên hệ ngay với Hải Trang Food để nhận bảng giá sỉ tốt nhất dành cho nhà hàng, khách sạn và đại lý.
+              Liên hệ ngay với Nhà Phân Phối Thủy Hương để nhận bảng giá sỉ tốt nhất dành cho nhà hàng, khách sạn và đại lý.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -337,11 +349,11 @@ export default function HomePage() {
                 Nhận Báo Giá Sỉ
               </Link>
               <a
-                href="tel:0123456789"
+                href="tel:0368588886"
                 className="bg-white hover:bg-gray-100 text-brand-green px-10 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-xl inline-flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1zM19 12h2c0-4.8-4-8.8-8.8-8.8v2c3.7 0 6.8 3 6.8 6.8z"/><path d="M13 8.8h2c0-2.1-1.7-3.8-3.8-3.8v2c1 0 1.8.8 1.8 1.8z"/></svg>
-                0123.456.789
+                036 85 88886
               </a>
             </div>
           </div>

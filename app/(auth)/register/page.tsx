@@ -58,9 +58,9 @@ export default function RegisterPage() {
     <div className="container mx-auto px-4 py-12 flex justify-center items-center min-h-[80vh]">
       <Card className="w-full max-w-md border-none shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold text-[#00483d]">Đăng ký tài khoản</CardTitle>
+          <CardTitle className="text-2xl font-bold text-[#a08679]">Đăng ký tài khoản</CardTitle>
           <CardDescription>
-            Tham gia cùng Hải Trang để nhận nhiều ưu đãi hấp dẫn
+            Tham gia cùng Thủy Hương để nhận nhiều ưu đãi hấp dẫn
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -124,7 +124,7 @@ export default function RegisterPage() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-[#00483d] hover:bg-[#00362e]"
+              className="w-full bg-[#a08679] hover:bg-[#8c756a]"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -144,7 +144,7 @@ export default function RegisterPage() {
         <CardFooter className="flex flex-col space-y-4 text-center">
           <div className="text-sm text-gray-500">
             Đã có tài khoản?{' '}
-            <Link href="/login" className="text-[#00483d] font-semibold hover:underline">
+            <Link href="/login" className="text-[#a08679] font-semibold hover:underline">
               Đăng nhập
             </Link>
           </div>

@@ -21,10 +21,10 @@ export function Footer() {
                   <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
                 </svg>
               </div>
-              <h2 className="text-2xl md:text-3xl font-extrabold uppercase tracking-widest">Trân trọng cảm ơn!</h2>
+              <h2 className="text-2xl md:text-3xl font-extrabold uppercase tracking-widest italic">Trân trọng cảm ơn!</h2>
             </div>
-            <p className="text-sm md:text-base opacity-90 max-w-2xl">
-              Cảm ơn quý Khách đã tin tưởng lựa chọn Hải Trang là nhà cung cấp phân phối của quý Khách!
+            <p className="text-sm md:text-base opacity-90 max-w-2xl font-medium">
+              Cảm ơn quý Khách đã tin tưởng lựa chọn Thủy Hương là nhà cung cấp phân phối của quý Khách!
             </p>
           </div>
         </div>
@@ -37,9 +37,9 @@ export function Footer() {
             <span className="text-lg font-bold text-gray-800">Liên hệ ĐẶT HÀNG nhận ngay </span>
             <span className="text-lg font-bold text-orange-600 italic uppercase">Ưu đãi!</span>
           </div>
-          <div className="flex items-center gap-2 text-brand-green font-bold text-xl">
+          <div className="flex items-center gap-2 text-brand-green font-black italic text-xl uppercase tracking-tighter">
             <Phone className="w-6 h-6 fill-current" />
-            <a href="tel:0945501989">094.550.1989</a>
+            <a href="tel:0368588886">036 85 88886</a>
           </div>
           <div className="flex items-center gap-2 text-gray-600 text-sm">
             <MapPin className="w-5 h-5 text-brand-green shrink-0" />
@@ -53,12 +53,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* About Column */}
           <div className="space-y-6">
-            <h3 className="text-lg font-bold text-gray-900 border-b-2 border-brand-green pb-2 inline-block">Về Hải Trang</h3>
+            <h3 className="text-lg font-bold text-gray-900 border-b-2 border-brand-green pb-2 inline-block uppercase italic">Về Thủy Hương</h3>
             <p className="text-sm text-gray-600 leading-relaxed text-justify">
-              Cửa hàng số 03 Hàng Khoai ra đời từ những năm 60. Hơn 60 năm hoạt động, cửa hàng nay lấy tên là Hải Trang đã phân phối các sản phẩm đa dạng từ nguyên liệu, gia vị, rau củ quả tươi, đồ hộp gia vị cho các nhà hàng trên toàn quốc.
+              Thủy Hương - Nhà phân phối gia vị Việt hàng đầu. Chúng tôi tự hào mang đến cho khách hàng những sản phẩm gia vị nguyên liệu, thực phẩm khô, rau củ quả tươi sạch chất lượng cao nhất phục vụ cho các nhà hàng trên toàn quốc.
             </p>
             <div className="space-y-1 text-sm text-gray-700 font-medium">
-              <p>Hải Trang được điều hành bởi <span className="text-gray-900 font-bold uppercase">Hộ kinh doanh Tạ Minh Hà</span></p>
+              <p>Thủy Hương được điều hành bởi <span className="text-gray-900 font-bold uppercase">Nhà Phân Phối Thủy Hương</span></p>
               <p className="text-xs text-gray-500 font-normal mt-2">
                 Theo Giấy Chứng Nhận Đăng Ký Kinh Doanh Số: 01C8019223<br />
                 Đăng ký lần đầu ngày 06 tháng 11 năm 2012<br />
@@ -113,8 +113,8 @@ export function Footer() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xl font-black text-gray-900 tracking-tight">094.550.1989</p>
-                  <p className="text-xs text-gray-500">Hotline hỗ trợ 24/7</p>
+                  <p className="text-xl font-black text-gray-900 tracking-tight italic">036 85 88886</p>
+                  <p className="text-xs text-gray-500 font-bold">Hotline: {`036 85 88886`}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 group">
@@ -122,14 +122,14 @@ export function Footer() {
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-900">cuahanghaitrang@gmail.com</p>
-                  <p className="text-xs text-gray-500">Email phản hồi</p>
+                  <p className="text-sm font-bold text-gray-900">giatothuyhuong@gmail.com</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-tighter">Liên hệ hợp tác phân phối</p>
                 </div>
               </div>
             </div>
 
             <div className="pt-4 space-y-4">
-              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-brand-green pb-2 inline-block">Theo dõi Hải Trang</h3>
+              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-brand-green pb-2 inline-block italic uppercase">Theo dõi Thủy Hương</h3>
               <div className="flex items-center gap-3">
                 {[
                   { icon: Facebook, label: 'Facebook' },
@@ -157,11 +157,11 @@ export function Footer() {
                 </div>
                 <div>
                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Điện thoại:</p>
-                   <p className="text-sm text-gray-800 font-medium">094.550.1989</p>
+                   <p className="text-sm text-gray-800 font-medium">036 85 88886</p>
                 </div>
                 <div>
                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Email:</p>
-                   <p className="text-sm text-gray-800 font-medium">cuahanghaitrang@gmail.com</p>
+                   <p className="text-sm text-gray-800 font-medium">giatothuyhuong@gmail.com</p>
                 </div>
              </div>
           </div>
@@ -171,8 +171,8 @@ export function Footer() {
       {/* Copyright */}
       <div className="bg-gray-100 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-xs text-gray-500 font-medium">
-            © {new Date().getFullYear()} Cửa hàng Hải Trang. All rights reserved. Thiết kế bởi Hải Trang Team.
+          <p className="text-xs text-gray-500 font-black uppercase tracking-tighter italic">
+            © {new Date().getFullYear()} NHÀ PHÂN PHỐI GIA VỊ VIỆT - THỦY HƯƠNG. All rights reserved.
           </p>
         </div>
       </div>

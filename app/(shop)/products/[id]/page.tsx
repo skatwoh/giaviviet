@@ -131,7 +131,7 @@ export default function ProductDetailPage() {
     return (
         <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-4 border-[#00483d] border-t-transparent rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-[#a08679] border-t-transparent rounded-full animate-spin" />
             <p className="text-gray-500 font-medium">Đang tải thông tin sản phẩm...</p>
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function ProductDetailPage() {
           <div className="text-center p-8 bg-white rounded-2xl shadow-sm border">
             <p className="text-gray-500 text-lg mb-6">Xin lỗi, sản phẩm này không tồn tại hoặc đã ngừng kinh doanh.</p>
             <Link href="/products">
-              <Button className="bg-[#00483d] hover:bg-[#00362d] px-8">
+              <Button className="bg-[#a08679] hover:bg-[#8c756a] px-8">
                 Quay lại cửa hàng
               </Button>
             </Link>
@@ -160,14 +160,14 @@ export default function ProductDetailPage() {
           {/* Breadcrumb & Navigation */}
           <div className="flex items-center justify-between mb-8">
             <nav className="flex items-center text-sm">
-              <Link href="/" className="text-gray-500 hover:text-[#00483d] transition-colors">Trang chủ</Link>
+              <Link href="/" className="text-gray-500 hover:text-[#a08679] transition-colors">Trang chủ</Link>
               <ChevronLeft className="w-4 h-4 mx-2 text-gray-400 rotate-180" />
-              <Link href="/products" className="text-gray-500 hover:text-[#00483d] transition-colors">Sản phẩm</Link>
+              <Link href="/products" className="text-gray-500 hover:text-[#a08679] transition-colors">Sản phẩm</Link>
               <ChevronLeft className="w-4 h-4 mx-2 text-gray-400 rotate-180" />
               <span className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</span>
             </nav>
             <Link href="/products">
-              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-[#00483d]">
+              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-[#a08679]">
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Quay lại
               </Button>
@@ -198,7 +198,7 @@ export default function ProductDetailPage() {
 
               <div className="grid grid-cols-4 gap-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-square relative rounded-xl overflow-hidden border bg-gray-50 cursor-pointer hover:border-[#00483d] transition-all">
+                  <div key={i} className="aspect-square relative rounded-xl overflow-hidden border bg-gray-50 cursor-pointer hover:border-[#a08679] transition-all">
                     <Image
                       src={product.image || '/images/placeholder.jpg'}
                       alt={`${product.name} preview ${i}`}
@@ -228,7 +228,7 @@ export default function ProductDetailPage() {
                 </h1>
 
                 <div className="flex items-baseline gap-2 mb-6 flex-wrap">
-                  <span className="text-4xl font-extrabold text-[#00483d]">
+                  <span className="text-4xl font-extrabold text-[#a08679]">
                     {product.price.toLocaleString('vi-VN')}đ
                   </span>
                   {product.unit && (
@@ -290,7 +290,7 @@ export default function ProductDetailPage() {
                           type="number"
                           value={quantity}
                           readOnly
-                          className="border-0 w-12 text-center font-bold text-[#00483d] focus-visible:ring-0"
+                          className="border-0 w-12 text-center font-bold text-[#a08679] focus-visible:ring-0"
                       />
                       <button
                           onClick={() => handleQuantityChange(quantity + 1)}
@@ -306,12 +306,12 @@ export default function ProductDetailPage() {
                     <Button
                         onClick={handleAddToCart}
                         disabled={product.stock === 0}
-                        className="sm:col-span-4 h-12 bg-[#00483d] hover:bg-[#00362d] text-white font-bold text-lg shadow-lg shadow-green-900/10 active:scale-95 transition-all"
+                        className="sm:col-span-4 h-12 bg-[#a08679] hover:bg-[#8c756a] text-white font-bold text-lg shadow-lg shadow-green-900/10 active:scale-95 transition-all"
                     >
                       <ShoppingCart className="w-5 h-5 mr-3" />
                       {addedToCart ? 'Đã thêm thành công!' : 'Thêm vào giỏ hàng'}
                     </Button>
-                    <Button variant="outline" className="h-12 border-gray-300 hover:border-[#00483d] hover:text-[#00483d]">
+                    <Button variant="outline" className="h-12 border-gray-300 hover:border-[#a08679] hover:text-[#a08679]">
                       <Share2 className="w-5 h-5" />
                     </Button>
                   </div>
@@ -322,19 +322,19 @@ export default function ProductDetailPage() {
               <div className="grid grid-cols-3 gap-2 py-6 border-t border-gray-100">
                 <div className="flex flex-col items-center text-center gap-2">
                   <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
-                    <Truck className="w-5 h-5 text-[#00483d]" />
+                    <Truck className="w-5 h-5 text-[#a08679]" />
                   </div>
                   <p className="text-[11px] font-bold text-gray-700 uppercase">Giao nhanh 2h</p>
                 </div>
                 <div className="flex flex-col items-center text-center gap-2">
                   <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
-                    <RotateCcw className="w-5 h-5 text-[#00483d]" />
+                    <RotateCcw className="w-5 h-5 text-[#a08679]" />
                   </div>
                   <p className="text-[11px] font-bold text-gray-700 uppercase">Đổi trả 7 ngày</p>
                 </div>
                 <div className="flex flex-col items-center text-center gap-2">
                   <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-[#00483d]" />
+                    <Shield className="w-5 h-5 text-[#a08679]" />
                   </div>
                   <p className="text-[11px] font-bold text-gray-700 uppercase">100% Chính hãng</p>
                 </div>
@@ -349,7 +349,7 @@ export default function ProductDetailPage() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
                   Sản phẩm cùng loại
                 </h2>
-                <Link href={`/products?category=${product.category}`} className="text-[#00483d] font-bold hover:underline">
+                <Link href={`/products?category=${product.category}`} className="text-[#a08679] font-bold hover:underline">
                   Xem tất cả
                 </Link>
               </div>
@@ -364,7 +364,7 @@ export default function ProductDetailPage() {
                     originalPrice={item.originalPrice}
                     image={item.image}
                     category={getCategoryName(item.category)}
-                    unit={(item as any).unit}
+                    unit={item.unit}
                     stock={item.stock}
                   />
                 ))}
@@ -373,16 +373,16 @@ export default function ProductDetailPage() {
           )}
 
           {/* Newsletter / CTA */}
-          <div className="mt-20 bg-[#00483d] rounded-3xl p-8 sm:p-12 text-center text-white overflow-hidden relative">
+          <div className="mt-20 bg-[#a08679] rounded-3xl p-8 sm:p-12 text-center text-white overflow-hidden relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 rounded-full -ml-32 -mb-32 blur-3xl" />
 
             <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="text-2xl sm:text-4xl font-bold mb-4">Tham gia cùng gia đình Hải Trang</h2>
+              <h2 className="text-2xl sm:text-4xl font-bold mb-4">Tham gia cùng gia đình Thủy Hương</h2>
               <p className="text-white/80 mb-8">Đăng ký nhận tin để không bỏ lỡ các ưu đãi đặc biệt và mẹo nấu ăn hữu ích hàng tuần.</p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Input placeholder="Địa chỉ email của bạn" className="bg-white/10 border-white/20 text-white placeholder:text-white/40 h-12 rounded-xl focus:bg-white/20" />
-                <Button className="bg-amber-500 hover:bg-amber-600 text-[#00483d] font-bold px-8 h-12 rounded-xl">Đăng ký ngay</Button>
+                <Button className="bg-amber-500 hover:bg-amber-600 text-[#a08679] font-bold px-8 h-12 rounded-xl">Đăng ký ngay</Button>
               </div>
             </div>
           </div>

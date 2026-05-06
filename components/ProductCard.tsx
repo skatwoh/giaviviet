@@ -74,7 +74,7 @@ export function ProductCard({ id, name, price, originalPrice, image, category, s
 
           {/* Brand Indicator */}
           <div className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center p-1 border border-gray-50 transform translate-y-12 group-hover:translate-y-0 transition-transform duration-500">
-             <div className="text-[7px] font-black text-brand-green leading-[1] text-center italic">HẢI<br/>TRANG</div>
+             <div className="text-[7px] font-black text-brand-green leading-[1] text-center italic uppercase">THỦY<br/>HƯƠNG</div>
           </div>
         </div>
       </Link>
@@ -83,7 +83,7 @@ export function ProductCard({ id, name, price, originalPrice, image, category, s
       <CardContent className="p-4 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[10px] text-brand-green font-black uppercase tracking-widest bg-brand-green/5 px-2 py-0.5 rounded">
-            {category || 'Hải Trang'}
+            {category || 'Thủy Hương'}
           </span>
           {stock > 0 ? (
              <span className="text-[9px] text-green-600 font-bold flex items-center gap-1">
@@ -125,7 +125,7 @@ export function ProductCard({ id, name, price, originalPrice, image, category, s
         <Button
           onClick={handleAddToCart}
           size="sm"
-          className="w-full bg-brand-green hover:bg-[#00362d] text-white font-bold text-xs h-10 rounded-xl transition-all duration-300 shadow-lg shadow-brand-green/10 hover:shadow-brand-green/20 flex items-center justify-center gap-2 uppercase tracking-wider"
+          className="w-full bg-brand-green hover:bg-[#8c756a] text-white font-bold text-xs h-10 rounded-xl transition-all duration-300 shadow-lg shadow-brand-green/10 hover:shadow-brand-green/20 flex items-center justify-center gap-2 uppercase tracking-wider"
         >
           <ShoppingBag className="w-4 h-4" />
           Thêm vào giỏ

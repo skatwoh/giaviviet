@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { ProductCard } from '@/components/ProductCard'
 import { ProductFilters } from '@/components/ProductFilters'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Search, ChevronDown } from 'lucide-react'
+import { Search, ChevronDown, LayoutGrid, List } from 'lucide-react'
 
 interface Product {
   id: number
@@ -15,40 +16,76 @@ interface Product {
   image: string
   category: string
   stock: number
+  unit?: string
+}
+
+interface Category {
+  id: string
+  name: string
 }
 
 type SortOption = 'newest' | 'price-low' | 'price-high' | 'name'
 
-export default function ProductsPage() {
+function ProductsContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams.get('category')
+
   const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200000])
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500000])
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [isLoading, setIsLoading] = useState(true)
   const [showSortMenu, setShowSortMenu] = useState(false)
 
-  // Fetch products
+  const selectedCategory = categoryParam
+
+  // Reset search when category changes from any source
   useEffect(() => {
-    const fetchProducts = async () => {
+    setSearchQuery('')
+  }, [categoryParam])
+
+  const handleCategoryChange = (categoryId: string | null) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (categoryId) {
+      params.set('category', categoryId)
+    } else {
+      params.delete('category')
+    }
+    router.push(`/products?${params.toString()}`, { scroll: false })
+  }
+
+  // Fetch products and categories
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/products')
-        const data = await response.json()
-        setProducts(data.products || [])
+        const [productsRes, categoriesRes] = await Promise.all([
+          fetch('/api/products'),
+          fetch('/api/categories')
+        ])
+
+        const productsData = await productsRes.json()
+        setProducts(productsData.products || [])
+
+        if (categoriesRes.ok) {
+          setCategories(await categoriesRes.json())
+        }
+
         setIsLoading(false)
       } catch (error) {
-        console.error('Error fetching products:', error)
+        console.error('Error fetching data:', error)
         setIsLoading(false)
       }
     }
 
-    fetchProducts()
+    fetchData()
   }, [])
 
   // Filter and sort products
   useEffect(() => {
-    let result = products
+    let result = [...products]
 
     // Filter by category
     if (selectedCategory) {
@@ -84,13 +121,11 @@ export default function ProductsPage() {
     setFilteredProducts(result)
   }, [products, selectedCategory, priceRange, searchQuery, sortBy])
 
-  const categories = Array.from(new Set(products.map((p) => p.category)))
-
   const handleReset = () => {
-    setSelectedCategory(null)
-    setPriceRange([0, 200000])
+    setPriceRange([0, 500000])
     setSearchQuery('')
     setSortBy('newest')
+    router.push('/products', { scroll: false })
   }
 
   const getSortLabel = () => {
@@ -103,138 +138,201 @@ export default function ProductsPage() {
     return labels[sortBy]
   }
 
+  const getCategoryName = (id: string) => {
+    return categories.find(c => c.id === id)?.name || id
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {/* Page Header */}
-        <div className="mb-10">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Sản phẩm</h1>
-              <p className="text-gray-600">Khám phá bộ sưu tập gia vị chất lượng cao của chúng tôi</p>
-            </div>
-            {!isLoading && (
-              <div className="text-right">
-                <p className="text-sm text-gray-500">
-                  Đang hiển thị <span className="font-bold text-violet-600">{filteredProducts.length}</span> sản phẩm
-                </p>
-              </div>
-            )}
-          </div>
-          
-          {/* Search Bar */}
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm theo tên..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 border-gray-300 bg-white text-base rounded-lg shadow-sm hover:shadow-md transition-shadow"
-            />
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Header */}
+      <div className="bg-[#a08679] py-12 md:py-20 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-2xl">
+            <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-[0.3em] mb-4 rounded-sm border border-white/20">
+              Thủy Hương Food
+            </span>
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase italic tracking-tighter leading-none">
+              Danh Mục <br /> <span className="text-amber-400 underline decoration-white/20 underline-offset-8">Sản Phẩm</span>
+            </h1>
+            <p className="text-white/80 text-lg md:text-xl font-medium max-w-lg leading-relaxed">
+              Khám phá nguồn nguyên liệu và gia vị thượng hạng, mang tinh hoa ẩm thực đến gian bếp của bạn.
+            </p>
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
           {/* Sidebar Filters */}
           <div className="lg:col-span-1">
             <ProductFilters
               categories={categories}
               selectedCategory={selectedCategory}
               priceRange={priceRange}
-              onCategoryChange={setSelectedCategory}
+              onCategoryChange={handleCategoryChange}
               onPriceChange={setPriceRange}
               onReset={handleReset}
             />
           </div>
 
           {/* Products Section */}
-          <div className="lg:col-span-3">
-            {/* Sort and View Controls */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-              <div className="relative">
-                <Button
-                  variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                  onClick={() => setShowSortMenu(!showSortMenu)}
-                >
-                  <span className="text-sm">Sắp xếp: <span className="font-semibold">{getSortLabel()}</span></span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${showSortMenu ? 'rotate-180' : ''}`} />
-                </Button>
-                
-                {/* Sort Menu */}
-                {showSortMenu && (
-                  <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                    {(
-                      [
-                        { value: 'newest', label: 'Mới nhất' },
-                        { value: 'price-low', label: 'Giá: Thấp → Cao' },
-                        { value: 'price-high', label: 'Giá: Cao → Thấp' },
-                        { value: 'name', label: 'Tên A-Z' }
-                      ] as Array<{ value: SortOption; label: string }>
-                    ).map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => {
-                          setSortBy(option.value)
-                          setShowSortMenu(false)
-                        }}
-                        className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                          sortBy === option.value
-                            ? 'bg-violet-50 text-violet-700 font-medium'
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+          <div className="lg:col-span-3 space-y-8">
+            {/* Search & Sort Bar */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center">
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Tìm sản phẩm bạn cần..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-12 h-12 border-gray-200 focus-visible:ring-[#a08679] text-sm font-bold rounded-xl w-full"
+                />
               </div>
 
-              {/* Active Filters Badge */}
-              {(selectedCategory || searchQuery || sortBy !== 'newest' || priceRange[0] > 0 || priceRange[1] < 200000) && (
+              <div className="flex items-center gap-3 w-full md:w-auto">
+                <div className="relative flex-1 md:flex-none">
+                  <Button
+                    variant="outline"
+                    className="w-full md:w-56 h-12 border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center justify-between px-4 rounded-xl font-bold"
+                    onClick={() => setShowSortMenu(!showSortMenu)}
+                  >
+                    <span className="text-xs uppercase tracking-wider opacity-50">Sắp xếp:</span>
+                    <span className="text-sm">{getSortLabel()}</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showSortMenu ? 'rotate-180' : ''}`} />
+                  </Button>
+
+                  {showSortMenu && (
+                    <div className="absolute top-full right-0 mt-2 w-full md:w-56 bg-white border border-gray-100 rounded-xl shadow-2xl z-20 overflow-hidden">
+                      {(
+                        [
+                          { value: 'newest', label: 'Mới nhất' },
+                          { value: 'price-low', label: 'Giá: Thấp → Cao' },
+                          { value: 'price-high', label: 'Giá: Cao → Thấp' },
+                          { value: 'name', label: 'Tên A-Z' }
+                        ] as Array<{ value: SortOption; label: string }>
+                      ).map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            setSortBy(option.value)
+                            setShowSortMenu(false)
+                          }}
+                          className={`block w-full text-left px-5 py-3 text-sm font-bold transition-colors ${
+                            sortBy === option.value
+                              ? 'bg-[#a08679] text-white'
+                              : 'text-gray-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="hidden sm:flex border border-gray-100 rounded-xl p-1 bg-gray-50">
+                  <Button size="icon" variant="ghost" className="h-10 w-10 bg-white shadow-sm text-[#a08679]">
+                    <LayoutGrid className="w-4 h-4" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-10 w-10 text-gray-400">
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Active Filters Summary */}
+            {(selectedCategory || searchQuery || sortBy !== 'newest') && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-black text-gray-400 uppercase tracking-widest mr-2">Đang lọc:</span>
+                {selectedCategory && (
+                  <span className="px-3 py-1.5 bg-[#a08679]/10 text-[#a08679] text-[10px] font-black uppercase rounded-full border border-[#a08679]/20">
+                    {getCategoryName(selectedCategory)}
+                  </span>
+                )}
+                {searchQuery && (
+                  <span className="px-3 py-1.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded-full border border-blue-100">
+                    Từ khóa: {searchQuery}
+                  </span>
+                )}
                 <button
                   onClick={handleReset}
-                  className="text-xs font-medium text-violet-600 hover:text-violet-700 hover:underline"
+                  className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline ml-auto"
                 >
                   Xóa tất cả bộ lọc
                 </button>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Products Grid */}
             {isLoading ? (
-              <div className="text-center py-16">
-                <div className="inline-block">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
-                  <p className="text-gray-500 mt-4">Đang tải sản phẩm...</p>
-                </div>
+              <div className="text-center py-32 flex flex-col items-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#a08679] border-t-transparent"></div>
+                <p className="text-gray-400 font-bold uppercase tracking-widest mt-6 text-xs">Đang tải tinh hoa ẩm thực...</p>
               </div>
             ) : filteredProducts.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy sản phẩm</h3>
-                <p className="text-gray-600 mb-6">
-                  Vui lòng thử lại với các bộ lọc khác hoặc từ khóa tìm kiếm
+              <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-gray-200">
+                <div className="text-6xl mb-6 opacity-20">🛒</div>
+                <h3 className="text-2xl font-black text-gray-900 mb-2 uppercase italic">Không tìm thấy sản phẩm</h3>
+                <p className="text-gray-500 font-medium mb-8">
+                  Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để tìm thấy thứ bạn cần.
                 </p>
                 <Button
                   onClick={handleReset}
-                  className="bg-violet-600 hover:bg-violet-700 text-white"
+                  className="bg-[#a08679] hover:bg-[#8c756a] text-white px-8 h-12 rounded-xl font-bold"
                 >
-                  Xóa bộ lọc
+                  Đặt lại toàn bộ
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
                 {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} {...product} />
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    name={product.name}
+                    price={product.price}
+                    originalPrice={product.originalPrice}
+                    image={product.image}
+                    category={getCategoryName(product.category)}
+                    stock={product.stock}
+                    unit={product.unit}
+                  />
                 ))}
+              </div>
+            )}
+
+            {/* Pagination Placeholder */}
+            {!isLoading && filteredProducts.length > 0 && (
+              <div className="flex justify-center pt-12 border-t border-gray-100 mt-12">
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" className="rounded-xl font-bold disabled:opacity-30" disabled>Trước</Button>
+                  <Button className="rounded-xl font-bold bg-[#a08679] hover:bg-[#8c756a] w-10 p-0">1</Button>
+                  <Button variant="ghost" className="rounded-xl font-bold w-10 p-0 text-gray-400">2</Button>
+                  <Button variant="ghost" className="rounded-xl font-bold w-10 p-0 text-gray-400">3</Button>
+                  <Button variant="outline" className="rounded-xl font-bold">Sau</Button>
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#a08679] border-t-transparent"></div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   )
 }

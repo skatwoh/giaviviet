@@ -46,7 +46,7 @@ export default function ProfilePage() {
   if (authLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-[#00483d]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#a08679]" />
       </div>
     )
   }
@@ -57,11 +57,11 @@ export default function ProfilePage() {
         {/* Sidebar */}
         <aside className="w-full md:w-64 space-y-4">
           <Card className="border-none shadow-sm overflow-hidden">
-            <div className="bg-[#00483d] h-20" />
+            <div className="bg-[#a08679] h-20" />
             <CardContent className="pt-0 -mt-10 text-center pb-6">
               <div className="relative inline-block">
                 <div className="w-20 h-20 rounded-full bg-white p-1 shadow-md">
-                  <div className="w-full h-full rounded-full bg-amber-100 flex items-center justify-center text-[#00483d] font-bold text-2xl">
+                  <div className="w-full h-full rounded-full bg-amber-100 flex items-center justify-center text-[#a08679] font-bold text-2xl">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                 </div>
@@ -75,7 +75,7 @@ export default function ProfilePage() {
           </Card>
 
           <nav className="space-y-1">
-            <Button variant="ghost" className="w-full justify-start text-[#00483d] font-medium" onClick={() => {}}>
+            <Button variant="ghost" className="w-full justify-start text-[#a08679] font-medium" onClick={() => {}}>
               <User className="mr-2 h-4 w-4" />
               Thông tin cá nhân
             </Button>
@@ -112,13 +112,13 @@ export default function ProfilePage() {
             <TabsList className="bg-transparent border-b w-full justify-start rounded-none h-auto p-0 mb-6">
               <TabsTrigger
                 value="info"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00483d] data-[state=active]:bg-transparent px-6 py-3"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#a08679] data-[state=active]:bg-transparent px-6 py-3"
               >
                 Hồ sơ của tôi
               </TabsTrigger>
               <TabsTrigger
                 value="orders"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00483d] data-[state=active]:bg-transparent px-6 py-3"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#a08679] data-[state=active]:bg-transparent px-6 py-3"
               >
                 Lịch sử mua hàng
               </TabsTrigger>
@@ -181,7 +181,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="flex justify-end pt-4 border-t">
-                      <Button type="submit" className="bg-[#00483d] hover:bg-[#00362e]" disabled={isUpdating}>
+                      <Button type="submit" className="bg-[#a08679] hover:bg-[#8c756a]" disabled={isUpdating}>
                         {isUpdating ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -207,7 +207,7 @@ export default function ProfilePage() {
                   </div>
                   <h3 className="font-medium text-gray-900">Bạn chưa có đơn hàng nào</h3>
                   <p className="text-sm text-gray-500 mt-1 mb-6">Hãy khám phá các sản phẩm tuyệt vời của chúng tôi.</p>
-                  <Button asChild className="bg-[#00483d] hover:bg-[#00362e]">
+                  <Button asChild className="bg-[#a08679] hover:bg-[#8c756a]">
                     <a href="/products">Mua sắm ngay</a>
                   </Button>
                 </CardContent>

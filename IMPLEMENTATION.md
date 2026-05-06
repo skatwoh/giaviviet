@@ -12,7 +12,7 @@
 - [x] Tạo JSON schema cho products, orders, messages
 - [x] Tạo 12 sản phẩm mẫu với đầy đủ thông tin
 - [x] Khởi tạo orders.json và messages.json trống
-- [x] Lưu trữ tại `/public/data/`
+- [x] Lưu trữ qua **Turso (LibSQL)**
 
 ### ✅ 2. API Routes
 - [x] `/api/products` - GET sản phẩm
@@ -290,7 +290,7 @@
 - **localStorage** - Persistent storage
 
 ### Data Storage
-- **JSON files** - `/public/data/`
+- **Turso (LibSQL)** - SQL database cho persistence
 - **Next.js API Routes** - Backend
 
 ### Tools & Utilities

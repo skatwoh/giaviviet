@@ -1,10 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { LayoutDashboard, Home, LogOut, Bell, Settings } from 'lucide-react'
+import { Home, LogOut, Bell, Settings, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/app/context/AuthContext'
 import { useRouter } from 'next/navigation'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
 
 export function AdminHeader() {
   const { logout } = useAuth()
@@ -17,12 +19,18 @@ export function AdminHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4">
-          <Link href="/admin" className="flex items-center gap-2 font-bold text-xl text-amber-700">
-            <LayoutDashboard className="h-6 w-6" />
-            <span className="hidden sm:inline-block">Hải Trang Admin</span>
-          </Link>
+      <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-4 flex-1">
+          <SidebarTrigger className="-ml-1 h-8 w-8 text-[#a08679]" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          <div className="relative max-w-md w-full hidden md:block">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <input
+              type="search"
+              placeholder="Tìm kiếm hệ thống..."
+              className="w-full bg-gray-50 rounded-lg pl-9 pr-4 py-2 text-sm border-none focus:ring-1 focus:ring-[#a08679] transition-all"
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
@@ -40,7 +48,7 @@ export function AdminHeader() {
             <Button variant="ghost" size="icon" className="text-gray-500">
               <Settings className="h-5 w-5" />
             </Button>
-            <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs border border-amber-200">
+            <div className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center text-[#a08679] font-bold text-xs border border-gray-200">
               AD
             </div>
             <Button
